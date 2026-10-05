@@ -8,6 +8,9 @@
                     <a href="{{ route('dashboard') }}">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                     </a>
+                    @if (Auth::user()->company)
+                        <span class="ms-3 font-semibold text-gray-800">{{ Auth::user()->company->name }}</span>
+                    @endif
                 </div>
 
                 <!-- Navigation Links -->
@@ -15,6 +18,16 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    @if (Auth::user()->isSuperAdmin())
+                        <x-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
+                            الشركات
+                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()->isOwner())
+                        <x-nav-link :href="route('warehouses.index')" :active="request()->routeIs('warehouses.*')">
+                            المستودعات
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -70,6 +83,16 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            @if (Auth::user()->isSuperAdmin())
+                <x-responsive-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
+                    الشركات
+                </x-responsive-nav-link>
+            @endif
+            @if (Auth::user()->isOwner())
+                <x-responsive-nav-link :href="route('warehouses.index')" :active="request()->routeIs('warehouses.*')">
+                    المستودعات
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

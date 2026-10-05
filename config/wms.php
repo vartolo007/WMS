@@ -24,4 +24,12 @@ return [
 
     'default_color' => '#1F4E79',
 
+    /*
+    | Platform owner (super admin) created by SuperAdminSeeder.
+    */
+    'admin' => [
+        'email' => env('ADMIN_EMAIL'),
+        'password' => env('ADMIN_PASSWORD'),
+    ],
+
 ];
