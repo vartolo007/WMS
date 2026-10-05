@@ -18,5 +18,5 @@ test('validation messages are in Arabic', function () {
 
 test('failed login message is in Arabic', function () {
     $this->post('/login', ['email' => 'nobody@example.com', 'password' => 'wrong-password'])
-        ->assertSessionHasErrors(['email' => 'بيانات الدخول غير صحيحة.']);
+        ->assertSessionHasErrors(['login' => 'بيانات الدخول غير صحيحة.']);
 });

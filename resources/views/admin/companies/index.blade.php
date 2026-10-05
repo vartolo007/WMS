@@ -1,87 +1,73 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">الشركات</h2>
-    </x-slot>
+<x-app-layout title="الشركات">
+    <div class="flex flex-col gap-6">
+        <x-ui.page-header title="الشركات" subtitle="الاشتراكات وحالاتها. الشركات اللي انتهت تجربتها مميّزة للتواصل معها." />
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
-            @if (session('status'))
-                <div class="p-3 rounded-md bg-green-50 text-green-800 text-sm">{{ session('status') }}</div>
-            @endif
+        @if ($errors->any())
+            <x-ui.alert>{{ $errors->first() }}</x-ui.alert>
+        @endif
 
-            @if ($errors->any())
-                <div class="p-3 rounded-md bg-red-50 text-red-800 text-sm">{{ $errors->first() }}</div>
-            @endif
-
-            <div class="bg-white shadow-sm sm:rounded-lg overflow-x-auto">
-                <table class="min-w-full text-sm text-start">
-                    <thead class="bg-gray-50 text-gray-600">
-                        <tr>
-                            <th class="px-4 py-3 text-start font-medium">الشركة</th>
-                            <th class="px-4 py-3 text-start font-medium">صاحب الشركة</th>
-                            <th class="px-4 py-3 text-start font-medium">الحالة</th>
-                            <th class="px-4 py-3 text-start font-medium">نهاية التجربة</th>
-                            <th class="px-4 py-3 text-start font-medium">الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        @forelse ($companies as $company)
-                            <tr @class(['bg-amber-50' => $company->isTrialExpired()])>
-                                <td class="px-4 py-3 font-medium text-gray-900">{{ $company->name }}</td>
-                                <td class="px-4 py-3 text-gray-700">
-                                    {{ $company->owner?->name }}
-                                    <div class="text-xs text-gray-500" dir="ltr">{{ $company->owner?->email }}</div>
-                                </td>
-                                <td class="px-4 py-3">
-                                    <span @class([
-                                        'px-2 py-1 rounded-full text-xs',
-                                        'bg-gray-100 text-gray-700' => $company->status === \App\Enums\CompanyStatus::Trial,
-                                        'bg-green-100 text-green-800' => $company->status === \App\Enums\CompanyStatus::Active,
-                                        'bg-red-100 text-red-800' => $company->status === \App\Enums\CompanyStatus::Suspended,
-                                    ])>{{ $company->status->label() }}</span>
-                                </td>
-                                <td class="px-4 py-3 text-gray-700">
-                                    <span dir="ltr">{{ $company->trial_ends_at->format('Y-m-d') }}</span>
-                                    @if ($company->isTrialExpired())
-                                        <div class="text-xs text-amber-700">انتهت التجربة</div>
+        @if ($companies->isEmpty())
+            <x-ui.empty-state title="ما في شركات بعد" description="أول ما تسجّل شركة من صفحة التسجيل بتظهر هون." />
+        @else
+            <x-ui.table>
+                <thead>
+                    <tr>
+                        <x-ui.th>الشركة</x-ui.th>
+                        <x-ui.th>صاحب الشركة</x-ui.th>
+                        <x-ui.th>الحالة</x-ui.th>
+                        <x-ui.th>نهاية التجربة</x-ui.th>
+                        <x-ui.th></x-ui.th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($companies as $company)
+                        <tr @class(['bg-amber-50' => $company->isTrialExpired()])>
+                            <x-ui.td class="font-medium">{{ $company->name }}</x-ui.td>
+                            <x-ui.td>
+                                {{ $company->owner?->name }}
+                                <div class="text-[13px] text-muted" dir="ltr">{{ $company->owner?->email }}</div>
+                            </x-ui.td>
+                            <x-ui.td><x-ui.badge :tone="$company->status->tone()">{{ $company->status->label() }}</x-ui.badge></x-ui.td>
+                            <x-ui.td class="whitespace-nowrap text-muted">
+                                {{ \App\Support\Format::date($company->trial_ends_at) }}
+                                @if ($company->isTrialExpired())
+                                    <div class="text-[13px] font-medium text-warning">انتهت التجربة</div>
+                                @endif
+                            </x-ui.td>
+                            <x-ui.td class="text-left">
+                                <div class="inline-flex flex-wrap items-center gap-1.5">
+                                    @if ($company->status !== \App\Enums\CompanyStatus::Active)
+                                        <form method="POST" action="{{ route('admin.companies.activate', $company) }}">
+                                            @csrf @method('PATCH')
+                                            <x-ui.button size="sm">تفعيل</x-ui.button>
+                                        </form>
                                     @endif
-                                </td>
-                                <td class="px-4 py-3">
-                                    <div class="flex flex-wrap items-center gap-2">
-                                        @if ($company->status !== \App\Enums\CompanyStatus::Active)
-                                            <form method="POST" action="{{ route('admin.companies.activate', $company) }}">
-                                                @csrf @method('PATCH')
-                                                <x-primary-button>تفعيل</x-primary-button>
-                                            </form>
-                                        @endif
 
-                                        @if ($company->status !== \App\Enums\CompanyStatus::Suspended)
-                                            <form method="POST" action="{{ route('admin.companies.suspend', $company) }}">
-                                                @csrf @method('PATCH')
-                                                <x-danger-button>إيقاف</x-danger-button>
-                                            </form>
-                                        @endif
+                                    @if ($company->status !== \App\Enums\CompanyStatus::Active)
+                                        <form method="POST" action="{{ route('admin.companies.extend-trial', $company) }}" class="inline-flex items-center gap-1">
+                                            @csrf @method('PATCH')
+                                            <input type="number" name="days" min="1" max="365" value="{{ config('wms.trial_days') }}" dir="ltr" aria-label="عدد الأيام"
+                                                   class="h-8 w-16 rounded-md border-line-strong px-2 text-[13px] tabular-nums focus:border-primary focus:ring-primary-ring">
+                                            <x-ui.button size="sm" variant="secondary">تمديد</x-ui.button>
+                                        </form>
+                                    @endif
 
-                                        @if ($company->status !== \App\Enums\CompanyStatus::Active)
-                                            <form method="POST" action="{{ route('admin.companies.extend-trial', $company) }}" class="flex items-center gap-1">
-                                                @csrf @method('PATCH')
-                                                <x-text-input type="number" name="days" min="1" max="365" class="w-20 text-sm" :value="config('wms.trial_days')" required />
-                                                <x-secondary-button type="submit">تمديد</x-secondary-button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-4 py-6 text-center text-gray-500">لا توجد شركات بعد.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                                    @if ($company->status !== \App\Enums\CompanyStatus::Suspended)
+                                        <x-ui.confirm :title="'إيقاف '.$company->name.'؟'" :action="route('admin.companies.suspend', $company)" method="PATCH" confirm-label="نعم، أوقف الشركة">
+                                            <x-slot:trigger>
+                                                <x-ui.button size="sm" variant="ghost" type="button" class="!text-danger">إيقاف</x-ui.button>
+                                            </x-slot:trigger>
+                                            صاحب الشركة وكل مستودعاتها ما رح يقدروا يدخلوا. البيانات ما بتنحذف، وبترجع كاملة عند التفعيل.
+                                        </x-ui.confirm>
+                                    @endif
+                                </div>
+                            </x-ui.td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </x-ui.table>
 
             {{ $companies->links() }}
-        </div>
+        @endif
     </div>
 </x-app-layout>

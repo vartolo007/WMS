@@ -50,36 +50,27 @@ test('email verification status is unchanged when the email address is unchanged
     $this->assertNotNull($user->refresh()->email_verified_at);
 });
 
-test('user can delete their account', function () {
+test('every role can open the profile page', function (string $state) {
+    $user = $state === 'owner' ? User::factory()->create() : User::factory()->{$state}()->create();
+
+    $this->actingAs($user)->get('/profile')->assertOk()->assertSee('الملف الشخصي');
+})->with(['owner', 'warehouse', 'superAdmin']);
+
+test('the profile email must stay unique on the platform', function () {
+    User::factory()->create(['email' => 'taken@example.com']);
     $user = User::factory()->create();
 
-    $response = $this
-        ->actingAs($user)
-        ->delete('/profile', [
-            'password' => 'password',
-        ]);
-
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect('/');
-
-    $this->assertGuest();
-    $this->assertNull($user->fresh());
+    $this->actingAs($user)
+        ->patch('/profile', ['name' => $user->name, 'email' => 'taken@example.com'])
+        ->assertSessionHasErrors('email');
 });
 
-test('correct password must be provided to delete account', function () {
+test('accounts cannot be deleted from the profile (T12)', function () {
     $user = User::factory()->create();
 
-    $response = $this
-        ->actingAs($user)
-        ->from('/profile')
-        ->delete('/profile', [
-            'password' => 'wrong-password',
-        ]);
+    $this->actingAs($user)
+        ->delete('/profile', ['password' => 'password'])
+        ->assertMethodNotAllowed();
 
-    $response
-        ->assertSessionHasErrorsIn('userDeletion', 'password')
-        ->assertRedirect('/profile');
-
-    $this->assertNotNull($user->fresh());
+    expect($user->fresh())->not->toBeNull();
 });

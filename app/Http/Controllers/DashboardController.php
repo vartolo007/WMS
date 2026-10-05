@@ -22,7 +22,10 @@ class DashboardController extends Controller
                 'counts' => Company::toBase()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
                 'expiredTrials' => Company::where('status', CompanyStatus::Trial)->whereDate('trial_ends_at', '<', today())->count(),
             ]),
-            Role::Owner => view('dashboard.owner', ['company' => $user->company]),
+            Role::Owner => view('dashboard.owner', [
+                'company' => $user->company,
+                'hasWarehouses' => $user->company->warehouses()->exists(),
+            ]),
             Role::Warehouse => view('dashboard.warehouse'),
         };
     }

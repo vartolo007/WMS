@@ -1,21 +1,17 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">تعديل المستودع: {{ $warehouse->name }}</h2>
-    </x-slot>
+<x-app-layout :title="'تعديل '.$warehouse->name">
+    <div class="flex max-w-2xl flex-col gap-6">
+        <x-ui.page-header :title="'تعديل '.$warehouse->name" />
 
-    <div class="py-8">
-        <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
-            <form method="POST" action="{{ route('warehouses.update', $warehouse) }}" class="bg-white shadow-sm sm:rounded-lg p-6">
-                @csrf
-                @method('PUT')
+        <form method="POST" action="{{ route('warehouses.update', $warehouse) }}" class="flex flex-col gap-5 rounded-xl border border-line bg-white p-6">
+            @csrf
+            @method('PUT')
 
-                @include('warehouses.partials.form', ['warehouse' => $warehouse])
+            @include('warehouses.partials.form', ['warehouse' => $warehouse])
 
-                <div class="flex items-center justify-end gap-3 mt-6">
-                    <a href="{{ route('warehouses.index') }}" class="text-sm text-gray-600 underline">{{ __('Cancel') }}</a>
-                    <x-primary-button>{{ __('Save') }}</x-primary-button>
-                </div>
-            </form>
-        </div>
+            <div class="flex gap-2">
+                <x-ui.button>حفظ</x-ui.button>
+                <x-ui.button variant="secondary" :href="route('warehouses.index')">إلغاء</x-ui.button>
+            </div>
+        </form>
     </div>
 </x-app-layout>

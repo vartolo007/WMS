@@ -25,6 +25,6 @@ class EnsureSubscriptionActive
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')->withErrors(['email' => trans($reason)]);
+        return redirect()->route('login')->withErrors(['login' => trans($reason)]);
     }
 }

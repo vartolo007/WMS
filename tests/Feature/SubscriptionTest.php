@@ -14,7 +14,7 @@ test('users of a suspended company cannot log in', function () {
     $warehouse = User::factory()->warehouse()->for($company)->create();
 
     foreach ([$owner, $warehouse] as $user) {
-        attemptLogin($user)->assertSessionHasErrors(['email' => trans('auth.suspended')]);
+        attemptLogin($user)->assertSessionHasErrors(['login' => trans('auth.suspended')]);
         $this->assertGuest();
     }
 });
@@ -22,7 +22,7 @@ test('users of a suspended company cannot log in', function () {
 test('a deactivated warehouse cannot log in', function () {
     $warehouse = User::factory()->warehouse()->inactive()->create();
 
-    attemptLogin($warehouse)->assertSessionHasErrors(['email' => trans('auth.inactive')]);
+    attemptLogin($warehouse)->assertSessionHasErrors(['login' => trans('auth.inactive')]);
     $this->assertGuest();
 });
 
@@ -41,7 +41,7 @@ test('an open session ends when the company is suspended', function () {
 
     $this->get('/dashboard')
         ->assertRedirect(route('login'))
-        ->assertSessionHasErrors(['email' => trans('auth.suspended')]);
+        ->assertSessionHasErrors(['login' => trans('auth.suspended')]);
     $this->assertGuest();
 });
 

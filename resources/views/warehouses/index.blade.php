@@ -1,61 +1,53 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">المستودعات</h2>
-            <a href="{{ route('warehouses.create') }}" class="px-4 py-2 rounded-md bg-primary text-white text-sm hover:bg-primary-dark">مستودع جديد</a>
-        </div>
-    </x-slot>
+<x-app-layout title="المستودعات">
+    <div class="flex flex-col gap-6">
+        <x-ui.page-header title="المستودعات" subtitle="لكل مستودع حساب دخول خاص. المستودع الموقوف ما بيقدر يدخل، وبتضل حركاته ظاهرة إلك.">
+            <x-ui.button :href="route('warehouses.create')">+ مستودع جديد</x-ui.button>
+        </x-ui.page-header>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
-            @if (session('status'))
-                <div class="p-3 rounded-md bg-green-50 text-green-800 text-sm">{{ session('status') }}</div>
-            @endif
-
-            <div class="bg-white shadow-sm sm:rounded-lg overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead class="bg-gray-50 text-gray-600">
-                        <tr>
-                            <th class="px-4 py-3 text-start font-medium">المستودع</th>
-                            <th class="px-4 py-3 text-start font-medium">البريد الإلكتروني</th>
-                            <th class="px-4 py-3 text-start font-medium">الحالة</th>
-                            <th class="px-4 py-3 text-start font-medium">الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        @forelse ($warehouses as $warehouse)
-                            <tr>
-                                <td class="px-4 py-3 font-medium text-gray-900">{{ $warehouse->name }}</td>
-                                <td class="px-4 py-3 text-gray-700" dir="ltr">{{ $warehouse->email }}</td>
-                                <td class="px-4 py-3">
-                                    <span @class([
-                                        'px-2 py-1 rounded-full text-xs',
-                                        'bg-green-100 text-green-800' => $warehouse->is_active,
-                                        'bg-red-100 text-red-800' => ! $warehouse->is_active,
-                                    ])>{{ $warehouse->is_active ? 'فعّال' : 'موقوف' }}</span>
-                                </td>
-                                <td class="px-4 py-3">
-                                    <div class="flex items-center gap-2">
-                                        <a href="{{ route('warehouses.edit', $warehouse) }}" class="text-primary hover:text-primary-dark underline">تعديل</a>
+        @if ($warehouses->isEmpty())
+            <x-ui.empty-state title="ما في مستودعات بعد" description="أنشئ حساب لكل مستودع، مثلاً مستودع المدينة ومستودع الريف.">
+                <x-ui.button :href="route('warehouses.create')">+ مستودع جديد</x-ui.button>
+            </x-ui.empty-state>
+        @else
+            <x-ui.table>
+                <thead>
+                    <tr>
+                        <x-ui.th>المستودع</x-ui.th>
+                        <x-ui.th>البريد الإلكتروني</x-ui.th>
+                        <x-ui.th>الحالة</x-ui.th>
+                        <x-ui.th></x-ui.th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($warehouses as $warehouse)
+                        <tr @class(['text-subtle' => ! $warehouse->is_active])>
+                            <x-ui.td class="font-medium">{{ $warehouse->name }}</x-ui.td>
+                            <x-ui.td><span dir="ltr">{{ $warehouse->email }}</span></x-ui.td>
+                            <x-ui.td>
+                                <x-ui.badge :tone="$warehouse->is_active ? 'success' : 'danger'">{{ $warehouse->is_active ? 'فعّال' : 'موقوف' }}</x-ui.badge>
+                            </x-ui.td>
+                            <x-ui.td class="whitespace-nowrap text-left">
+                                <div class="inline-flex items-center gap-1">
+                                    <x-ui.button size="sm" variant="ghost" :href="route('warehouses.edit', $warehouse)">تعديل</x-ui.button>
+                                    @if ($warehouse->is_active)
+                                        <x-ui.confirm :title="'إيقاف '.$warehouse->name.'؟'" :action="route('warehouses.toggle', $warehouse)" method="PATCH" confirm-label="نعم، أوقفه">
+                                            <x-slot:trigger>
+                                                <x-ui.button size="sm" variant="ghost" type="button" class="!text-danger">إيقاف</x-ui.button>
+                                            </x-slot:trigger>
+                                            حساب المستودع ما رح يقدر يدخل. حركاته وأرصدته بتضل محفوظة وظاهرة إلك، وفيك ترجّع تفعّله بأي وقت.
+                                        </x-ui.confirm>
+                                    @else
                                         <form method="POST" action="{{ route('warehouses.toggle', $warehouse) }}">
                                             @csrf @method('PATCH')
-                                            @if ($warehouse->is_active)
-                                                <x-danger-button>إيقاف</x-danger-button>
-                                            @else
-                                                <x-secondary-button type="submit">تفعيل</x-secondary-button>
-                                            @endif
+                                            <x-ui.button size="sm" variant="ghost">تفعيل</x-ui.button>
                                         </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="px-4 py-6 text-center text-gray-500">لا توجد مستودعات بعد. ابدأ بإنشاء أول مستودع.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                                    @endif
+                                </div>
+                            </x-ui.td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </x-ui.table>
+        @endif
     </div>
 </x-app-layout>

@@ -1,25 +1,22 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
-
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    <form method="POST" action="{{ route('password.email') }}">
+    <form method="POST" action="{{ route('password.email') }}" class="flex flex-col gap-5">
         @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <div class="flex flex-col gap-1.5">
+            <h1 class="text-2xl font-bold sm:text-[28px]">نسيت كلمة المرور؟</h1>
+            <span class="text-[15px] leading-7 text-muted">اكتب بريدك ومنبعتلك رابط لتختار كلمة مرور جديدة.</span>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
+        @if (session('status'))
+            <x-ui.alert tone="success">{{ session('status') }}</x-ui.alert>
+        @endif
+
+        <x-ui.input name="email" type="email" label="البريد الإلكتروني" size="lg" ltr required autofocus autocomplete="username" placeholder="name@company.com" />
+
+        <x-ui.button size="lg" class="w-full">إرسال رابط إعادة التعيين</x-ui.button>
+
+        <div class="text-center text-[15px] text-muted">
+            <a href="{{ route('login') }}" class="font-medium text-primary hover:underline">رجوع لتسجيل الدخول</a>
         </div>
     </form>
 </x-guest-layout>

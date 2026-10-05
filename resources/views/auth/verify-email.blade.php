@@ -1,31 +1,22 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
-    </div>
-
-    @if (session('status') == 'verification-link-sent')
-        <div class="mb-4 font-medium text-sm text-green-600">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
+    <div class="flex flex-col gap-5">
+        <div class="flex flex-col gap-1.5">
+            <h1 class="text-2xl font-bold sm:text-[28px]">تأكيد البريد</h1>
+            <span class="text-[15px] leading-7 text-muted">بعتنالك رابط على بريدك. اضغط عليه لتأكيد الحساب، وإذا ما وصلك منبعتلك غيره.</span>
         </div>
-    @endif
 
-    <div class="mt-4 flex items-center justify-between">
+        @if (session('status') == 'verification-link-sent')
+            <x-ui.alert tone="success">تم إرسال رابط تحقق جديد إلى بريدك.</x-ui.alert>
+        @endif
+
         <form method="POST" action="{{ route('verification.send') }}">
             @csrf
-
-            <div>
-                <x-primary-button>
-                    {{ __('Resend Verification Email') }}
-                </x-primary-button>
-            </div>
+            <x-ui.button size="lg" class="w-full">إعادة إرسال الرابط</x-ui.button>
         </form>
 
-        <form method="POST" action="{{ route('logout') }}">
+        <form method="POST" action="{{ route('logout') }}" class="text-center">
             @csrf
-
-            <button type="submit" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                {{ __('Log Out') }}
-            </button>
+            <button type="submit" class="text-[15px] font-medium text-muted hover:text-ink">تسجيل الخروج</button>
         </form>
     </div>
 </x-guest-layout>

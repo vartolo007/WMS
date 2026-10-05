@@ -1,29 +1,37 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+<x-app-layout title="الملف الشخصي">
+    <div class="flex max-w-2xl flex-col gap-6">
+        <x-ui.page-header title="الملف الشخصي" subtitle="اسمك وبريدك وكلمة المرور" />
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
-            </div>
+        <section class="rounded-xl border border-line bg-white p-6">
+            <h2 class="mb-5 text-xl font-semibold">معلومات الحساب</h2>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
-            </div>
+            <form method="POST" action="{{ route('profile.update') }}" class="flex flex-col gap-5">
+                @csrf
+                @method('PATCH')
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
+                <x-ui.input name="name" label="الاسم" :value="$user->name" required autocomplete="name" />
+                <x-ui.input name="email" type="email" label="البريد الإلكتروني" :value="$user->email" ltr required autocomplete="username" />
+
+                <div><x-ui.button>حفظ</x-ui.button></div>
+            </form>
+        </section>
+
+        <section class="rounded-xl border border-line bg-white p-6">
+            <h2 class="mb-1 text-xl font-semibold">تغيير كلمة المرور</h2>
+            <p class="mb-5 text-sm text-muted">تغيير كلمة المرور بيحتاج كلمة المرور الحالية.</p>
+
+            <form method="POST" action="{{ route('password.update') }}" class="flex flex-col gap-5">
+                @csrf
+                @method('PUT')
+
+                <x-ui.input name="current_password" type="password" label="كلمة المرور الحالية" bag="updatePassword" autocomplete="current-password" />
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <x-ui.input name="password" type="password" label="كلمة المرور الجديدة" bag="updatePassword" autocomplete="new-password" />
+                    <x-ui.input name="password_confirmation" type="password" label="تأكيد كلمة المرور" bag="updatePassword" autocomplete="new-password" />
                 </div>
-            </div>
-        </div>
+
+                <div><x-ui.button>تغيير كلمة المرور</x-ui.button></div>
+            </form>
+        </section>
     </div>
 </x-app-layout>

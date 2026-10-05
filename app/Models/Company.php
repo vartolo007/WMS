@@ -52,4 +52,12 @@ class Company extends Model
     {
         return $this->status === CompanyStatus::Trial && $this->trial_ends_at->lt(today());
     }
+
+    /**
+     * Whole days left in the trial, never negative (0 on the last day and after).
+     */
+    public function trialDaysLeft(): int
+    {
+        return max(0, (int) today()->diffInDays($this->trial_ends_at, false));
+    }
 }

@@ -3,21 +3,23 @@
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\WarehouseContextController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// No landing page in the design: go straight to the dashboard or the login.
+Route::redirect('/', '/dashboard');
 
 Route::middleware(['auth', 'subscription'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
+    // FR-26. No account deletion: nothing is hard-deleted (T12).
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::middleware('role:owner')->group(function () {
+        Route::post('/warehouse-context', WarehouseContextController::class)->name('warehouse-context');
+
         Route::get('/warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
         Route::get('/warehouses/create', [WarehouseController::class, 'create'])->name('warehouses.create');
         Route::post('/warehouses', [WarehouseController::class, 'store'])->name('warehouses.store');

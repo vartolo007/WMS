@@ -29,6 +29,14 @@ class RegisterCompanyRequest extends FormRequest
     /**
      * @return array<string, string>
      */
+    public function messages(): array
+    {
+        return ['email.unique' => 'هالبريد مسجّل من قبل. سجّل دخول بداله.'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
     public function attributes(): array
     {
         return [
