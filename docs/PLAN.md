@@ -1,6 +1,6 @@
 # Implementation Plan
 
-**Current phase: 1**
+**Current phase: 2**
 
 Each phase: plan mode → user approval → code + tests → `php artisan test` and `pint` green → tick tasks → log line.
 
@@ -15,14 +15,14 @@ Each phase: plan mode → user approval → code + tests → `php artisan test` 
 **Done when:** the app runs, login page renders in Arabic RTL, `php artisan test` passes.
 
 ## Phase 1 — Platform, tenancy, roles (FR-01 → FR-06)
-- [ ] Enums: Role, CompanyStatus
-- [ ] Migrations + models: companies, users changes (company_id, role, is_active)
-- [ ] `BelongsToCompany` trait (applied to tenant models as they are created)
-- [ ] Company registration: Company (trial) + owner User in one transaction
-- [ ] `EnsureSubscriptionActive`, `EnsureRole` middleware
-- [ ] Super admin seeder; admin page: list companies, activate / suspend / extend trial
-- [ ] Owner: create / edit / deactivate warehouse users
-- [ ] Role-based dashboards (empty shells)
+- [x] Enums: Role, CompanyStatus
+- [x] Migrations + models: companies, users changes (company_id, role, is_active)
+- [x] `BelongsToCompany` trait (applied to tenant models as they are created)
+- [x] Company registration: Company (trial) + owner User in one transaction
+- [x] `EnsureSubscriptionActive`, `EnsureRole` middleware
+- [x] Super admin seeder; admin page: list companies, activate / suspend / extend trial
+- [x] Owner: create / edit / deactivate warehouse users
+- [x] Role-based dashboards (empty shells)
 
 **Done when:** a company registers, creates warehouses, a suspended company is blocked,
 and tests prove company A cannot see company B's users or data.
@@ -86,3 +86,10 @@ changing the colour changes the UI for all company users, an SVG logo is rejecte
 2026-10-05 — 0 — `APP_TIMEZONE` from env, `.env.example` (MySQL, ADMIN_*, WMS_TRIAL_DAYS), tests on `wms_testing`
 2026-10-05 — 0 — composer authors + Arabic README; leftovers and Sanctum removed
 2026-10-05 — 0 — Git initialised, first commit; 30 tests pass, Pint clean
+2026-10-05 — 1 — Enums Role, CompanyStatus; companies migration + users company_id/role/is_active
+2026-10-05 — 1 — `BelongsToCompany` + `CompanyScope` (fail safe `1 = 0`), tested on a temporary table
+2026-10-05 — 1 — Registration creates a trial company + owner in one transaction (`CompanyRegistrationService`)
+2026-10-05 — 1 — `EnsureSubscriptionActive` + login check via `User::accessBlockReason()`; `EnsureRole`
+2026-10-05 — 1 — Super admin seeder; admin companies page: activate / suspend / extend trial
+2026-10-05 — 1 — Owner manages warehouse accounts (create / edit / deactivate, no delete) with `UserPolicy`
+2026-10-05 — 1 — Role dashboards (shells) and role-based navigation; 76 tests pass, Pint clean

@@ -52,3 +52,8 @@ Add new decisions here: `YYYY-MM-DD — decision — reason`.
 - 2026-10-05 — Removed `tracking-widest` / `uppercase` from Breeze buttons — letter spacing breaks Arabic letter joining.
 - 2026-10-05 — `users` keeps Laravel's `email_verified_at` and `remember_token` (added to schema.json) — needed by Breeze ("remember me", optional email verification); approved by the user.
 - 2026-10-05 — Breeze "delete account" stays until Phase 2 (FR-26) — user's choice; until then an owner deleting their account leaves the company without an owner.
+- 2026-10-05 — One rule for "may this user use the system": `User::accessBlockReason()` (inactive account or suspended company; super admin never blocked), used by login and by `EnsureSubscriptionActive` — the same rule cannot drift between the two places.
+- 2026-10-05 — Extending a trial starts from the later of today and the current end date, sets status back to trial, and is refused for an active company — the admin page offers it only for trial / suspended companies.
+- 2026-10-05 — `BelongsToCompany` tests use a TEMPORARY table — CREATE/DROP TABLE implicitly commits the RefreshDatabase transaction in MySQL.
+- 2026-10-05 — Local `DemoSeeder` (APP_ENV=local only) with demo accounts, password "password" — fast manual testing; never runs in production.
+- 2026-10-05 — New UI text is written in Arabic directly in views; `__()` + `lang/ar.json` stays for Breeze strings.
