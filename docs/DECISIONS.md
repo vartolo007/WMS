@@ -33,6 +33,7 @@ Anything else → ask first.
 | Q2 | Who can add products and parties? | Owner and warehouses | Non-blocking: implement in one Policy method so it can be flipped | Phase 2 |
 | Q3 | Does the receiving warehouse confirm a transfer? | No, immediate | ⚠ BLOCKED | Phase 6 (transfer) |
 | Q4 | Trial period length? | `config('wms.trial_days', 14)` | Non-blocking: config value | Phase 1 |
+| Q7 | Platform name? (design uses the placeholder "رفّ") | `config('app.name')`, currently `WMS` | Non-blocking: one config value, shown on login / register / admin bar | Phase 2 |
 | Q6 | Product location per warehouse? (shared catalog, but shelves differ per warehouse) | One general `location` per product | Non-blocking: a per-warehouse location would need a new product–warehouse table | Phase 2 |
 | Q5 | Cancelling a posted movement: delete its `operations` rows or add reversing rows? | Delete rows | ⚠ BLOCKED | Phase 6 (cancel), `PostingService::unpost()` |
 
@@ -57,3 +58,16 @@ Add new decisions here: `YYYY-MM-DD — decision — reason`.
 - 2026-10-05 — `BelongsToCompany` tests use a TEMPORARY table — CREATE/DROP TABLE implicitly commits the RefreshDatabase transaction in MySQL.
 - 2026-10-05 — Local `DemoSeeder` (APP_ENV=local only) with demo accounts, password "password" — fast manual testing; never runs in production.
 - 2026-10-05 — New UI text is written in Arabic directly in views; `__()` + `lang/ar.json` stays for Breeze strings.
+- 2026-10-05 — UI follows `docs/design/` (design batch 1 in `01-design-system/`); where it contradicts the SRS, the SRS wins — the design is a prototype, the SRS is the approved requirement.
+- 2026-10-05 — Font changes from Cairo to IBM Plex Sans Arabic — the approved design uses it (supersedes the Cairo decision).
+- 2026-10-05 — Neutral and semantic colours (ink, muted, borders, success, warning, danger, badge colours) become fixed Tailwind tokens; only `--color-primary` varies per company — rule 10 bans hard-coded brand colours, not neutrals.
+- 2026-10-05 — Login and register use `var(--color-primary)` (the default colour before login) instead of the design's hard-coded `#1F4E79` — rule 10.
+- 2026-10-05 — Owner warehouse selector: selection stored in the session, filters lists and reports; "all warehouses" is not valid for creating a movement, the owner picks one (FR-05).
+- 2026-10-05 — Movement number prefixes (S-, P-, …) are display only and live in `MovementType` — the schema keeps an unsigned int number (rule 4).
+- 2026-10-05 — Movements list shows the number of items, not a total quantity — quantities of different units cannot be summed (design deviation).
+- 2026-10-05 — Cancel confirmation text must describe the real stock effect per movement type, and the cancel action is hidden where the SRS refuses it (invoice with active returns); cancellation itself stays ⚠ BLOCKED (Q5).
+- 2026-10-05 — No "terms of use" link on register — not in the SRS (design deviation).
+- 2026-10-05 — Trial length on the register page comes from `config('wms.trial_days')`, never hard-coded (Q4).
+- 2026-10-05 — Dates shown with Levantine month names (تشرين الأول …) as in the design, via one formatting helper.
+- 2026-10-05 — The design's "delete" button is used only to remove an invoice line before saving — records are never deleted (T12).
+- 2026-10-05 — Quick-add of a party from inside an invoice (design) is deferred to Phase 3 and follows Q2 — not required by the SRS.

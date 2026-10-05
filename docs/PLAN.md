@@ -28,15 +28,22 @@ Each phase: plan mode → user approval → code + tests → `php artisan test` 
 and tests prove company A cannot see company B's users or data.
 
 ## Phase 2 — Master data and settings (FR-07 → FR-09, FR-25, FR-26)
+- [ ] App shell and design system from `docs/design/01-design-system/` (design batch 1): Tailwind tokens,
+      IBM Plex Sans Arabic, Blade components (button, input, select, badge, table, modal, toast, empty state),
+      right sidebar per role (owner / warehouse / super admin), top bar, Alpine mobile menu
+- [ ] Owner warehouse selector in the top bar, kept in the session (filters lists and reports;
+      "all warehouses" is not valid when creating a movement)
+- [ ] Login and register redesigned per the design (trial days from config, no terms link)
 - [ ] products (barcode unique per company, location, min_stock, is_active)
 - [ ] parties (customer / supplier, is_active)
 - [ ] Company settings page (FR-25): name, logo upload, palette colour, currency symbol, markup_percent
 - [ ] Currency formatting component used for every amount
-- [ ] Profile page (FR-26) available to all roles
+- [ ] Profile page (FR-26) available to all roles; remove Breeze "delete account"
 - [ ] Policies (Q2 default: owner and warehouses can manage products and parties)
 - [ ] Search products by name / barcode
 
-**Done when:** CRUD works, barcode uniqueness is per company, isolation tests pass,
+**Done when:** every screen uses the design batch 1 shell and components, CRUD works,
+barcode uniqueness is per company, isolation tests pass,
 changing the colour changes the UI for all company users, an SVG logo is rejected.
 
 ## Phase 3 — Purchases, sales, posting (FR-10 → FR-14, FR-18) ⚠ review posting with Kamal first
