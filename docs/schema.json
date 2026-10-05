@@ -88,6 +88,16 @@
     "is_active",
     "boolean",
     "فعّال أو موقوف"
+   ],
+   [
+    "email_verified_at",
+    "timestamp",
+    "عمود Laravel للمصادقة: تاريخ تأكيد البريد (اختياري)"
+   ],
+   [
+    "remember_token",
+    "string",
+    "عمود Laravel للمصادقة: رمز خيار تذكرني (اختياري)"
    ]
   ]
  },

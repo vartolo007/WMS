@@ -197,6 +197,7 @@ for `(company_id, type)` in `movements`. No extra counters table (schema stays a
   `products.min_stock`, `parties.phone`, `movements.target_warehouse_id`, `movements.document_no`,
   `movements.related_movement_id`, `movements.party_id`, `operations.party_id`.
 - Nullable (v2.2): `companies.logo_path`, `companies.currency_symbol`.
+- Nullable (Laravel auth columns): `users.email_verified_at`, `users.remember_token`.
 - Defaults: `companies.status = trial`, `companies.markup_percent = 200`, `companies.primary_color = #1F4E79`, `is_active = true` (users, products, parties),
   `movements.status = confirmed`, `movements.discount = 0`.
 - Foreign keys: `restrictOnDelete()` everywhere (nothing is hard-deleted by users).

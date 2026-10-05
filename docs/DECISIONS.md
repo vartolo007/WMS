@@ -50,3 +50,5 @@ Add new decisions here: `YYYY-MM-DD — decision — reason`.
 - 2026-10-05 — Font: Cairo from fonts.bunny.net (same CDN Breeze uses) — readable Arabic UI font.
 - 2026-10-05 — Tests run on a separate MySQL database `wms_testing` (not SQLite) — row locks and window functions must be tested on the real engine.
 - 2026-10-05 — Removed `tracking-widest` / `uppercase` from Breeze buttons — letter spacing breaks Arabic letter joining.
+- 2026-10-05 — `users` keeps Laravel's `email_verified_at` and `remember_token` (added to schema.json) — needed by Breeze ("remember me", optional email verification); approved by the user.
+- 2026-10-05 — Breeze "delete account" stays until Phase 2 (FR-26) — user's choice; until then an owner deleting their account leaves the company without an owner.
