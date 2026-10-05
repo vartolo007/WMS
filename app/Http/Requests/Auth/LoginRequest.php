@@ -51,6 +51,28 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        $this->ensureAccessAllowed();
+    }
+
+    /**
+     * Reject a deactivated account or a suspended company after valid credentials (FR-03, FR-05).
+     *
+     * @throws ValidationException
+     */
+    protected function ensureAccessAllowed(): void
+    {
+        $reason = Auth::user()->accessBlockReason();
+
+        if ($reason === null) {
+            return;
+        }
+
+        Auth::guard('web')->logout();
+
+        throw ValidationException::withMessages([
+            'email' => trans($reason),
+        ]);
     }
 
     /**
