@@ -1,0 +1,404 @@
+[
+ {
+  "name": "companies",
+  "title": "5.2 جدول الشركات (companies)",
+  "cols": [
+   [
+    "id",
+    "bigint",
+    "المعرف الرئيسي",
+    null,
+    "pk"
+   ],
+   [
+    "name",
+    "string",
+    "اسم الشركة"
+   ],
+   [
+    "status",
+    "enum",
+    "trial / active / suspended"
+   ],
+   [
+    "trial_ends_at",
+    "date",
+    "تاريخ انتهاء الفترة التجريبية"
+   ],
+   [
+    "markup_percent",
+    "decimal(6,2)",
+    "نسبة التسعير (افتراضيًا 200)"
+   ],
+   [
+    "logo_path",
+    "string",
+    "مسار شعار الشركة (اختياري)؛ PNG أو JPG أو WEBP، حتى 1 ميغا"
+   ],
+   [
+    "primary_color",
+    "string",
+    "اللون الأساسي للواجهة، من قائمة الألوان المعتمدة (افتراضيًا #1F4E79)"
+   ],
+   [
+    "currency_symbol",
+    "string",
+    "رمز العملة المعروض مع المبالغ، مثل ل.س أو $ (اختياري)"
+   ]
+  ]
+ },
+ {
+  "name": "users",
+  "title": "5.3 جدول المستخدمين (users)",
+  "cols": [
+   [
+    "id",
+    "bigint",
+    "المعرف الرئيسي",
+    null,
+    "pk"
+   ],
+   [
+    "company_id",
+    "bigint",
+    "(فارغ لمدير المنصة)",
+    "companies"
+   ],
+   [
+    "name",
+    "string",
+    "اسم صاحب الشركة أو اسم المستودع"
+   ],
+   [
+    "email",
+    "string",
+    "فريد على مستوى المنصة"
+   ],
+   [
+    "password",
+    "string",
+    "مشفّرة"
+   ],
+   [
+    "role",
+    "enum",
+    "owner / warehouse / super_admin"
+   ],
+   [
+    "is_active",
+    "boolean",
+    "فعّال أو موقوف"
+   ]
+  ]
+ },
+ {
+  "name": "products",
+  "title": "5.4 جدول المواد (products)",
+  "cols": [
+   [
+    "id",
+    "bigint",
+    "المعرف الرئيسي",
+    null,
+    "pk"
+   ],
+   [
+    "company_id",
+    "bigint",
+    "",
+    "companies"
+   ],
+   [
+    "barcode",
+    "string",
+    "فريد داخل الشركة، اختياري"
+   ],
+   [
+    "name",
+    "string",
+    "اسم المادة"
+   ],
+   [
+    "unit",
+    "string",
+    "الوحدة (قطعة، لتر، كيلو...)"
+   ],
+   [
+    "location",
+    "string",
+    "الموقع والرف (اختياري)"
+   ],
+   [
+    "custom_sale_price",
+    "decimal(12,2)",
+    "سعر بيع يدوي (اختياري)"
+   ],
+   [
+    "min_stock",
+    "decimal(12,3)",
+    "الحد الأدنى للمخزون (اختياري)"
+   ],
+   [
+    "is_active",
+    "boolean",
+    "فعّالة أو موقوفة"
+   ]
+  ]
+ },
+ {
+  "name": "parties",
+  "title": "5.5 جدول العملاء والموردين (parties)",
+  "cols": [
+   [
+    "id",
+    "bigint",
+    "المعرف الرئيسي",
+    null,
+    "pk"
+   ],
+   [
+    "company_id",
+    "bigint",
+    "",
+    "companies"
+   ],
+   [
+    "name",
+    "string",
+    "الاسم"
+   ],
+   [
+    "phone",
+    "string",
+    "رقم الهاتف (اختياري)"
+   ],
+   [
+    "type",
+    "enum",
+    "customer / supplier"
+   ],
+   [
+    "is_active",
+    "boolean",
+    "فعّال أو موقوف"
+   ]
+  ]
+ },
+ {
+  "name": "movements",
+  "title": "5.6 جدول الحركات (movements)",
+  "cols": [
+   [
+    "id",
+    "bigint",
+    "المعرف الرئيسي",
+    null,
+    "pk"
+   ],
+   [
+    "company_id",
+    "bigint",
+    "",
+    "companies"
+   ],
+   [
+    "warehouse_id",
+    "bigint",
+    "مستودع الحركة (المصدر في النقل)؛ مستخدم بدور warehouse",
+    "users"
+   ],
+   [
+    "target_warehouse_id",
+    "bigint",
+    "المستودع الهدف (للنقل فقط)؛ مستخدم بدور warehouse",
+    "users"
+   ],
+   [
+    "type",
+    "enum",
+    "purchase / sale / purchase_return / sale_return / transfer"
+   ],
+   [
+    "number",
+    "unsigned int",
+    "رقم الحركة (فريد ضمن الشركة والنوع)"
+   ],
+   [
+    "document_no",
+    "string",
+    "رقم الوثيقة، مثل رقم فاتورة المورد (اختياري)"
+   ],
+   [
+    "status",
+    "enum",
+    "confirmed / cancelled"
+   ],
+   [
+    "related_movement_id",
+    "bigint",
+    "الفاتورة الأصلية (للمرتجعات)",
+    "movements"
+   ],
+   [
+    "party_id",
+    "bigint",
+    "(اختياري)",
+    "parties"
+   ],
+   [
+    "date",
+    "date",
+    "تاريخ الحركة"
+   ],
+   [
+    "subtotal",
+    "decimal(12,2)",
+    "مجموع قيم البنود"
+   ],
+   [
+    "discount",
+    "decimal(12,2)",
+    "الحسم على الفاتورة (افتراضيًا 0)"
+   ],
+   [
+    "total",
+    "decimal(12,2)",
+    "الصافي = المدفوع نقدًا"
+   ],
+   [
+    "created_by",
+    "bigint",
+    "المستخدم الذي أنشأ الحركة",
+    "users"
+   ]
+  ],
+  "note": "تُخزَّن إجماليات الحركة لأنها قيمة ثابتة لا تتغير بعد الحفظ. في المرتجع، يمثل عمود discount الحصة النسبية من حسم الفاتورة الأصلية."
+ },
+ {
+  "name": "movement_items",
+  "title": "5.7 جدول البنود (movement_items)",
+  "cols": [
+   [
+    "id",
+    "bigint",
+    "المعرف الرئيسي",
+    null,
+    "pk"
+   ],
+   [
+    "movement_id",
+    "bigint",
+    "",
+    "movements"
+   ],
+   [
+    "product_id",
+    "bigint",
+    "",
+    "products"
+   ],
+   [
+    "quantity",
+    "decimal(12,3)",
+    "الكمية (تقبل الكسور، مثل 1.250)"
+   ],
+   [
+    "unit_price",
+    "decimal(12,2)",
+    "سعر الوحدة، مثبَّت لحظة الحفظ"
+   ],
+   [
+    "line_total",
+    "decimal(12,2)",
+    "القيمة = الكمية × سعر الوحدة، مقربة لمنزلتين"
+   ]
+  ]
+ },
+ {
+  "name": "operations",
+  "title": "5.8 جدول العمليات (operations)",
+  "output": true,
+  "intro": "ناتج المعالجة (الترحيل)، ومصدر جميع التقارير. كل سطر يمثل أثر بند واحد على مخزون مستودع واحد.",
+  "cols": [
+   [
+    "id",
+    "bigint",
+    "المعرف الرئيسي",
+    null,
+    "pk"
+   ],
+   [
+    "company_id",
+    "bigint",
+    "",
+    "companies"
+   ],
+   [
+    "warehouse_id",
+    "bigint",
+    "المستودع المتأثر",
+    "users"
+   ],
+   [
+    "movement_id",
+    "bigint",
+    "",
+    "movements"
+   ],
+   [
+    "movement_item_id",
+    "bigint",
+    "",
+    "movement_items"
+   ],
+   [
+    "product_id",
+    "bigint",
+    "",
+    "products"
+   ],
+   [
+    "party_id",
+    "bigint",
+    "(اختياري)",
+    "parties"
+   ],
+   [
+    "type",
+    "enum",
+    "نوع الحركة الأصلية"
+   ],
+   [
+    "date",
+    "date",
+    "تاريخ الحركة"
+   ],
+   [
+    "qty_in",
+    "decimal(12,3)",
+    "الكمية الداخلة (صفر إن كان إخراجًا)"
+   ],
+   [
+    "qty_out",
+    "decimal(12,3)",
+    "الكمية الخارجة (صفر إن كان إدخالًا)"
+   ],
+   [
+    "unit_price",
+    "decimal(12,2)",
+    "سعر الوحدة من البند (قبل الحسم)"
+   ],
+   [
+    "value",
+    "decimal(12,2)",
+    "القيمة قبل الحسم = الكمية × سعر الوحدة"
+   ],
+   [
+    "net_value",
+    "decimal(12,2)",
+    "القيمة الصافية بعد حصة السطر من حسم الحركة (القسم 6.2)"
+   ]
+  ],
+  "note": "هذا الجدول يكرر معلومات من الحركات والبنود بشكل مقصود: لأنه يُكتب من مصدر واحد (خدمة الترحيل) ضمن المعاملة نفسها، ولأن النقل يُنتج أثرين من بند واحد، ولأن كل سطر يحمل قيمته الصافية بعد الحسم؛ مما يجعل كل التقارير استعلامات بسيطة على جدول واحد بدون حالات خاصة."
+ }
+]
