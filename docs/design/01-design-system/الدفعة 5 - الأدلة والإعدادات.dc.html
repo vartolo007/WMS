@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E6E8EB;font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;color:#16191D;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:var(--color-primary,#1F4E79);text-decoration:none;font-weight:500}
+a:hover{text-decoration:underline}
+code{unicode-bidi:isolate;direction:ltr}
+button,input,select{font-family:inherit}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" dir="rtl" style="--color-primary:#1F4E79;padding:64px;display:flex;flex-direction:column;gap:72px;width:1568px">
+
+<header style="display:flex;justify-content:space-between;align-items:flex-end">
+  <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;color:#5B6270;font-weight:500">منصة إدارة المستودعات · الدفعة 5 من 7</div><h1 style="margin:0;font-size:36px">الأدلة والإعدادات</h1></div>
+  <nav style="display:flex;gap:20px;font-size:15px"><a href="#s11">11 · دليل المواد</a><a href="#s12">12 · العملاء والموردون</a><a href="#s13">13 · المستودعات</a><a href="#s14">14 · إعدادات الشركة</a><a href="#s15">15 · الملف الشخصي</a></nav>
+</header>
+
+<section id="s11" style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:center;gap:12px"><span style="background:#16191D;color:#fff;font-weight:700;font-size:14px;padding:4px 10px;border-radius:6px">11</span><h2 style="margin:0;font-size:26px">دليل المواد</h2><span style="color:#5B6270;font-size:15px">— صاحب الشركة · اضغط "تعديل" أو "+ مادة"</span></div>
+  <div style="width:1440px;height:860px;background:#F5F6F7;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,.08);position:relative">
+    <dc-import name="Topbar" role="owner" wh="كل المستودعات" hint-size="100%,64px"></dc-import>
+    <div style="flex:1;display:flex;min-height:0">
+      <dc-import name="Sidebar" role="owner" active="items" hint-size="248px,100%" style="flex:none;width:248px;height:100%"></dc-import>
+      <main style="flex:1;padding:28px 40px;display:flex;flex-direction:column;gap:20px;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h1 style="margin:0;font-size:28px">دليل المواد</h1><button onClick="{{ newItem }}" style="white-space:nowrap;height:40px;padding:0 18px;border-radius:8px;border:0;background:var(--color-primary);color:#fff;font-size:15px;font-weight:600;cursor:pointer">+ مادة</button></div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <input value="{{ iq }}" onChange="{{ onIq }}" placeholder="ابحث بالاسم أو امسح الباركود" style="flex:1;max-width:460px;height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 14px;font-size:15px;background:#fff">
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px"><input type="checkbox" checked="{{ lowOnly }}" onChange="{{ toggleLow }}" style="width:18px;height:18px;accent-color:var(--color-primary)">المنخفضة فقط</label>
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px"><input type="checkbox" checked="{{ showOff }}" onChange="{{ toggleOff }}" style="width:18px;height:18px;accent-color:var(--color-primary)">إظهار الموقوفة</label>
+        </div>
+        <div style="flex:1;background:#fff;border:1px solid #E3E5E8;border-radius:12px;overflow:auto;min-height:0">
+          <table style="width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums">
+            <thead><tr style="background:#F5F6F7;color:#5B6270;font-size:13px">
+              <th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">الاسم</th><th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">الباركود</th><th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">الوحدة</th><th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">الموقع</th><th style="text-align:left;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">رصيد المدينة</th><th style="text-align:left;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">رصيد الريف</th><th style="text-align:left;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">السعر المقترح</th><th style="border-bottom:1px solid #E3E5E8"></th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ items }}" as="r" hint-placeholder-count="4">
+                <tr style="color:{{ r.fg }}">
+                  <td style="padding:12px 16px;border-bottom:1px solid #EEF0F2"><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b style="font-weight:600">{{ r.name }}</b><sc-if value="{{ r.low }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:4px;font-size:12px;font-weight:600;background:#FFEDD5;color:#9A3412">منخفضة</span></sc-if><sc-if value="{{ r.off }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:4px;font-size:12px;font-weight:600;background:#EEF0F2;color:#5B6270">موقوفة</span></sc-if></span></td>
+                  <td style="padding:12px 16px;border-bottom:1px solid #EEF0F2;color:#5B6270">{{ r.code }}</td>
+                  <td style="padding:12px 16px;border-bottom:1px solid #EEF0F2">{{ r.unit }}</td>
+                  <td style="padding:12px 16px;border-bottom:1px solid #EEF0F2">{{ r.loc }}</td>
+                  <td style="padding:12px 16px;border-bottom:1px solid #EEF0F2;text-align:left;font-weight:600;color:{{ r.c1Fg }}">{{ r.s1 }}</td>
+                  <td style="padding:12px 16px;border-bottom:1px solid #EEF0F2;text-align:left;font-weight:600;color:{{ r.c2Fg }}">{{ r.s2 }}</td>
+                  <td style="padding:12px 16px;border-bottom:1px solid #EEF0F2;text-align:left">{{ r.price }}</td>
+                  <td style="padding:6px 16px;border-bottom:1px solid #EEF0F2;text-align:left;white-space:nowrap"><span style="display:inline-flex;gap:4px"><button onClick="{{ r.edit }}" style="height:30px;padding:0 10px;border:0;background:transparent;color:var(--color-primary);font-size:14px;font-weight:600;border-radius:6px;cursor:pointer">تعديل</button><button onClick="{{ r.toggle }}" style="height:30px;padding:0 10px;border:0;background:transparent;color:{{ r.tFg }};font-size:14px;font-weight:600;border-radius:6px;cursor:pointer">{{ r.tLabel }}</button></span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+          <sc-if value="{{ itemsEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:56px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center"><b style="font-size:17px">ما في مادة بهالاسم أو الباركود</b><span style="font-size:14px;color:#5B6270">تأكد من الرمز، أو أضفها كمادة جديدة.</span><button onClick="{{ newItem }}" style="height:36px;padding:0 14px;border-radius:8px;border:0;background:var(--color-primary);color:#fff;font-size:14px;font-weight:600;margin-top:4px;cursor:pointer">+ مادة جديدة</button></div></sc-if>
+        </div>
+      </main>
+    </div>
+    <sc-if value="{{ drawer }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(22,25,29,.35)"></div>
+      <div style="position:absolute;top:0;bottom:0;left:0;width:460px;background:#fff;box-shadow:12px 0 32px rgba(0,0,0,.15);display:flex;flex-direction:column">
+        <div style="padding:20px 24px;border-bottom:1px solid #E3E5E8;display:flex;justify-content:space-between;align-items:center"><b style="font-size:19px">{{ drawerTitle }}</b><button onClick="{{ closeDrawer }}" style="width:36px;height:36px;border:0;background:#F5F6F7;border-radius:8px;font-size:16px;cursor:pointer">✕</button></div>
+        <div style="flex:1;padding:24px;display:flex;flex-direction:column;gap:18px;overflow:auto">
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">اسم المادة</span><input value="{{ f.name }}" onChange="{{ noop }}" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px"></label>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">الباركود</span><input value="{{ f.code }}" onChange="{{ noop }}" placeholder="امسح أو اكتب الرمز" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px;direction:ltr;text-align:right"><span style="font-size:12px;color:#5B6270">لازم يكون فريد بالشركة</span></label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">الوحدة</span><input value="{{ f.unit }}" onChange="{{ noop }}" placeholder="لتر، كيلو، علبة" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px"></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">الموقع <span style="color:#5B6270;font-weight:400">(اختياري)</span></span><input value="{{ f.loc }}" onChange="{{ noop }}" placeholder="رف A3" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px"></label>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">الحد الأدنى</span><input value="{{ f.min }}" onChange="{{ noop }}" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px;direction:ltr;text-align:left"><span style="font-size:12px;color:#5B6270">تحته بتصير "منخفضة"</span></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">السعر المقترح</span><input value="{{ f.price }}" onChange="{{ noop }}" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px;direction:ltr;text-align:left;background:#F5F6F7"><span style="font-size:12px;color:#5B6270">آخر سعر شراء × 200%</span></label>
+          </div>
+          <label style="display:flex;gap:8px;align-items:center;font-size:14px"><input type="checkbox" checked="" style="width:18px;height:18px;accent-color:var(--color-primary)">الكمية تقبل كسور عشرية</label>
+        </div>
+        <div style="padding:16px 24px;border-top:1px solid #E3E5E8;display:flex;gap:8px"><button onClick="{{ closeDrawer }}" style="height:44px;padding:0 22px;border-radius:8px;border:0;background:var(--color-primary);color:#fff;font-size:15px;font-weight:600;cursor:pointer">حفظ</button><button onClick="{{ closeDrawer }}" style="height:44px;padding:0 18px;border-radius:8px;border:1px solid #C9CDD3;background:#fff;font-size:15px;cursor:pointer">إلغاء</button></div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ offConfirm }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(22,25,29,.45);display:flex;align-items:center;justify-content:center">
+        <div style="background:#fff;border-radius:12px;width:420px;padding:24px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:18px;font-weight:700">إيقاف "{{ offConfirm }}"؟</div>
+          <div style="font-size:14px;color:#5B6270;line-height:1.7">ما رح تظهر بالبحث ولا بالباركود بالحركات الجديدة. الحركات القديمة والتقارير ما بتتأثر، وفيك تعيد تفعيلها بأي وقت.</div>
+          <div style="display:flex;gap:8px;margin-top:8px"><button onClick="{{ doOff }}" style="height:40px;padding:0 18px;border-radius:8px;border:0;background:#C81E1E;color:#fff;font-size:15px;font-weight:600;cursor:pointer">إيقاف</button><button onClick="{{ closeOff }}" style="height:40px;padding:0 18px;border-radius:8px;border:1px solid #C9CDD3;background:#fff;font-size:15px;cursor:pointer">تراجع</button></div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+  <div style="font-size:15px;color:#2B3038;line-height:1.8;max-width:1000px"><b>المستودع:</b> عمود رصيد واحد (مستودعه)، وبيقدر يضيف ويعدّل المواد لأنه الدليل مشترك. <b>موبايل:</b> البحث فوق بعرض كامل، الجدول بينزلق أفقياً، ولوحة التعديل بتصير شاشة كاملة.</div>
+</section>
+
+<section id="s12" style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:center;gap:12px"><span style="background:#16191D;color:#fff;font-weight:700;font-size:14px;padding:4px 10px;border-radius:6px">12</span><h2 style="margin:0;font-size:26px">العملاء والموردون</h2><span style="color:#5B6270;font-size:15px">— التبويبات شغّالة</span></div>
+  <div style="width:1440px;height:720px;background:#F5F6F7;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,.08);position:relative">
+    <dc-import name="Topbar" role="warehouse" wh="مستودع المدينة" hint-size="100%,64px"></dc-import>
+    <div style="flex:1;display:flex;min-height:0">
+      <dc-import name="Sidebar" role="warehouse" active="parties" hint-size="248px,100%" style="flex:none;width:248px;height:100%"></dc-import>
+      <main style="flex:1;padding:28px 40px;display:flex;flex-direction:column;gap:20px;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h1 style="margin:0;font-size:28px">العملاء والموردون</h1><button onClick="{{ openParty }}" style="white-space:nowrap;height:40px;padding:0 18px;border-radius:8px;border:0;background:var(--color-primary);color:#fff;font-size:15px;font-weight:600;cursor:pointer">+ إضافة</button></div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div style="display:flex;gap:4px;background:#E9EBEE;border-radius:10px;padding:4px">
+            <sc-for list="{{ pTabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.pick }}" style="white-space:nowrap;height:36px;padding:0 16px;border:0;border-radius:7px;font-size:14px;cursor:pointer;background:{{ t.bg }};color:{{ t.fg }};font-weight:{{ t.fw }};box-shadow:{{ t.sh }}">{{ t.label }}</button></sc-for>
+          </div>
+          <input placeholder="بحث بالاسم أو الهاتف" style="width:320px;height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 14px;font-size:15px;background:#fff">
+        </div>
+        <div style="background:#fff;border:1px solid #E3E5E8;border-radius:12px;overflow:hidden">
+          <table style="width:100%;border-collapse:collapse;font-size:15px">
+            <thead><tr style="background:#F5F6F7;color:#5B6270;font-size:13px"><th style="text-align:right;font-weight:500;padding:12px 16px">الاسم</th><th style="text-align:right;font-weight:500;padding:12px 16px">النوع</th><th style="text-align:right;font-weight:500;padding:12px 16px">الهاتف</th><th style="text-align:right;font-weight:500;padding:12px 16px">الحالة</th><th></th></tr></thead>
+            <tbody>
+              <sc-for list="{{ parties }}" as="p" hint-placeholder-count="4">
+                <tr style="color:{{ p.fg }}"><td style="padding:12px 16px;border-top:1px solid #EEF0F2;font-weight:600">{{ p.name }}</td><td style="padding:12px 16px;border-top:1px solid #EEF0F2">{{ p.type }}</td><td style="padding:12px 16px;border-top:1px solid #EEF0F2;direction:ltr;text-align:right;font-variant-numeric:tabular-nums">{{ p.phone }}</td>
+                  <td style="padding:12px 16px;border-top:1px solid #EEF0F2"><span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid {{ p.sB }};color:{{ p.sF }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ p.sD }}"></span>{{ p.status }}</span></td>
+                  <td style="padding:6px 16px;border-top:1px solid #EEF0F2;text-align:left;white-space:nowrap"><button onClick="{{ openParty }}" style="height:30px;padding:0 10px;border:0;background:transparent;color:var(--color-primary);font-size:14px;font-weight:600;cursor:pointer">تعديل</button><a href="#" style="font-size:14px;font-weight:600;padding:0 10px">حركته</a></td></tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+    <sc-if value="{{ partyModal }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(22,25,29,.45);display:flex;align-items:center;justify-content:center">
+        <div style="background:#fff;border-radius:12px;width:480px;padding:24px;display:flex;flex-direction:column;gap:16px">
+          <b style="font-size:19px">إضافة طرف</b>
+          <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">النوع</span><div style="display:flex;gap:8px"><label style="flex:1;height:44px;border:2px solid var(--color-primary);border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 12px;font-size:15px;font-weight:600"><input type="radio" name="pt" checked="" style="accent-color:var(--color-primary)">عميل</label><label style="flex:1;height:44px;border:1px solid #C9CDD3;border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 12px;font-size:15px"><input type="radio" name="pt">مورد</label></div></div>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">الاسم</span><input style="height:44px;border:1px solid #C81E1E;background:#FEF6F6;border-radius:8px;padding:0 12px;font-size:15px"><span style="font-size:13px;color:#C81E1E;font-weight:500">الاسم إلزامي</span></label>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">الهاتف <span style="color:#5B6270;font-weight:400">(اختياري)</span></span><input placeholder="0944 000 000" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px;direction:ltr;text-align:right"></label>
+          <div style="display:flex;gap:8px;margin-top:4px"><button onClick="{{ closeParty }}" style="height:44px;padding:0 22px;border-radius:8px;border:0;background:var(--color-primary);color:#fff;font-size:15px;font-weight:600;cursor:pointer">حفظ</button><button onClick="{{ closeParty }}" style="height:44px;padding:0 18px;border-radius:8px;border:1px solid #C9CDD3;background:#fff;font-size:15px;cursor:pointer">إلغاء</button></div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+  <div style="font-size:15px;color:#2B3038;line-height:1.8;max-width:1000px">ما في أرصدة ولا ديون — "حركته" بيفتح تقرير حركة عميل. <b>موبايل:</b> كل طرف بطاقة فيها الاسم والهاتف (رابط اتصال) والحالة.</div>
+</section>
+
+<section id="s13" style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:center;gap:12px"><span style="background:#16191D;color:#fff;font-weight:700;font-size:14px;padding:4px 10px;border-radius:6px">13</span><h2 style="margin:0;font-size:26px">إدارة المستودعات</h2><span style="color:#5B6270;font-size:15px">— صاحب الشركة فقط</span></div>
+  <div style="width:1440px;height:720px;background:#F5F6F7;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,.08)">
+    <dc-import name="Topbar" role="owner" wh="كل المستودعات" hint-size="100%,64px"></dc-import>
+    <div style="flex:1;display:flex;min-height:0">
+      <dc-import name="Sidebar" role="owner" active="warehouses" hint-size="248px,100%" style="flex:none;width:248px;height:100%"></dc-import>
+      <main style="flex:1;padding:28px 40px;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:24px;align-content:start;min-width:0">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <h1 style="margin:0;font-size:28px">المستودعات</h1>
+          <div style="background:#fff;border:1px solid #E3E5E8;border-radius:12px;overflow:hidden">
+            <table style="width:100%;border-collapse:collapse;font-size:15px">
+              <thead><tr style="background:#F5F6F7;color:#5B6270;font-size:13px"><th style="text-align:right;font-weight:500;padding:12px 16px">المستودع</th><th style="text-align:right;font-weight:500;padding:12px 16px">بريد الحساب</th><th style="text-align:right;font-weight:500;padding:12px 16px">آخر دخول</th><th style="text-align:right;font-weight:500;padding:12px 16px">الحالة</th><th></th></tr></thead>
+              <tbody>
+                <tr><td style="padding:14px 16px;border-top:1px solid #EEF0F2;font-weight:600">مستودع المدينة</td><td style="padding:14px 16px;border-top:1px solid #EEF0F2;direction:ltr;text-align:right;color:#5B6270">city@alnoor.sy</td><td style="padding:14px 16px;border-top:1px solid #EEF0F2;color:#5B6270;font-variant-numeric:tabular-nums">اليوم 09:02</td><td style="padding:14px 16px;border-top:1px solid #EEF0F2"><span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid #CFE5D6;color:#166534"><span style="width:6px;height:6px;border-radius:50%;background:#15803D"></span>فعّال</span></td><td style="padding:6px 16px;border-top:1px solid #EEF0F2;text-align:left;white-space:nowrap"><button style="height:30px;padding:0 10px;border:0;background:transparent;color:var(--color-primary);font-size:14px;font-weight:600">تعديل</button><button style="height:30px;padding:0 10px;border:0;background:transparent;color:#C81E1E;font-size:14px;font-weight:600">إيقاف</button></td></tr>
+                <tr><td style="padding:14px 16px;border-top:1px solid #EEF0F2;font-weight:600">مستودع الريف</td><td style="padding:14px 16px;border-top:1px solid #EEF0F2;direction:ltr;text-align:right;color:#5B6270">rif@alnoor.sy</td><td style="padding:14px 16px;border-top:1px solid #EEF0F2;color:#5B6270;font-variant-numeric:tabular-nums">2026-10-04</td><td style="padding:14px 16px;border-top:1px solid #EEF0F2"><span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid #CFE5D6;color:#166534"><span style="width:6px;height:6px;border-radius:50%;background:#15803D"></span>فعّال</span></td><td style="padding:6px 16px;border-top:1px solid #EEF0F2;text-align:left;white-space:nowrap"><button style="height:30px;padding:0 10px;border:0;background:transparent;color:var(--color-primary);font-size:14px;font-weight:600">تعديل</button><button style="height:30px;padding:0 10px;border:0;background:transparent;color:#C81E1E;font-size:14px;font-weight:600">إيقاف</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="font-size:14px;color:#5B6270;line-height:1.8">الإيقاف بيمنع حساب المستودع من الدخول، وبيضل رصيده وحركاته ظاهرين بالتقارير. نافذة التأكيد نفس النمط بنظام التصميم.</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E3E5E8;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:16px">
+          <b style="font-size:18px">مستودع جديد</b>
+          <span style="font-size:14px;color:#5B6270;line-height:1.7;margin-top:-8px">كل مستودع إله حساب دخول خاص بيشوف فيه حركاته بس.</span>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">اسم المستودع</span><input placeholder="مثال: مستودع الميدان" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px"></label>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">بريد الحساب</span><input value="rif@alnoor.sy" style="height:44px;border:1px solid #C81E1E;background:#FEF6F6;border-radius:8px;padding:0 12px;font-size:15px;direction:ltr;text-align:right"><span style="font-size:13px;color:#C81E1E;font-weight:500">هالبريد مستخدم لمستودع الريف</span></label>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">كلمة المرور</span><input type="password" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px"><span style="font-size:12px;color:#5B6270">8 أحرف على الأقل. بلّغها لمسؤول المستودع.</span></label>
+          <button style="height:44px;border-radius:8px;border:0;background:var(--color-primary);color:#fff;font-size:15px;font-weight:600">إنشاء المستودع والحساب</button>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div style="font-size:15px;color:#2B3038;line-height:1.8;max-width:1000px"><b>حالة فارغة</b> (شركة جديدة): "ما عندك مستودعات لسا — أنشئ أول مستودع لتبدأ تسجّل حركات" مع تركيز النموذج. <b>موبايل:</b> النموذج تحت القائمة.</div>
+</section>
+
+<section id="s14" style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:center;gap:12px"><span style="background:#16191D;color:#fff;font-weight:700;font-size:14px;padding:4px 10px;border-radius:6px">14</span><h2 style="margin:0;font-size:26px">إعدادات الشركة</h2><span style="color:#5B6270;font-size:15px">— اختر لون ونسبة تسعير والمعاينة بتتحدث فوراً</span></div>
+  <div style="width:1440px;height:940px;background:#F5F6F7;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,.08)">
+    <dc-import name="Topbar" role="owner" wh="كل المستودعات" hint-size="100%,64px"></dc-import>
+    <div style="flex:1;display:flex;min-height:0">
+      <dc-import name="Sidebar" role="owner" active="settings" hint-size="248px,100%" style="flex:none;width:248px;height:100%"></dc-import>
+      <main style="flex:1;padding:28px 40px;display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:24px;align-content:start;min-width:0">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <h1 style="margin:0;font-size:28px">إعدادات الشركة</h1>
+          <div style="background:#fff;border:1px solid #E3E5E8;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:20px">
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">اسم الشركة</span><input value="{{ coName }}" onChange="{{ onCoName }}" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px;max-width:420px"></label>
+            <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:500">الشعار</span>
+              <div style="display:flex;gap:16px;align-items:center">
+                <span style="width:72px;height:72px;border-radius:12px;border:1px dashed #C9CDD3;background:#F5F6F7;display:flex;align-items:center;justify-content:center;font-size:12px;color:#8A909B">شعار</span>
+                <div style="display:flex;flex-direction:column;gap:6px"><button style="width:fit-content;height:36px;padding:0 14px;border-radius:8px;border:1px solid #C9CDD3;background:#fff;font-size:14px">رفع صورة</button><span style="font-size:13px;color:#5B6270">PNG أو JPG أو WEBP، حتى 1 ميغا. بدون شعار بنعرض أول حرف من الاسم.</span></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px"><span style="font-size:14px;font-weight:500">اللون الأساسي</span>
+              <div style="display:flex;gap:12px">
+                <sc-for list="{{ swatches }}" as="c" hint-placeholder-count="8"><button onClick="{{ c.pick }}" title="{{ c.hex }}" style="width:40px;height:40px;border-radius:50%;border:0;cursor:pointer;background:{{ c.hex }};box-shadow:{{ c.ring }}"></button></sc-for>
+              </div>
+              <span style="font-size:13px;color:#5B6270">بيتطبّق على كل الشاشات والمطبوعات لكل مستخدمين الشركة.</span>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E3E5E8;border-radius:12px;padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">رمز العملة</span><input value="{{ cur }}" onChange="{{ onCur }}" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px;width:140px"></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">نسبة التسعير</span><span style="display:flex;align-items:center;height:44px;border:1px solid {{ ratioBorder }};border-radius:8px;background:#fff;width:180px"><input value="{{ ratio }}" onChange="{{ onRatio }}" style="flex:1;min-width:0;height:100%;border:0;padding:0 12px;font-size:15px;outline:none;direction:ltr;text-align:left;background:transparent"><span style="padding:0 12px;color:#5B6270;border-right:1px solid #E3E5E8">%</span></span>
+              <sc-if value="{{ ratioErr }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#C81E1E;font-weight:500">{{ ratioErr }}</span></sc-if></label>
+            <div style="grid-column:1 / -1;padding:14px 16px;border-radius:10px;background:#F5F6F7;font-size:15px;font-variant-numeric:tabular-nums;display:flex;gap:10px;align-items:center">مثال: سعر شراء <b>1,000.00 {{ cur }}</b> ← سعر بيع مقترح <b style="color:var(--color-primary);font-size:17px">{{ example }} {{ cur }}</b></div>
+          </div>
+          <div style="display:flex;gap:8px"><button style="height:44px;padding:0 22px;border-radius:8px;border:0;background:var(--color-primary);color:#fff;font-size:15px;font-weight:600">حفظ الإعدادات</button></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;position:sticky;top:0">
+          <span style="font-size:14px;font-weight:600;color:#5B6270;margin-top:52px">معاينة فورية</span>
+          <div style="--color-primary:{{ pColor }};border:1px solid #E3E5E8;border-radius:12px;overflow:hidden;background:#F5F6F7">
+            <div style="height:48px;background:#fff;border-bottom:1px solid #E3E5E8;display:flex;align-items:center;gap:10px;padding:0 14px"><span style="width:28px;height:28px;border-radius:7px;background:var(--color-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px">{{ coInitial }}</span><b style="font-size:14px">{{ coName }}</b></div>
+            <div style="display:flex">
+              <div style="width:120px;background:#fff;border-left:1px solid #E3E5E8;padding:8px;display:flex;flex-direction:column;gap:2px;font-size:12px"><span style="padding:7px 8px;border-radius:6px;background:color-mix(in srgb,var(--color-primary) 9%,white);color:var(--color-primary);font-weight:600">لوحة التحكم</span><span style="padding:7px 8px">حركة جديدة</span><span style="padding:7px 8px">الحركات</span><span style="padding:7px 8px">التقارير</span></div>
+              <div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:10px">
+                <div style="background:#fff;border:1px solid #E3E5E8;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;color:#5B6270">صافي مبيعات اليوم</span><b style="font-size:18px;color:var(--color-primary);font-variant-numeric:tabular-nums">297,494.63 <span style="font-size:11px;color:#5B6270;font-weight:500">{{ cur }}</span></b></div>
+                <div style="display:flex;gap:6px"><span style="height:30px;padding:0 12px;border-radius:6px;background:var(--color-primary);color:#fff;font-size:12px;font-weight:600;display:inline-flex;align-items:center">+ فاتورة بيع</span><span style="height:30px;padding:0 12px;border-radius:6px;border:1px solid #C9CDD3;background:#fff;font-size:12px;display:inline-flex;align-items:center">+ شراء</span></div>
+                <a href="#" style="font-size:12px">كل الحركات</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div style="font-size:15px;color:#2B3038;line-height:1.8;max-width:1000px">بـ Alpine: <code>x-data="{ color: '#1F4E79' }"</code> و <code>:style="`--color-primary:${color}`"</code> على المعاينة. نسبة التسعير بين 100% و1000%. <b>موبايل:</b> المعاينة بتنزل تحت النموذج.</div>
+</section>
+
+<section id="s15" style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:center;gap:12px"><span style="background:#16191D;color:#fff;font-weight:700;font-size:14px;padding:4px 10px;border-radius:6px">15</span><h2 style="margin:0;font-size:26px">الملف الشخصي</h2></div>
+  <div style="width:1440px;height:700px;background:#F5F6F7;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,.08)">
+    <dc-import name="Topbar" role="warehouse" wh="مستودع المدينة" hint-size="100%,64px"></dc-import>
+    <div style="flex:1;display:flex;min-height:0">
+      <dc-import name="Sidebar" role="warehouse" active="profile" hint-size="248px,100%" style="flex:none;width:248px;height:100%"></dc-import>
+      <main style="flex:1;padding:28px 40px;display:flex;flex-direction:column;gap:16px;min-width:0">
+        <h1 style="margin:0;font-size:28px">الملف الشخصي</h1>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:960px;align-items:start">
+          <div style="background:#fff;border:1px solid #E3E5E8;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:16px">
+            <b style="font-size:17px">البيانات</b>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">الاسم</span><input value="حساب مستودع المدينة" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px"></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">البريد الإلكتروني</span><input value="city@alnoor.sy" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px;direction:ltr;text-align:right"></label>
+            <button style="width:fit-content;height:40px;padding:0 18px;border-radius:8px;border:0;background:var(--color-primary);color:#fff;font-size:15px;font-weight:600">حفظ</button>
+          </div>
+          <div style="background:#fff;border:1px solid #E3E5E8;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:16px">
+            <b style="font-size:17px">تغيير كلمة المرور</b>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">كلمة المرور الحالية</span><input type="password" value="xxxxxxxx" style="height:44px;border:1px solid #C81E1E;background:#FEF6F6;border-radius:8px;padding:0 12px;font-size:15px"><span style="font-size:13px;color:#C81E1E;font-weight:500">كلمة المرور الحالية غلط</span></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">كلمة المرور الجديدة</span><input type="password" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px"><span style="font-size:12px;color:#5B6270">8 أحرف على الأقل</span></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:500">تأكيد الجديدة</span><input type="password" style="height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px"></label>
+            <button style="width:fit-content;height:40px;padding:0 18px;border-radius:8px;border:1px solid #C9CDD3;background:#fff;font-size:15px;font-weight:600">تغيير كلمة المرور</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div style="font-size:15px;color:#2B3038;line-height:1.8;max-width:1000px">نفس الشاشة لكل الأدوار. بعد تغيير كلمة المرور بتنسكّر الجلسات على باقي الأجهزة مع رسالة نجاح. <b>موبايل:</b> البطاقتين فوق بعض.</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;primary&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#1F4E79&quot;,&quot;options&quot;:[&quot;#1F4E79&quot;,&quot;#2E75B6&quot;,&quot;#0F766E&quot;,&quot;#15803D&quot;,&quot;#B45309&quot;,&quot;#B91C1C&quot;,&quot;#7E22CE&quot;,&quot;#374151&quot;],&quot;tsType&quot;:&quot;string&quot;}}">
+const ITEMS = [
+  { id: 1, name: 'زيت زيتون', code: '6210001', unit: 'لتر', loc: 'A3', s1: 8, s2: 22, min: 20, price: 19999.5, dec: true },
+  { id: 2, name: 'سكر', code: '6210002', unit: 'كيلو', loc: 'B2', s1: 140, s2: 12.5, min: 50, price: 9000, dec: true },
+  { id: 3, name: 'معلبات حمص', code: '6210003', unit: 'علبة', loc: 'C1', s1: 30, s2: 64, min: 48, price: 6500, dec: false },
+  { id: 4, name: 'أرز', code: '6210004', unit: 'كيلو', loc: 'B4', s1: 95, s2: 70, min: 30, price: 12400, dec: true },
+  { id: 5, name: 'شاي أسود', code: '6210005', unit: 'علبة', loc: 'D2', s1: 0, s2: 0, min: 10, price: 15000, dec: false, off: true }
+];
+const PARTIES = [['سامر الحلبي', 'c', '0944 112 233', true], ['محل أبو خالد', 'c', '0933 445 566', true], ['مؤسسة الشام للمواد الغذائية', 's', '011 223 4455', true], ['شركة الفرات للتوريد', 's', '021 667 8899', true], ['بقالية الأمل', 'c', '—', false]];
+const COLORS = ['#1F4E79', '#2E75B6', '#0F766E', '#15803D', '#B45309', '#B91C1C', '#7E22CE', '#374151'];
+const money = x => x.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const q = (x, d) => d ? x.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) : String(x);
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  state = { iq: '', lowOnly: false, showOff: true, off: { 5: true }, drawer: null, offConfirm: null, pTab: 'all', partyModal: false, color: null, ratio: '200', cur: 'ل.س', coName: 'شركة النور' };
+  applyColor() { const el = this.rootRef.current; if (el) el.style.setProperty('--color-primary', this.props.primary ?? '#1F4E79'); }
+  componentDidMount() { this.applyColor(); }
+  componentDidUpdate(pp) { if (pp.primary !== this.props.primary) this.applyColor(); }
+  renderVals() {
+    const s = this.state;
+    const items = ITEMS.filter(i => {
+      const off = !!s.off[i.id], low = Math.min(i.s1, i.s2) < i.min && !off;
+      return (!s.iq || i.name.includes(s.iq) || i.code.includes(s.iq)) && (!s.lowOnly || low) && (s.showOff || !off);
+    }).map(i => {
+      const off = !!s.off[i.id];
+      return { name: i.name, code: i.code, unit: i.unit, loc: 'رف ' + i.loc, s1: q(i.s1, i.dec), s2: q(i.s2, i.dec), price: money(i.price),
+        low: !off && Math.min(i.s1, i.s2) < i.min, off, fg: off ? '#8A909B' : '#16191D',
+        c1Fg: off ? '#8A909B' : (i.s1 < i.min ? '#9A3412' : '#16191D'), c2Fg: off ? '#8A909B' : (i.s2 < i.min ? '#9A3412' : '#16191D'),
+        edit: () => this.setState({ drawer: i }), tLabel: off ? 'تفعيل' : 'إيقاف', tFg: off ? 'var(--color-primary)' : '#C81E1E',
+        toggle: () => off ? this.setState(st => ({ off: { ...st.off, [i.id]: false } })) : this.setState({ offConfirm: i.name, offId: i.id }) };
+    });
+    const d = s.drawer;
+    const pc = s.color ?? this.props.primary ?? '#1F4E79';
+    const r = parseFloat(s.ratio);
+    const ratioErr = isNaN(r) ? 'اكتب رقم' : (r < 100 || r > 1000 ? 'النسبة لازم تكون بين 100% و1000%' : '');
+    const tab = (k, label) => { const on = s.pTab === k; return { label, bg: on ? '#fff' : 'transparent', fg: on ? 'var(--color-primary)' : '#2B3038', fw: on ? 700 : 500, sh: on ? '0 1px 3px rgba(0,0,0,.12)' : 'none', pick: () => this.setState({ pTab: k }) }; };
+    return {
+      rootRef: this.rootRef, iq: s.iq, onIq: e => this.setState({ iq: e.target.value }), lowOnly: s.lowOnly, toggleLow: () => this.setState({ lowOnly: !s.lowOnly }), showOff: s.showOff, toggleOff: () => this.setState({ showOff: !s.showOff }),
+      items, itemsEmpty: items.length === 0,
+      drawer: !!d, drawerTitle: d && d.id ? 'تعديل: ' + d.name : 'مادة جديدة',
+      f: d ? { name: d.name || '', code: d.code || '', unit: d.unit || '', loc: d.loc ? 'رف ' + d.loc : '', min: d.min != null ? String(d.min) : '', price: d.price ? money(d.price) : '' } : {},
+      newItem: () => this.setState({ drawer: {} }), closeDrawer: () => this.setState({ drawer: null }),
+      offConfirm: s.offConfirm, closeOff: () => this.setState({ offConfirm: null }), doOff: () => this.setState(st => ({ off: { ...st.off, [st.offId]: true }, offConfirm: null })),
+      pTabs: [tab('all', 'الكل'), tab('c', 'العملاء'), tab('s', 'الموردون')],
+      parties: PARTIES.filter(p => s.pTab === 'all' || p[1] === s.pTab).map(([name, t, phone, on]) => ({ name, type: t === 'c' ? 'عميل' : 'مورد', phone, status: on ? 'فعّال' : 'موقوف', fg: on ? '#16191D' : '#8A909B', sB: on ? '#CFE5D6' : '#E3E5E8', sF: on ? '#166534' : '#8A909B', sD: on ? '#15803D' : '#A3A9B3' })),
+      partyModal: s.partyModal, openParty: () => this.setState({ partyModal: true }), closeParty: () => this.setState({ partyModal: false }),
+      swatches: COLORS.map(hex => ({ hex, ring: hex === pc ? `0 0 0 3px #fff, 0 0 0 5px ${hex}` : 'none', pick: () => this.setState({ color: hex }) })),
+      pColor: pc, ratio: s.ratio, onRatio: e => this.setState({ ratio: e.target.value }), ratioErr, ratioBorder: ratioErr ? '#C81E1E' : '#C9CDD3',
+      example: ratioErr ? '—' : money(1000 * r / 100), cur: s.cur, onCur: e => this.setState({ cur: e.target.value }),
+      coName: s.coName, onCoName: e => this.setState({ coName: e.target.value }), coInitial: (s.coName.replace('شركة ', '')[0] || 'ن'),
+      noop: () => {}
+    };
+  }
+}
+</script>
+</body>
+</html>

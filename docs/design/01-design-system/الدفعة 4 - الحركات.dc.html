@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E6E8EB;font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;color:#16191D;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:var(--color-primary,#1F4E79);text-decoration:none;font-weight:500}
+a:hover{text-decoration:underline}
+code{unicode-bidi:isolate;direction:ltr}
+button,input,select{font-family:inherit}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" dir="rtl" style="--color-primary:#1F4E79;padding:64px;display:flex;flex-direction:column;gap:72px;width:1568px">
+
+<header style="display:flex;justify-content:space-between;align-items:flex-end">
+  <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;color:#5B6270;font-weight:500">منصة إدارة المستودعات · الدفعة 4 من 7</div><h1 style="margin:0;font-size:36px">الحركات</h1></div>
+  <nav style="display:flex;gap:20px;font-size:15px"><a href="#s8">8 · قائمة الحركات</a><a href="#s9">9 · تفاصيل حركة</a><a href="#s10">10 · طباعة الفاتورة</a></nav>
+</header>
+
+<section id="s8" style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:center;gap:12px"><span style="background:#16191D;color:#fff;font-weight:700;font-size:14px;padding:4px 10px;border-radius:6px">8</span><h2 style="margin:0;font-size:26px">قائمة الحركات</h2><span style="color:#5B6270;font-size:15px">— الفلاتر شغّالة · صاحب الشركة</span></div>
+  <div style="width:1440px;height:900px;background:#F5F6F7;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,.08);position:relative">
+    <dc-import name="Topbar" role="owner" wh="كل المستودعات" hint-size="100%,64px"></dc-import>
+    <div style="flex:1;display:flex;min-height:0">
+      <dc-import name="Sidebar" role="owner" active="tx" hint-size="248px,100%" style="flex:none;width:248px;height:100%"></dc-import>
+      <main style="flex:1;padding:28px 40px;display:flex;flex-direction:column;gap:20px;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h1 style="margin:0;font-size:28px">الحركات</h1><button style="white-space:nowrap;height:40px;padding:0 18px;border-radius:8px;border:0;background:var(--color-primary);color:#fff;font-size:15px;font-weight:600">+ حركة جديدة</button></div>
+        <div style="background:#fff;border:1px solid #E3E5E8;border-radius:12px;padding:16px 20px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">النوع</span><select value="{{ fType }}" onChange="{{ onType }}" style="height:40px;width:160px;border:1px solid #C9CDD3;border-radius:8px;padding:0 10px;font-size:15px;background:#fff"><option value="">كل الأنواع</option><option value="purchase">شراء</option><option value="sale">بيع</option><option value="preturn">مرتجع شراء</option><option value="sreturn">مرتجع بيع</option><option value="transfer">نقل</option></select></label>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">من</span><input type="date" value="2026-10-01" onChange="{{ noop }}" style="height:40px;border:1px solid #C9CDD3;border-radius:8px;padding:0 10px;font-size:15px"></label>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">إلى</span><input type="date" value="2026-10-05" onChange="{{ noop }}" style="height:40px;border:1px solid #C9CDD3;border-radius:8px;padding:0 10px;font-size:15px"></label>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">المستودع</span><select value="{{ fWh }}" onChange="{{ onWh }}" style="height:40px;width:170px;border:1px solid #C9CDD3;border-radius:8px;padding:0 10px;font-size:15px;background:#fff"><option value="">كل المستودعات</option><option>مستودع المدينة</option><option>مستودع الريف</option></select></label>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">الحالة</span><select value="{{ fStatus }}" onChange="{{ onStatus }}" style="height:40px;width:130px;border:1px solid #C9CDD3;border-radius:8px;padding:0 10px;font-size:15px;background:#fff"><option value="">الكل</option><option value="ok">مؤكدة</option><option value="cancel">ملغاة</option></select></label>
+          <label style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px"><span style="font-size:13px;font-weight:500">بحث</span><input value="{{ fQ }}" onChange="{{ onQ }}" placeholder="رقم الحركة أو الطرف" style="height:40px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px"></label>
+          <button onClick="{{ clear }}" style="white-space:nowrap;height:40px;padding:0 14px;border:0;border-radius:8px;background:transparent;color:var(--color-primary);font-size:15px;font-weight:600;cursor:pointer">مسح الفلاتر</button>
+        </div>
+        <div style="flex:1;background:#fff;border:1px solid #E3E5E8;border-radius:12px;overflow:auto;min-height:0">
+          <table style="width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums">
+            <thead><tr style="background:#F5F6F7;color:#5B6270;font-size:13px">
+              <th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">رقم الحركة</th><th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">التاريخ</th><th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">النوع</th><th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">المستودع</th><th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">الطرف / المقابل</th><th style="text-align:left;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">الصافي</th><th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">الحالة</th><th style="border-bottom:1px solid #E3E5E8"></th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+                <tr style="color:{{ r.fg }}">
+                  <td style="padding:11px 16px;border-bottom:1px solid #EEF0F2;direction:ltr;text-align:right;font-weight:500;text-decoration:{{ r.strike }}">{{ r.no }}</td>
+                  <td style="padding:11px 16px;border-bottom:1px solid #EEF0F2;color:#5B6270">{{ r.date }}</td>
+                  <td style="padding:11px 16px;border-bottom:1px solid #EEF0F2;opacity:{{ r.op }}"><span style="display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;font-size:13px;font-weight:600;white-space:nowrap;background:{{ r.tBg }};color:{{ r.tFg }}">{{ r.type }}</span></td>
+                  <td style="padding:11px 16px;border-bottom:1px solid #EEF0F2">{{ r.wh }}</td>
+                  <td style="padding:11px 16px;border-bottom:1px solid #EEF0F2;text-decoration:{{ r.strike }}">{{ r.party }}</td>
+                  <td style="padding:11px 16px;border-bottom:1px solid #EEF0F2;text-align:left;font-weight:600;text-decoration:{{ r.strike }}">{{ r.net }}</td>
+                  <td style="padding:11px 16px;border-bottom:1px solid #EEF0F2"><span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap;border:1px solid {{ r.sBorder }};color:{{ r.sFg }};background:{{ r.sBg }};text-decoration:{{ r.strike }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ r.sDot }}"></span>{{ r.status }}</span></td>
+                  <td style="padding:6px 16px;border-bottom:1px solid #EEF0F2;text-align:left;white-space:nowrap"><span style="display:inline-flex;gap:4px"><a href="#s9" style="height:30px;padding:0 10px;display:inline-flex;align-items:center;font-size:14px;font-weight:600;border-radius:6px">عرض</a><sc-if value="{{ r.canCancel }}" hint-placeholder-val="{{ true }}"><button onClick="{{ r.ask }}" style="height:30px;padding:0 10px;border:0;background:transparent;color:#C81E1E;font-size:14px;font-weight:600;border-radius:6px;cursor:pointer" style-hover="background:#FEF6F6">إلغاء</button></sc-if></span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+          <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:64px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center"><b style="font-size:17px">ما في حركات بهالفلتر</b><span style="font-size:14px;color:#5B6270">جرّب فترة أوسع أو امسح الفلاتر.</span><button onClick="{{ clear }}" style="height:36px;padding:0 14px;border-radius:8px;border:1px solid #C9CDD3;background:#fff;font-size:14px;margin-top:4px;cursor:pointer">مسح الفلاتر</button></div>
+          </sc-if>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;color:#5B6270"><span>{{ countLabel }}</span><span>صفحة 1 من 1</span></div>
+      </main>
+    </div>
+    <sc-if value="{{ confirm }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(22,25,29,.45);display:flex;align-items:center;justify-content:center">
+        <div style="background:#fff;border-radius:12px;width:440px;padding:24px;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 40px rgba(0,0,0,.2)">
+          <div style="font-size:18px;font-weight:700">إلغاء الحركة <span style="direction:ltr;unicode-bidi:isolate">{{ confirm }}</span>؟</div>
+          <div style="font-size:14px;color:#5B6270;line-height:1.7">الإلغاء نهائي. الكميات بترجع لوضعها قبل الحركة، والحركة بتضل ظاهرة بالسجل كـ "ملغاة"، وما فيك ترجعها.</div>
+          <div style="display:flex;gap:8px;margin-top:8px"><button onClick="{{ doCancel }}" style="height:40px;padding:0 18px;border-radius:8px;border:0;background:#C81E1E;color:#fff;font-size:15px;font-weight:600;cursor:pointer">نعم، ألغِ الحركة</button><button onClick="{{ closeConfirm }}" style="height:40px;padding:0 18px;border-radius:8px;border:1px solid #C9CDD3;background:#fff;font-size:15px;cursor:pointer">تراجع</button></div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+  <div style="font-size:15px;color:#2B3038;line-height:1.8;max-width:1000px"><b>المستودع:</b> بيختفي فلتر وعمود المستودع. <b>موبايل:</b> الفلاتر بتنطوي ورا زر "فلترة (3)"، والجدول بينزلق أفقياً مع تثبيت عمود رقم الحركة.</div>
+</section>
+
+<section id="s9" style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:center;gap:12px"><span style="background:#16191D;color:#fff;font-weight:700;font-size:14px;padding:4px 10px;border-radius:6px">9</span><h2 style="margin:0;font-size:26px">تفاصيل حركة</h2><span style="color:#5B6270;font-size:15px">— فاتورة بيع عليها مرتجع · جرّب زر الإلغاء</span></div>
+  <div style="width:1440px;height:900px;background:#F5F6F7;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,.08);position:relative">
+    <dc-import name="Topbar" role="owner" wh="كل المستودعات" hint-size="100%,64px"></dc-import>
+    <div style="flex:1;display:flex;min-height:0">
+      <dc-import name="Sidebar" role="owner" active="tx" hint-size="248px,100%" style="flex:none;width:248px;height:100%"></dc-import>
+      <main style="flex:1;padding:28px 40px;display:flex;flex-direction:column;gap:20px;min-width:0;opacity:{{ dOp }}">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:14px;color:#5B6270"><a href="#s8">الحركات</a> ‹ S-0141</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
+            <div style="display:flex;align-items:center;gap:12px"><h1 style="margin:0;font-size:28px;direction:ltr;text-decoration:{{ dStrike }}">S-0141</h1><span style="display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:6px;font-size:13px;font-weight:600;background:oklch(0.95 0.035 150);color:oklch(0.45 0.13 150)">بيع</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap;border:1px solid {{ dsBorder }};color:{{ dsFg }};background:{{ dsBg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ dsDot }}"></span>{{ dStatus }}</span></div>
+            <div style="display:flex;gap:8px"><a href="#s10" style="white-space:nowrap;height:40px;padding:0 18px;border-radius:8px;border:1px solid #C9CDD3;background:#fff;color:#16191D;font-size:15px;display:inline-flex;align-items:center;text-decoration:none">طباعة</a><sc-if value="{{ dCanCancel }}" hint-placeholder-val="{{ true }}"><button onClick="{{ askDetail }}" style="white-space:nowrap;height:40px;padding:0 18px;border-radius:8px;border:1px solid #F5C9C9;background:#fff;color:#C81E1E;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#FEF6F6">إلغاء الحركة</button></sc-if></div>
+          </div>
+        </div>
+        <sc-if value="{{ dCancelled }}" hint-placeholder-val="{{ false }}"><div style="padding:12px 16px;border-radius:10px;background:#F5F6F7;border:1px solid #E3E5E8;font-size:14px;color:#5B6270">أُلغيت هالحركة بتاريخ 2026-10-05 13:20 بواسطة أحمد النوري. الكميات رجعت للمخزون.</div></sc-if>
+        <div style="background:#fff;border:1px solid #E3E5E8;border-radius:12px;padding:20px;display:grid;grid-template-columns:repeat(5,1fr);gap:16px;font-size:15px">
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;color:#5B6270">التاريخ</span><b style="font-weight:600;font-variant-numeric:tabular-nums">2026-10-05 · 10:31</b></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;color:#5B6270">المستودع</span><b style="font-weight:600">مستودع المدينة</b></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;color:#5B6270">العميل</span><b style="font-weight:600">محل أبو خالد</b></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;color:#5B6270">سجّلها</span><b style="font-weight:600">حساب مستودع المدينة</b></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;color:#5B6270">الدفع</span><b style="font-weight:600">نقدي</b></div>
+        </div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:20px;align-items:start">
+          <div style="background:#fff;border:1px solid #E3E5E8;border-radius:12px;overflow:hidden">
+            <table style="width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums">
+              <thead><tr style="background:#F5F6F7;color:#5B6270;font-size:13px"><th style="text-align:right;font-weight:500;padding:12px 16px">الرمز</th><th style="text-align:right;font-weight:500;padding:12px 16px">اسم المادة</th><th style="text-align:left;font-weight:500;padding:12px 16px">الكمية</th><th style="text-align:left;font-weight:500;padding:12px 16px">مرتجع</th><th style="text-align:left;font-weight:500;padding:12px 16px">سعر الوحدة</th><th style="text-align:left;font-weight:500;padding:12px 16px">القيمة</th></tr></thead>
+              <tbody>
+                <tr><td style="padding:12px 16px;border-top:1px solid #EEF0F2;color:#5B6270">6210001</td><td style="padding:12px 16px;border-top:1px solid #EEF0F2"><b style="font-weight:600">زيت زيتون</b> <span style="font-size:13px;color:#5B6270">· لتر</span></td><td style="padding:12px 16px;border-top:1px solid #EEF0F2;text-align:left">6.000</td><td style="padding:12px 16px;border-top:1px solid #EEF0F2;text-align:left;color:oklch(0.47 0.15 20);font-weight:600">3.000</td><td style="padding:12px 16px;border-top:1px solid #EEF0F2;text-align:left">19,999.50</td><td style="padding:12px 16px;border-top:1px solid #EEF0F2;text-align:left;font-weight:600">119,997.00</td></tr>
+                <tr><td style="padding:12px 16px;border-top:1px solid #EEF0F2;color:#5B6270">6210004</td><td style="padding:12px 16px;border-top:1px solid #EEF0F2"><b style="font-weight:600">أرز</b> <span style="font-size:13px;color:#5B6270">· كيلو</span></td><td style="padding:12px 16px;border-top:1px solid #EEF0F2;text-align:left">5.000</td><td style="padding:12px 16px;border-top:1px solid #EEF0F2;text-align:left;color:#8A909B">—</td><td style="padding:12px 16px;border-top:1px solid #EEF0F2;text-align:left">12,400.00</td><td style="padding:12px 16px;border-top:1px solid #EEF0F2;text-align:left;font-weight:600">62,000.00</td></tr>
+              </tbody>
+            </table>
+            <div style="display:flex;flex-direction:column;gap:10px;padding:16px 20px;border-top:1px solid #E3E5E8;font-variant-numeric:tabular-nums;margin-right:auto;width:360px">
+              <div style="display:flex;justify-content:space-between;font-size:15px"><span style="color:#5B6270">المجموع</span><b>181,997.00</b></div>
+              <div style="display:flex;justify-content:space-between;font-size:15px"><span style="color:#5B6270">الحسم</span><b>−1,997.00</b></div>
+              <div style="height:1px;background:#E3E5E8"></div>
+              <div style="display:flex;justify-content:space-between;align-items:flex-end"><span style="display:flex;flex-direction:column"><b>الصافي</b><span style="font-size:13px;color:#5B6270">المقبوض نقداً</span></span><span style="font-size:28px;font-weight:700;color:var(--color-primary)">180,000.00 <span style="font-size:14px;color:#5B6270;font-weight:500">ل.س</span></span></div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E3E5E8;border-radius:12px;overflow:hidden">
+            <div style="padding:14px 20px;border-bottom:1px solid #E3E5E8;display:flex;justify-content:space-between;align-items:center"><b style="font-size:16px">المرتجعات على هالفاتورة</b><span style="font-size:13px;color:#5B6270">1</span></div>
+            <div style="padding:14px 20px;display:flex;align-items:center;gap:12px;font-size:15px;font-variant-numeric:tabular-nums"><a href="#" style="direction:ltr;font-weight:600">SR-0012</a><span style="color:#5B6270;font-size:14px">2026-10-05</span><span style="flex:1"></span><b>59,998.50</b></div>
+            <div style="padding:12px 20px;border-top:1px solid #EEF0F2;font-size:13px;color:#5B6270;line-height:1.7;background:#FAFBFB">إذا الفاتورة عليها مرتجع مؤكد، لازم تلغي المرتجع أولاً قبل إلغائها.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;padding:12px 16px;border:1px dashed #C9CDD3;border-radius:10px;font-size:14px;color:#5B6270;max-width:720px"><b style="color:#16191D">بحركة مرتجع:</b> بيظهر سطر بالرأس "الفاتورة الأصلية: <a href="#" style="direction:ltr;unicode-bidi:isolate">S-0141</a>" مكان قائمة المرتجعات.</div>
+      </main>
+    </div>
+    <sc-if value="{{ dConfirm }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(22,25,29,.45);display:flex;align-items:center;justify-content:center">
+        <div style="background:#fff;border-radius:12px;width:460px;padding:24px;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 40px rgba(0,0,0,.2)">
+          <div style="font-size:18px;font-weight:700">إلغاء الفاتورة <span style="direction:ltr;unicode-bidi:isolate">S-0141</span>؟</div>
+          <div style="font-size:14px;color:#5B6270;line-height:1.7">الإلغاء نهائي. 6 لتر زيت و5 كيلو أرز رح يرجعوا لمستودع المدينة، والفاتورة بتضل بالسجل كـ "ملغاة".</div>
+          <div style="padding:10px 12px;border-radius:8px;background:#FFF7ED;color:#9A3412;font-size:13px;line-height:1.6">ملاحظة: بالواقع الإلغاء ممنوع هون لأنه في مرتجع مؤكد (SR-0012). معروضة للتوضيح فقط.</div>
+          <div style="display:flex;gap:8px;margin-top:8px"><button onClick="{{ doCancelDetail }}" style="height:40px;padding:0 18px;border-radius:8px;border:0;background:#C81E1E;color:#fff;font-size:15px;font-weight:600;cursor:pointer">نعم، ألغِ الفاتورة</button><button onClick="{{ closeDetail }}" style="height:40px;padding:0 18px;border-radius:8px;border:1px solid #C9CDD3;background:#fff;font-size:15px;cursor:pointer">تراجع</button></div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+  <div style="font-size:15px;color:#2B3038;line-height:1.8;max-width:1000px"><b>موبايل:</b> أزرار الطباعة والإلغاء بقائمة "⋯" بالرأس، بيانات الرأس بعمودين، البنود بطاقات، والمرتجعات تحت الإجماليات.</div>
+</section>
+
+<section id="s10" style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:center;gap:12px"><span style="background:#16191D;color:#fff;font-weight:700;font-size:14px;padding:4px 10px;border-radius:6px">10</span><h2 style="margin:0;font-size:26px">نسخة طباعة الفاتورة</h2><span style="color:#5B6270;font-size:15px">— A4 · أبيض وأسود مع لون الشركة بالترويسة فقط</span></div>
+  <div style="display:flex;gap:48px;align-items:flex-start">
+    <div style="width:794px;min-height:1123px;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.12);padding:56px 60px;display:flex;flex-direction:column;gap:28px;font-size:13px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:20px;border-bottom:3px solid var(--color-primary)">
+        <div style="display:flex;gap:14px;align-items:center"><span style="width:56px;height:56px;border-radius:10px;background:var(--color-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:26px">ن</span><div style="display:flex;flex-direction:column;gap:2px"><b style="font-size:22px">شركة النور</b><span style="color:#5B6270">مستودع المدينة</span></div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><b style="font-size:20px">فاتورة بيع</b><span style="direction:ltr;font-size:15px;font-weight:600">S-0141</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:13px">
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="color:#5B6270">التاريخ</span><b style="font-variant-numeric:tabular-nums">2026-10-05 · 10:31</b></div>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="color:#5B6270">العميل</span><b>محل أبو خالد</b></div>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="color:#5B6270">الدفع</span><b>نقدي</b></div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums">
+        <thead><tr style="border-top:1px solid #16191D;border-bottom:1px solid #16191D"><th style="text-align:right;padding:8px 6px;font-weight:600">#</th><th style="text-align:right;padding:8px 6px;font-weight:600">الرمز</th><th style="text-align:right;padding:8px 6px;font-weight:600">المادة</th><th style="text-align:right;padding:8px 6px;font-weight:600">الوحدة</th><th style="text-align:left;padding:8px 6px;font-weight:600">الكمية</th><th style="text-align:left;padding:8px 6px;font-weight:600">السعر</th><th style="text-align:left;padding:8px 6px;font-weight:600">القيمة</th></tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #D5D8DD"><td style="padding:8px 6px">1</td><td style="padding:8px 6px">6210001</td><td style="padding:8px 6px">زيت زيتون</td><td style="padding:8px 6px">لتر</td><td style="padding:8px 6px;text-align:left">6.000</td><td style="padding:8px 6px;text-align:left">19,999.50</td><td style="padding:8px 6px;text-align:left">119,997.00</td></tr>
+          <tr style="border-bottom:1px solid #D5D8DD"><td style="padding:8px 6px">2</td><td style="padding:8px 6px">6210004</td><td style="padding:8px 6px">أرز</td><td style="padding:8px 6px">كيلو</td><td style="padding:8px 6px;text-align:left">5.000</td><td style="padding:8px 6px;text-align:left">12,400.00</td><td style="padding:8px 6px;text-align:left">62,000.00</td></tr>
+        </tbody>
+      </table>
+      <div style="display:flex;flex-direction:column;gap:6px;width:300px;margin-right:auto;font-variant-numeric:tabular-nums;font-size:14px">
+        <div style="display:flex;justify-content:space-between"><span>المجموع</span><span>181,997.00</span></div>
+        <div style="display:flex;justify-content:space-between"><span>الحسم</span><span>1,997.00</span></div>
+        <div style="display:flex;justify-content:space-between;border-top:2px solid #16191D;padding-top:8px;font-size:17px;font-weight:700"><span>الصافي المقبوض</span><span>180,000.00 ل.س</span></div>
+      </div>
+      <div style="flex:1"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;font-size:13px;color:#5B6270"><div style="border-top:1px solid #8A909B;padding-top:6px">توقيع المستلم</div><div style="border-top:1px solid #8A909B;padding-top:6px">توقيع البائع</div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#8A909B;border-top:1px solid #E3E5E8;padding-top:10px"><span>طُبعت 2026-10-05 14:02 · أحمد النوري</span><span>صفحة 1 من 1</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:520px;font-size:15px;line-height:1.8;color:#2B3038">
+      <h3 style="margin:0;font-size:18px">ملاحظات الطباعة</h3>
+      <ul style="margin:0;padding-right:20px">
+        <li>صفحة Blade مستقلة <code>/transactions/{id}/print</code> بتفتح بتبويب جديد وبتنادي <code>window.print()</code>.</li>
+        <li>بدون قائمة ولا شريط؛ اللون الوحيد هو خط الترويسة وخلفية الشعار (إذا ما في شعار مرفوع بنعرض أول حرف).</li>
+        <li>الفاتورة الملغاة بتنطبع مع ختم "ملغاة" مائل بالخلفية.</li>
+        <li>بـ Tailwind: <code>print:hidden</code> لأي زر، و <code>@page { size: A4; margin: 0 }</code>.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;primary&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#1F4E79&quot;,&quot;options&quot;:[&quot;#1F4E79&quot;,&quot;#2E75B6&quot;,&quot;#0F766E&quot;,&quot;#15803D&quot;,&quot;#B45309&quot;,&quot;#B91C1C&quot;,&quot;#7E22CE&quot;,&quot;#374151&quot;],&quot;tsType&quot;:&quot;string&quot;}}">
+const TM = { purchase: ['شراء', 'oklch(0.95 0.035 250)', 'oklch(0.45 0.13 250)'], sale: ['بيع', 'oklch(0.95 0.035 150)', 'oklch(0.45 0.13 150)'], preturn: ['مرتجع شراء', 'oklch(0.95 0.035 75)', 'oklch(0.45 0.11 65)'], sreturn: ['مرتجع بيع', 'oklch(0.95 0.035 15)', 'oklch(0.47 0.15 20)'], transfer: ['نقل', 'oklch(0.95 0.035 300)', 'oklch(0.45 0.14 300)'] };
+const DATA = [
+  ['S-0142', '2026-10-05', 'sale', 'مستودع المدينة', 'سامر الحلبي', '24,999.38', true],
+  ['SR-0012', '2026-10-05', 'sreturn', 'مستودع المدينة', 'محل أبو خالد', '59,998.50', true],
+  ['S-0141', '2026-10-05', 'sale', 'مستودع المدينة', 'محل أبو خالد', '180,000.00', true],
+  ['S-0058', '2026-10-05', 'sale', 'مستودع الريف', 'سامر الحلبي', '112,498.50', true],
+  ['T-0024', '2026-10-05', 'transfer', 'مستودع المدينة', '← مستودع الريف', '—', true],
+  ['P-0088', '2026-10-05', 'purchase', 'مستودع المدينة', 'شركة الفرات للتوريد', '152,000.00', true],
+  ['P-0087', '2026-10-04', 'purchase', 'مستودع المدينة', 'مؤسسة الشام للمواد الغذائية', '399,990.00', true],
+  ['PR-0003', '2026-10-03', 'preturn', 'مستودع الريف', 'شركة الفرات للتوريد', '45,000.00', true],
+  ['SR-0011', '2026-10-03', 'sreturn', 'مستودع المدينة', 'محل أبو خالد', '59,998.50', false],
+  ['S-0139', '2026-10-02', 'sale', 'مستودع الريف', 'بيع نقدي', '38,800.00', true]
+];
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  state = { fType: '', fWh: '', fStatus: '', fQ: '', cancelled: {}, confirm: null, dConfirm: false, dCancelled: false };
+  applyColor() { const el = this.rootRef.current; if (el) el.style.setProperty('--color-primary', this.props.primary ?? '#1F4E79'); }
+  componentDidMount() { this.applyColor(); }
+  componentDidUpdate(pp) { if (pp.primary !== this.props.primary) this.applyColor(); }
+  renderVals() {
+    const s = this.state;
+    const rows = DATA.filter(([no, , t, wh, party, , ok0]) => {
+      const ok = ok0 && !s.cancelled[no];
+      return (!s.fType || s.fType === t) && (!s.fWh || s.fWh === wh) && (!s.fStatus || (s.fStatus === 'ok') === ok) && (!s.fQ || (no + party).toLowerCase().includes(s.fQ.toLowerCase()));
+    }).map(([no, date, t, wh, party, net, ok0]) => {
+      const ok = ok0 && !s.cancelled[no], [type, tBg, tFg] = TM[t];
+      return { no, date, wh, party, net, type, tBg, tFg, fg: ok ? '#16191D' : '#8A909B', strike: ok ? 'none' : 'line-through', op: ok ? 1 : .55,
+        status: ok ? 'مؤكدة' : 'ملغاة', sBorder: ok ? '#CFE5D6' : '#E3E5E8', sFg: ok ? '#166534' : '#8A909B', sBg: ok ? '#fff' : '#F5F6F7', sDot: ok ? '#15803D' : '#A3A9B3',
+        canCancel: ok, ask: () => this.setState({ confirm: no }) };
+    });
+    const dc = s.dCancelled;
+    return {
+      rootRef: this.rootRef, rows, empty: rows.length === 0, countLabel: `${rows.length} حركة`,
+      fType: s.fType, fWh: s.fWh, fStatus: s.fStatus, fQ: s.fQ,
+      onType: e => this.setState({ fType: e.target.value }), onWh: e => this.setState({ fWh: e.target.value }), onStatus: e => this.setState({ fStatus: e.target.value }), onQ: e => this.setState({ fQ: e.target.value }),
+      clear: () => this.setState({ fType: '', fWh: '', fStatus: '', fQ: '' }),
+      confirm: s.confirm, closeConfirm: () => this.setState({ confirm: null }),
+      doCancel: () => this.setState(st => ({ cancelled: { ...st.cancelled, [st.confirm]: true }, confirm: null })),
+      dConfirm: s.dConfirm, askDetail: () => this.setState({ dConfirm: true }), closeDetail: () => this.setState({ dConfirm: false }),
+      doCancelDetail: () => this.setState({ dConfirm: false, dCancelled: true }),
+      dCancelled: dc, dCanCancel: !dc, dOp: 1, dStrike: dc ? 'line-through' : 'none',
+      dStatus: dc ? 'ملغاة' : 'مؤكدة', dsBorder: dc ? '#E3E5E8' : '#CFE5D6', dsFg: dc ? '#8A909B' : '#166534', dsBg: dc ? '#F5F6F7' : '#fff', dsDot: dc ? '#A3A9B3' : '#15803D',
+      noop: () => {}
+    };
+  }
+}
+</script>
+</body>
+</html>

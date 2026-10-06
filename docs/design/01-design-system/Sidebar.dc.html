@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<aside dir="rtl" style="width:248px;height:100%;flex:none;background:#fff;border-left:1px solid #E3E5E8;padding:16px 12px;display:flex;flex-direction:column;gap:2px;font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;box-sizing:border-box">
+  <sc-for list="{{ main }}" as="n" hint-placeholder-count="6">
+    <span style="height:40px;flex:none;display:flex;align-items:center;padding:0 12px;border-radius:8px;font-size:15px;font-weight:{{ n.fw }};color:{{ n.fg }};background:{{ n.bg }}">{{ n.label }}</span>
+  </sc-for>
+  <sc-if value="{{ hasAdmin }}" hint-placeholder-val="{{ false }}">
+    <div style="font-size:12px;color:#8A909B;font-weight:600;padding:20px 12px 6px">إدارة الشركة</div>
+    <sc-for list="{{ adminItems }}" as="n" hint-placeholder-count="2">
+      <span style="height:40px;flex:none;display:flex;align-items:center;padding:0 12px;border-radius:8px;font-size:15px;font-weight:{{ n.fw }};color:{{ n.fg }};background:{{ n.bg }}">{{ n.label }}</span>
+    </sc-for>
+  </sc-if>
+  <div style="flex:1"></div>
+  <sc-for list="{{ bottom }}" as="n" hint-placeholder-count="2">
+    <span style="height:40px;flex:none;display:flex;align-items:center;padding:0 12px;border-radius:8px;font-size:15px;font-weight:{{ n.fw }};color:{{ n.fg }};background:{{ n.bg }}">{{ n.label }}</span>
+  </sc-for>
+</aside>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:248,&quot;height&quot;:700},&quot;role&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;owner&quot;,&quot;warehouse&quot;,&quot;admin&quot;],&quot;default&quot;:&quot;owner&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;active&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;dash&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const role = this.props.role ?? 'owner', active = this.props.active ?? 'dash';
+    const mk = ([k, label, muted]) => {
+      const on = k === active;
+      return { label, fw: on ? 600 : 500, fg: on ? (role === 'admin' ? '#16191D' : 'var(--color-primary)') : (muted ? '#5B6270' : '#16191D'), bg: on ? (role === 'admin' ? '#EEF0F2' : 'color-mix(in srgb,var(--color-primary) 9%,white)') : 'transparent' };
+    };
+    const ops = [['dash', 'لوحة التحكم'], ['new', 'حركة جديدة'], ['tx', 'الحركات'], ['items', 'دليل المواد'], ['parties', 'العملاء والموردون'], ['reports', 'التقارير']];
+    return {
+      main: (role === 'admin' ? [['companies', 'الشركات']] : ops).map(mk),
+      hasAdmin: role === 'owner',
+      adminItems: [['warehouses', 'المستودعات'], ['settings', 'إعدادات الشركة']].map(mk),
+      bottom: [['profile', 'الملف الشخصي'], ['logout', 'تسجيل الخروج', true]].map(mk)
+    };
+  }
+}
+</script>
+</body>
+</html>

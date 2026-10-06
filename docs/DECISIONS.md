@@ -71,3 +71,14 @@ Add new decisions here: `YYYY-MM-DD — decision — reason`.
 - 2026-10-05 — Dates shown with Levantine month names (تشرين الأول …) as in the design, via one formatting helper.
 - 2026-10-05 — The design's "delete" button is used only to remove an invoice line before saving — records are never deleted (T12).
 - 2026-10-05 — Quick-add of a party from inside an invoice (design) is deferred to Phase 3 and follows Q2 — not required by the SRS.
+- 2026-10-06 — Design files stay exactly as exported from the design tool (Arabic names, all batches in `docs/design/01-design-system/`, plus `Sidebar` / `Topbar`); never renamed — re-exports replace them cleanly. PLAN.md maps each design screen number to its phase.
+- 2026-10-06 — Units: `config('wms.units')` lists each unit with `allows_fraction` (لتر / كيلو: yes; علبة / قطعة: no); the product unit is a select from that list; quantities of a non-fractional unit must be whole numbers — user's decision; replaces the design's per-product "accepts fractions" checkbox, which has no column (rule 11).
+- 2026-10-06 — Stagnant products: dashboards use `config('wms.stagnant_days', 60)`; reports use the period from the filter (SRS 3.6.6) — user's decision; the design's fixed "60 days" applies to dashboards only.
+- 2026-10-06 — Suspended company: users may sign in, then every route except logout redirects to the suspended-subscription page (design screen 20) and no data page opens; a test walks every route — user's decision; supersedes refusing the login (Phase 1). A deactivated warehouse account is still refused at login (FR-05). Platform contact details (phone, email, hours) come from config, not the database.
+- 2026-10-06 — Invoice print page added to Phase 3 (design screen 10) — user's decision.
+- 2026-10-06 — Markup percent limited to 100–1000% — user's decision (design); below 100% would suggest selling under cost.
+- 2026-10-06 — No "last login" column on the warehouses page — no column in the schema (rule 11); user's decision.
+- 2026-10-06 — No camera barcode button on mobile — would need a barcode library (T6); USB scanners type like a keyboard; user's decision.
+- 2026-10-06 — "Cancelled at / by" on the movement details page deferred to Phase 6 with Q5 — needs a schema proposal; user's decision.
+- 2026-10-06 — The companies page (status cards + list, design screen 19) is the super admin dashboard — covers FR-24 for the platform owner without a separate page.
+- 2026-10-06 — Design deviations fixed in favour of the SRS: return net carries its proportional discount (SRS 3.4.6); a transfer is valued at the last purchase price (SRS 3.4.7); a discount above the subtotal is rejected, not clamped (SRS 7); "low stock" means balance ≤ min_stock (SRS 3.6.6); the reports screen lists all SRS 3.6.2 reports, not four; the product form has the manual sale price field (FR-07); dates show the real weekday.

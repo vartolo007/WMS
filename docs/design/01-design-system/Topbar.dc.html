@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div dir="rtl" style="height:64px;width:100%;flex:none;background:{{ bg }};color:{{ fg }};border-bottom:1px solid {{ border }};display:flex;align-items:center;gap:20px;padding:0 24px;font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;box-sizing:border-box">
+  <div style="display:flex;align-items:center;gap:12px;min-width:200px">
+    <span style="width:36px;height:36px;border-radius:8px;background:{{ logoBg }};color:{{ logoFg }};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px">{{ logo }}</span>
+    <span style="font-weight:700;font-size:17px">{{ title }}</span>
+    <sc-if value="{{ sub }}" hint-placeholder-val="{{ false }}"><span style="white-space:nowrap;font-size:14px;color:{{ subFg }};padding-right:12px;border-right:1px solid {{ border }}">{{ sub }}</span></sc-if>
+  </div>
+  <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ false }}">
+    <div style="height:40px;display:flex;align-items:center;gap:10px;padding:0 14px;border:1px solid #C9CDD3;border-radius:8px;background:#fff;font-size:15px;min-width:220px">
+      <span style="font-size:13px;color:#5B6270">المستودع:</span><span style="font-weight:600;flex:1">{{ wh }}</span>
+      <span style="width:7px;height:7px;border-left:2px solid #5B6270;border-bottom:2px solid #5B6270;transform:rotate(-45deg);margin-top:-3px"></span>
+    </div>
+  </sc-if>
+  <div style="flex:1"></div>
+  <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ false }}">
+    <span style="display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:600;background:#FEF3C7;color:#92400E"><span style="width:6px;height:6px;border-radius:50%;background:#D97706"></span>تجريبي · باقي 9 أيام</span>
+  </sc-if>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.3"><span style="font-weight:600;font-size:14px">{{ user }}</span><span style="font-size:12px;color:{{ subFg }}">{{ roleLabel }}</span></div>
+    <span style="width:36px;height:36px;border-radius:50%;background:{{ avBg }};display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;color:{{ subFg }}">{{ initial }}</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:64},&quot;role&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;owner&quot;,&quot;warehouse&quot;,&quot;admin&quot;],&quot;default&quot;:&quot;owner&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;wh&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;كل المستودعات&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const role = this.props.role ?? 'owner';
+    const admin = role === 'admin';
+    const map = {
+      owner: { user: 'أحمد النوري', roleLabel: 'صاحب الشركة', initial: 'أ', sub: '' },
+      warehouse: { user: 'حساب ' + (this.props.wh ?? 'مستودع المدينة'), roleLabel: 'مستودع', initial: 'م', sub: this.props.wh ?? 'مستودع المدينة' },
+      admin: { user: 'مدير المنصة', roleLabel: 'إدارة المنصة', initial: 'م', sub: 'لوحة إدارة المنصة' }
+    };
+    return {
+      ...map[role], isOwner: role === 'owner', wh: this.props.wh ?? 'كل المستودعات',
+      title: admin ? 'رفّ' : 'شركة النور', logo: admin ? 'ر' : 'ن',
+      bg: admin ? '#16191D' : '#fff', fg: admin ? '#fff' : '#16191D', border: admin ? '#3A3F47' : '#E3E5E8',
+      logoBg: admin ? '#fff' : 'var(--color-primary)', logoFg: admin ? '#16191D' : '#fff',
+      subFg: admin ? '#A3A9B3' : '#5B6270', avBg: admin ? '#3A3F47' : '#E3E5E8'
+    };
+  }
+}
+</script>
+</body>
+</html>

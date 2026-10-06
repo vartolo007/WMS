@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E6E8EB;font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;color:#16191D;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:var(--color-primary,#1F4E79);text-decoration:none;font-weight:500}
+a:hover{text-decoration:underline}
+code{unicode-bidi:isolate;direction:ltr}
+button,input,select{font-family:inherit}
+input:focus,select:focus{outline:none;border-color:var(--color-primary)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--color-primary) 18%,white)}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" dir="rtl" style="--color-primary:#1F4E79;padding:64px;display:flex;flex-direction:column;gap:40px;width:1568px">
+
+<header style="display:flex;flex-direction:column;gap:6px">
+  <div style="font-size:14px;color:#5B6270;font-weight:500">منصة إدارة المستودعات · الدفعة 3 من 7</div>
+  <h1 style="margin:0;font-size:36px">7 · حركة جديدة</h1>
+  <div style="font-size:15px;color:#5B6270;max-width:900px;line-height:1.7">نموذج تفاعلي: بدّل النوع من التبويبات، امسح باركود (اكتب الرمز واضغط Enter)، عدّل الكميات. الدور (صاحب شركة / مستودع) من لوحة Tweaks.</div>
+</header>
+
+<section id="s7" style="width:1440px;min-height:960px;background:#F5F6F7;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,.08);position:relative">
+  <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ true }}"><dc-import name="Topbar" role="owner" wh="كل المستودعات" hint-size="100%,64px"></dc-import></sc-if>
+  <sc-if value="{{ isWarehouse }}" hint-placeholder-val="{{ false }}"><dc-import name="Topbar" role="warehouse" wh="مستودع المدينة" hint-size="100%,64px"></dc-import></sc-if>
+  <div style="flex:1;display:flex;min-height:0">
+    <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ true }}"><dc-import name="Sidebar" role="owner" active="new" hint-size="248px,100%" style="flex:none;width:248px;align-self:stretch"></dc-import></sc-if>
+    <sc-if value="{{ isWarehouse }}" hint-placeholder-val="{{ false }}"><dc-import name="Sidebar" role="warehouse" active="new" hint-size="248px,100%" style="flex:none;width:248px;align-self:stretch"></dc-import></sc-if>
+    <main style="flex:1;padding:28px 40px 40px;display:flex;flex-direction:column;gap:20px;min-width:0">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
+        <h1 style="margin:0;font-size:28px">حركة جديدة</h1>
+        <div style="display:flex;gap:4px;background:#E9EBEE;border-radius:10px;padding:4px">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+            <button onClick="{{ t.pick }}" style="white-space:nowrap;height:40px;padding:0 18px;border:0;border-radius:7px;display:flex;align-items:center;gap:8px;font-size:15px;cursor:pointer;background:{{ t.bg }};color:{{ t.fg }};font-weight:{{ t.fw }};box-shadow:{{ t.shadow }}"><span style="width:8px;height:8px;border-radius:2px;background:{{ t.dot }}"></span>{{ t.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #E3E5E8;border-radius:12px;padding:20px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px">
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">التاريخ</span><input type="date" value="2026-10-05" onChange="{{ noop }}" style="height:40px;border:1px solid #C9CDD3;border-radius:8px;padding:0 10px;font-size:15px;background:#fff"></label>
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500;color:#5B6270">رقم الحركة</span><span style="height:40px;border:1px solid #E3E5E8;border-radius:8px;padding:0 12px;font-size:15px;background:#F5F6F7;color:#5B6270;display:flex;align-items:center;justify-content:space-between"><span style="direction:ltr;font-weight:600;color:#16191D">{{ txNo }}</span><span style="font-size:12px">تلقائي</span></span></label>
+        <sc-if value="{{ isPurchase }}" hint-placeholder-val="{{ false }}">
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">رقم الوثيقة <span style="color:#5B6270;font-weight:400">(فاتورة المورد)</span></span><input value="{{ docNo }}" onChange="{{ onDoc }}" placeholder="مثال: SH-2291" style="height:40px;border:1px solid #C9CDD3;border-radius:8px;padding:0 12px;font-size:15px;direction:ltr;text-align:right"></label>
+        </sc-if>
+        <sc-if value="{{ showPartySelect }}" hint-placeholder-val="{{ true }}">
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">{{ partyLabel }}</span>
+            <select value="{{ party }}" onChange="{{ onParty }}" style="height:40px;border:1px solid {{ partyBorder }};border-radius:8px;padding:0 10px;font-size:15px;background:#fff">
+              <sc-for list="{{ partyOpts }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+            </select>
+            <sc-if value="{{ partyErr }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#C81E1E;font-weight:500">اختر المورد، هالحقل إلزامي بالشراء</span></sc-if>
+          </label>
+        </sc-if>
+        <sc-if value="{{ isReturn }}" hint-placeholder-val="{{ false }}">
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500;color:#5B6270">{{ partyLabel }}</span><span style="height:40px;border:1px solid #E3E5E8;border-radius:8px;padding:0 12px;font-size:15px;background:#F5F6F7;display:flex;align-items:center">{{ retParty }}</span></label>
+        </sc-if>
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">{{ whLabel }}</span>
+          <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ true }}">
+            <select value="{{ whFrom }}" onChange="{{ onWhFrom }}" style="height:40px;border:1px solid #C9CDD3;border-radius:8px;padding:0 10px;font-size:15px;background:#fff"><option>مستودع المدينة</option><option>مستودع الريف</option></select>
+          </sc-if>
+          <sc-if value="{{ isWarehouse }}" hint-placeholder-val="{{ false }}">
+            <span style="height:40px;border:1px solid #E3E5E8;border-radius:8px;padding:0 12px;font-size:15px;background:#F5F6F7;display:flex;align-items:center">مستودع المدينة</span>
+          </sc-if>
+        </label>
+        <sc-if value="{{ isTransfer }}" hint-placeholder-val="{{ false }}">
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">المستودع المستقبِل</span><select style="height:40px;border:1px solid #C9CDD3;border-radius:8px;padding:0 10px;font-size:15px;background:#fff"><option>{{ whTo }}</option></select></label>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ notReturn }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#fff;border:2px solid var(--color-primary);border-radius:12px;padding:16px 20px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:16px">
+            <span style="flex:none;display:flex;flex-direction:column;gap:2px"><b style="font-size:16px">الباركود</b><span style="font-size:12px;color:#5B6270">امسح أو اكتب الاسم + Enter</span></span>
+            <input ref="{{ bcRef }}" value="{{ bc }}" onChange="{{ onBc }}" onKeyDown="{{ onBcKey }}" placeholder="جاهز للمسح…" style="flex:1;height:56px;border:1px solid #C9CDD3;border-radius:10px;padding:0 18px;font-size:22px;font-weight:600;letter-spacing:1px;background:#FAFBFB">
+            <button onClick="{{ addBc }}" style="white-space:nowrap;flex:none;height:56px;padding:0 22px;border-radius:10px;border:0;background:var(--color-primary);color:#fff;font-size:16px;font-weight:600;cursor:pointer">إضافة</button>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px">
+            <sc-if value="{{ bcErr }}" hint-placeholder-val="{{ false }}"><span style="color:#C81E1E;font-weight:500">{{ bcErr }}</span></sc-if>
+            <sc-if value="{{ bcFlash }}" hint-placeholder-val="{{ false }}"><span style="color:#15803D;font-weight:500">{{ bcFlash }}</span></sc-if>
+            <span style="flex:1"></span>
+            <span style="color:#5B6270;display:flex;gap:6px;align-items:center">للتجربة:
+              <sc-for list="{{ demoCodes }}" as="d" hint-placeholder-count="4"><button onClick="{{ d.scan }}" style="border:1px solid #E3E5E8;background:#F5F6F7;border-radius:6px;padding:2px 8px;font-size:12px;cursor:pointer;direction:ltr">{{ d.code }} · {{ d.name }}</button></sc-for>
+            </span>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isReturn }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border:1px solid #E3E5E8;border-radius:12px;padding:16px 20px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:16px">
+            <span style="flex:none;display:flex;flex-direction:column;gap:2px"><b style="font-size:16px">الفاتورة الأصلية</b><span style="font-size:12px;color:#5B6270">الخطوة 1: ابحث برقمها</span></span>
+            <sc-if value="{{ noInv }}" hint-placeholder-val="{{ true }}">
+              <input value="{{ invQ }}" onChange="{{ onInvQ }}" placeholder="{{ invPh }}" style="flex:1;height:48px;border:1px solid #C9CDD3;border-radius:10px;padding:0 16px;font-size:18px;direction:ltr;text-align:right">
+            </sc-if>
+            <sc-if value="{{ inv }}" hint-placeholder-val="{{ false }}">
+              <div style="flex:1;height:48px;border:1px solid #E3E5E8;background:#F5F6F7;border-radius:10px;padding:0 16px;display:flex;align-items:center;gap:16px;font-size:15px">
+                <b style="direction:ltr">{{ inv.no }}</b><span>{{ inv.party }}</span><span style="color:#5B6270;font-variant-numeric:tabular-nums">{{ inv.date }}</span><span style="color:#5B6270;font-variant-numeric:tabular-nums">الصافي {{ inv.total }} ل.س</span><span style="flex:1"></span><button onClick="{{ clearInv }}" style="border:0;background:transparent;color:var(--color-primary);font-weight:600;font-size:14px;cursor:pointer">تغيير</button>
+              </div>
+            </sc-if>
+          </div>
+          <sc-if value="{{ noInv }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;border:1px solid #E3E5E8;border-radius:10px;overflow:hidden">
+              <sc-for list="{{ invResults }}" as="r" hint-placeholder-count="2">
+                <button onClick="{{ r.pick }}" style="display:flex;gap:20px;align-items:center;padding:12px 16px;border:0;border-bottom:1px solid #EEF0F2;background:#fff;font-size:15px;text-align:right;cursor:pointer" style-hover="background:#F5F6F7"><b style="direction:ltr;width:80px;text-align:right">{{ r.no }}</b><span style="flex:1">{{ r.party }}</span><span style="color:#5B6270;font-variant-numeric:tabular-nums">{{ r.date }}</span><span style="font-variant-numeric:tabular-nums;font-weight:600;width:140px;text-align:left">{{ r.total }}</span></button>
+              </sc-for>
+              <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}"><div style="padding:16px;font-size:14px;color:#5B6270">ما في فاتورة بهالرقم بهالمستودع.</div></sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <div style="background:#fff;border:1px solid #E3E5E8;border-radius:12px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:{{ cols }};gap:12px;align-items:center;padding:10px 20px;background:#F5F6F7;border-bottom:1px solid #E3E5E8;font-size:13px;color:#5B6270;font-weight:500">
+          <sc-for list="{{ heads }}" as="h" hint-placeholder-count="6"><span style="text-align:{{ h.align }}">{{ h.label }}</span></sc-for>
+        </div>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="2">
+          <div style="display:grid;grid-template-columns:{{ cols }};gap:12px;align-items:start;padding:10px 20px;border-bottom:1px solid #EEF0F2;background:{{ r.bg }};font-variant-numeric:tabular-nums">
+            <span style="direction:ltr;text-align:right;color:#5B6270;font-size:14px;padding-top:9px">{{ r.code }}</span>
+            <span style="display:flex;flex-direction:column;padding-top:5px"><b style="font-size:15px;font-weight:600">{{ r.name }}</b><span style="font-size:12px;color:#5B6270">{{ r.unit }} · رف {{ r.loc }}</span></span>
+            <sc-if value="{{ r.showOrig }}" hint-placeholder-val="{{ false }}"><span style="text-align:left;padding-top:9px;color:#5B6270">{{ r.orig }}</span></sc-if>
+            <sc-if value="{{ r.showRet }}" hint-placeholder-val="{{ false }}"><span style="text-align:left;padding-top:9px;font-weight:600">{{ r.availRet }}</span></sc-if>
+            <sc-if value="{{ r.showAvail }}" hint-placeholder-val="{{ false }}"><span style="text-align:left;padding-top:9px;color:{{ r.availFg }};font-weight:600">{{ r.avail }}</span></sc-if>
+            <span style="display:flex;flex-direction:column;gap:4px"><input value="{{ r.qty }}" onChange="{{ r.onQty }}" onKeyDown="{{ r.onQtyKey }}" inputMode="decimal" style="height:40px;border:1px solid {{ r.qtyBorder }};background:{{ r.qtyBg }};border-radius:8px;padding:0 10px;font-size:15px;direction:ltr;text-align:left;font-variant-numeric:tabular-nums;width:100%"><sc-if value="{{ r.err }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#C81E1E;font-weight:600">{{ r.err }}</span></sc-if></span>
+            <sc-if value="{{ r.showPrice }}" hint-placeholder-val="{{ true }}">
+              <span style="display:flex;flex-direction:column;gap:4px">
+                <sc-if value="{{ r.priceEdit }}" hint-placeholder-val="{{ true }}"><input value="{{ r.priceStr }}" onChange="{{ r.onPrice }}" inputMode="decimal" style="height:40px;border:1px solid #C9CDD3;border-radius:8px;padding:0 10px;font-size:15px;direction:ltr;text-align:left;font-variant-numeric:tabular-nums;width:100%;background:#fff"></sc-if>
+                <sc-if value="{{ r.priceFixed }}" hint-placeholder-val="{{ false }}"><span style="height:40px;display:flex;align-items:center;justify-content:flex-end;padding:0 10px;border-radius:8px;background:#F5F6F7;color:#5B6270;font-size:15px">{{ r.priceStr }}</span></sc-if>
+                <sc-if value="{{ r.suggested }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:600;color:var(--color-primary);background:color-mix(in srgb,var(--color-primary) 9%,white);border-radius:4px;padding:1px 6px;align-self:flex-end">سعر مقترح</span></sc-if>
+              </span>
+              <span style="text-align:left;padding-top:9px;font-weight:700;font-size:15px">{{ r.value }}</span>
+            </sc-if>
+            <sc-if value="{{ r.canDel }}" hint-placeholder-val="{{ true }}"><button onClick="{{ r.del }}" title="حذف السطر" style="width:36px;height:36px;margin-top:2px;border:0;border-radius:8px;background:transparent;color:#8A909B;font-size:18px;cursor:pointer" style-hover="background:#FEF6F6;color:#C81E1E">✕</button></sc-if>
+          </div>
+        </sc-for>
+        <sc-if value="{{ emptyLines }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:40px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center"><b style="font-size:16px">{{ emptyTitle }}</b><span style="font-size:14px;color:#5B6270">{{ emptySub }}</span></div>
+        </sc-if>
+      </div>
+
+      <div style="display:flex;gap:20px;align-items:flex-start">
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px">
+          <sc-if value="{{ saveErr }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;background:#FEF6F6;border:1px solid #F5C9C9;font-size:14px;color:#991B1B;line-height:1.6"><span style="width:16px;height:16px;border-radius:50%;background:#C81E1E;flex:none;margin-top:3px"></span>{{ saveErr }}</div>
+          </sc-if>
+          <div style="font-size:13px;color:#5B6270;line-height:1.8">{{ typeNote }}</div>
+          <div style="display:flex;gap:16px;font-size:12px;color:#8A909B"><span><code style="background:#EEF0F2;padding:1px 6px;border-radius:4px">Enter</code> بالكمية ← يرجع للباركود</span><span><code style="background:#EEF0F2;padding:1px 6px;border-radius:4px">Ctrl+S</code> حفظ</span><span><code style="background:#EEF0F2;padding:1px 6px;border-radius:4px">F2</code> الباركود</span></div>
+        </div>
+        <div style="width:440px;flex:none;background:#fff;border:1px solid #E3E5E8;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px;font-variant-numeric:tabular-nums">
+          <sc-if value="{{ notTransfer }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;justify-content:space-between;font-size:15px"><span style="color:#5B6270">المجموع</span><b>{{ sumStr }}</b></div>
+            <sc-if value="{{ hasDiscount }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:15px"><span style="color:#5B6270">الحسم</span><input value="{{ disc }}" onChange="{{ onDisc }}" placeholder="0.00" style="width:150px;height:36px;border:1px solid #C9CDD3;border-radius:8px;padding:0 10px;font-size:15px;direction:ltr;text-align:left;font-variant-numeric:tabular-nums"></div>
+            </sc-if>
+            <div style="height:1px;background:#E3E5E8"></div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-end"><span style="display:flex;flex-direction:column"><b style="font-size:16px">الصافي</b><span style="font-size:13px;color:#5B6270">{{ netLabel }}</span></span><span style="font-size:34px;font-weight:700;color:var(--color-primary);line-height:1.1">{{ netStr }} <span style="font-size:15px;color:#5B6270;font-weight:500">ل.س</span></span></div>
+          </sc-if>
+          <sc-if value="{{ isTransfer }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;justify-content:space-between;font-size:15px"><span style="color:#5B6270">عدد البنود</span><b>{{ lineCount }}</b></div>
+            <div style="display:flex;justify-content:space-between;font-size:15px"><span style="color:#5B6270">من ← إلى</span><b>{{ whFrom }} ← {{ whTo }}</b></div>
+          </sc-if>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <button onClick="{{ save }}" style="flex:1;height:48px;border-radius:8px;border:0;background:var(--color-primary);color:#fff;font-size:16px;font-weight:600;cursor:pointer" style-hover="filter:brightness(0.9)">حفظ الحركة</button>
+            <button onClick="{{ reset }}" style="height:48px;padding:0 18px;border-radius:8px;border:1px solid #C9CDD3;background:#fff;font-size:15px;cursor:pointer">إفراغ</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;top:80px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:10px;background:#fff;border:1px solid #CFE5D6;box-shadow:0 12px 32px rgba(22,25,29,.15);font-size:15px"><span style="width:18px;height:18px;border-radius:50%;background:#15803D"></span><b>{{ toast }}</b></div>
+  </sc-if>
+</section>
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px;width:1440px;font-size:15px;line-height:1.8;color:#2B3038">
+  <div style="display:flex;flex-direction:column;gap:8px"><h3 style="margin:0;font-size:18px">سلوك الحقول حسب النوع</h3><ul style="margin:0;padding-right:20px"><li><b>شراء:</b> رقم الوثيقة + مورد إلزامي، السعر = سعر الشراء الأخير وقابل للتعديل.</li><li><b>بيع:</b> عميل اختياري، سعر مقترح تلقائي، عمود الرصيد المتوفر.</li><li><b>مرتجع:</b> ما في باركود؛ بتختار الفاتورة وبتدخل الكمية المرتجعة بس، السعر ثابت.</li><li><b>نقل:</b> بدون طرف ولا حسم ولا أسعار، مع المستودع المستقبِل.</li></ul></div>
+  <div style="display:flex;flex-direction:column;gap:8px"><h3 style="margin:0;font-size:18px">الباركود والكيبورد</h3><ul style="margin:0;padding-right:20px"><li>التركيز دائماً على حقل الباركود عند الفتح وبعد كل إضافة.</li><li>مسح نفس المادة مرة تانية بيزيد كميتها 1 بدل سطر جديد.</li><li>رمز غير معروف ← رسالة تحت الحقل والنص بيضل محدد لإعادة المسح.</li><li>الحفظ ممنوع إذا في سطر أحمر؛ بتطلع رسالة فوق الإجماليات.</li></ul></div>
+  <div style="display:flex;flex-direction:column;gap:8px"><h3 style="margin:0;font-size:18px">على الموبايل</h3><ul style="margin:0;padding-right:20px"><li>التبويبات بتصير شريط أفقي منزلق.</li><li>حقل الباركود لاصق أعلى الشاشة مع زر كاميرا.</li><li>كل سطر بيصير بطاقة: الاسم فوق، الكمية والسعر جنب بعض، القيمة تحت.</li><li>شريط سفلي لاصق فيه الصافي وزر الحفظ.</li></ul></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;primary&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#1F4E79&quot;,&quot;options&quot;:[&quot;#1F4E79&quot;,&quot;#2E75B6&quot;,&quot;#0F766E&quot;,&quot;#15803D&quot;,&quot;#B45309&quot;,&quot;#B91C1C&quot;,&quot;#7E22CE&quot;,&quot;#374151&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;role&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;owner&quot;,&quot;warehouse&quot;],&quot;default&quot;:&quot;owner&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const CAT = {
+  '6210001': { code: '6210001', name: 'زيت زيتون', unit: 'لتر', loc: 'A3', stock: 8, buy: 9999.75, sell: 19999.5, dec: true },
+  '6210002': { code: '6210002', name: 'سكر', unit: 'كيلو', loc: 'B2', stock: 140, buy: 4500, sell: 9000, dec: true },
+  '6210003': { code: '6210003', name: 'معلبات حمص', unit: 'علبة', loc: 'C1', stock: 30, buy: 3250, sell: 6500, dec: false },
+  '6210004': { code: '6210004', name: 'أرز', unit: 'كيلو', loc: 'B4', stock: 95, buy: 6200, sell: 12400, dec: true }
+};
+const INV = {
+  sreturn: [
+    { no: 'S-0142', party: 'سامر الحلبي', date: '2026-10-05', lines: [['6210001', 1.25, 19999.5, 0], ['6210002', 2, 9000, 0]] },
+    { no: 'S-0141', party: 'محل أبو خالد', date: '2026-10-05', lines: [['6210001', 6, 19999.5, 3], ['6210004', 5, 12400, 0]] }
+  ],
+  preturn: [
+    { no: 'P-0087', party: 'مؤسسة الشام للمواد الغذائية', date: '2026-10-05', lines: [['6210001', 40, 9999.75, 0]] },
+    { no: 'P-0088', party: 'شركة الفرات للتوريد', date: '2026-10-05', lines: [['6210002', 20, 4500, 0], ['6210004', 10, 6200, 0]] }
+  ]
+};
+const TYPES = [
+  { k: 'purchase', label: 'شراء', hue: 250, no: 'P-0089' },
+  { k: 'sale', label: 'بيع', hue: 150, no: 'S-0143' },
+  { k: 'preturn', label: 'مرتجع شراء', hue: 70, no: 'PR-0004' },
+  { k: 'sreturn', label: 'مرتجع بيع', hue: 15, no: 'SR-0013' },
+  { k: 'transfer', label: 'نقل', hue: 300, no: 'T-0025' }
+];
+const r2 = x => Math.round(x * 100) / 100;
+const money = x => r2(x).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const qfmt = (x, dec) => dec ? x.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) : String(x);
+const plain = x => String(+x.toFixed(3));
+let uid = 10;
+
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  bcRef = React.createRef();
+  state = {
+    type: 'sale', bc: '', bcErr: '', bcFlash: '', saveErr: '', toast: '', partyErr: false,
+    lines: {
+      purchase: [{ id: 1, code: '6210001', qty: '40', price: 9999.75 }],
+      sale: [{ id: 2, code: '6210001', qty: '1.25', price: 19999.5 }, { id: 3, code: '6210003', qty: '36', price: 6500 }],
+      transfer: [{ id: 4, code: '6210004', qty: '25', price: 0 }]
+    },
+    party: { purchase: 'مؤسسة الشام للمواد الغذائية', sale: '' },
+    docNo: 'SH-2291', disc: { purchase: '', sale: '' },
+    inv: { sreturn: 'S-0141', preturn: null }, invQ: { sreturn: '', preturn: '' },
+    ret: { sreturn: { '6210001': '1', '6210004': '' }, preturn: {} },
+    whFrom: 'مستودع المدينة'
+  };
+  applyColor() { const el = this.rootRef.current; if (el) el.style.setProperty('--color-primary', this.props.primary ?? '#1F4E79'); }
+  focusBc() { setTimeout(() => this.bcRef.current && this.bcRef.current.focus({ preventScroll: true }), 0); }
+  componentDidMount() {
+    this.applyColor(); this.focusBc();
+    this.onKey = e => {
+      if (e.key === 'F2') { e.preventDefault(); this.focusBc(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); this.save(); }
+    };
+    window.addEventListener('keydown', this.onKey);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this.onKey); }
+  componentDidUpdate(pp) { if (pp.primary !== this.props.primary) this.applyColor(); }
+  setLines(fn) { const t = this.state.type; this.setState(s => ({ lines: { ...s.lines, [t]: fn(s.lines[t]) }, saveErr: '' })); }
+  addCode(q) {
+    q = (q || '').trim(); if (!q) return;
+    const it = CAT[q] || Object.values(CAT).find(i => i.name.includes(q));
+    if (!it) { this.setState({ bcErr: `ما في مادة بالرمز أو الاسم "${q}"`, bcFlash: '' }); this.focusBc(); return; }
+    const t = this.state.type;
+    this.setLines(ls => {
+      const ex = ls.find(l => l.code === it.code);
+      if (ex) return ls.map(l => l === ex ? { ...l, qty: plain((parseFloat(l.qty) || 0) + 1) } : l);
+      return [...ls, { id: ++uid, code: it.code, qty: '1', price: t === 'purchase' ? it.buy : t === 'sale' ? it.sell : 0 }];
+    });
+    this.setState({ bc: '', bcErr: '', bcFlash: `أُضيف: ${it.name}` });
+    this.focusBc();
+  }
+  save = () => {
+    const v = this.lastVals; if (!v) return;
+    if (v.isPurchase && !this.state.party.purchase) { this.setState({ partyErr: true, saveErr: 'اختر المورد قبل الحفظ.' }); return; }
+    if (v.errCount) { this.setState({ saveErr: `في ${v.errCount === 1 ? 'سطر فيه' : v.errCount + ' أسطر فيها'} كمية أكبر من المسموح. صحّح الأسطر الحمراء.` }); return; }
+    if (!v.lineCount) { this.setState({ saveErr: 'ما في بنود للحفظ.' }); return; }
+    this.setState({ toast: `تم حفظ الحركة ${v.txNo}`, saveErr: '' });
+    clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 3000);
+  };
+  renderVals() {
+    const s = this.state, t = s.type, role = this.props.role ?? 'owner';
+    const T = TYPES.find(x => x.k === t);
+    const isReturn = t === 'preturn' || t === 'sreturn', isTransfer = t === 'transfer', isSale = t === 'sale', isPurchase = t === 'purchase';
+    const whTo = s.whFrom === 'مستودع المدينة' ? 'مستودع الريف' : 'مستودع المدينة';
+    let rows = [], heads, cols, sum = 0, errCount = 0;
+    const errStyle = err => ({ bg: err ? '#FEF6F6' : '#fff', qtyBorder: err ? '#C81E1E' : '#C9CDD3', qtyBg: err ? '#fff' : '#fff' });
+    const qtyKey = e => { if (e.key === 'Enter') { e.preventDefault(); this.focusBc(); } };
+    let inv = null;
+    if (isReturn) {
+      inv = INV[t].find(i => i.no === s.inv[t]) || null;
+      const pr = t === 'preturn';
+      cols = pr ? '100px minmax(0,1fr) 100px 120px 110px 140px 140px 150px' : '100px minmax(0,1fr) 100px 120px 140px 140px 150px';
+      heads = ['الرمز', 'اسم المادة', 'الكمية الأصلية', 'المتاح للإرجاع', ...(pr ? ['الرصيد المتوفر'] : []), 'الكمية المرتجعة', 'سعر الوحدة', 'القيمة'];
+      if (inv) rows = inv.lines.map(([code, orig, price, returned]) => {
+        const it = CAT[code], availRet = orig - returned, qs = s.ret[t][code] ?? '', q = parseFloat(qs) || 0;
+        let err = '';
+        if (q > availRet) err = `المتاح للإرجاع ${plain(availRet)} فقط`;
+        else if (pr && q > it.stock) err = `الرصيد المتوفر ${plain(it.stock)} فقط`;
+        if (err) errCount++;
+        const value = r2(q * price); sum += value;
+        return { code, name: it.name, unit: it.unit, loc: it.loc, showOrig: true, orig: qfmt(orig, it.dec), showRet: true, availRet: qfmt(availRet, it.dec), showAvail: pr, avail: qfmt(it.stock, it.dec), availFg: '#16191D', qty: qs, onQty: e => { const v = e.target.value; this.setState(st => ({ ret: { ...st.ret, [t]: { ...st.ret[t], [code]: v } }, saveErr: '' })); }, onQtyKey: () => {}, err, ...errStyle(err), showPrice: true, priceEdit: false, priceFixed: true, priceStr: money(price), suggested: false, value: q ? money(value) : '—', canDel: false };
+      });
+    } else {
+      const showAvail = isSale || isTransfer;
+      cols = isTransfer ? '110px minmax(0,1fr) 140px 170px 48px' : (isSale ? '110px minmax(0,1fr) 130px 150px 170px 170px 48px' : '110px minmax(0,1fr) 150px 170px 170px 48px');
+      heads = ['الرمز', 'اسم المادة', ...(showAvail ? ['الرصيد المتوفر'] : []), 'الكمية', ...(isTransfer ? [] : ['سعر الوحدة', 'القيمة']), ''];
+      rows = s.lines[t].map(l => {
+        const it = CAT[l.code], q = parseFloat(l.qty) || 0;
+        const err = showAvail && q > it.stock ? `الرصيد المتوفر ${plain(it.stock)} فقط` : '';
+        if (err) errCount++;
+        const value = r2(q * l.price); sum += value;
+        return { code: l.code, name: it.name, unit: it.unit, loc: it.loc, showOrig: false, showRet: false, showAvail, avail: qfmt(it.stock, it.dec), availFg: err ? '#C81E1E' : '#16191D', qty: l.qty,
+          onQty: e => { const v = e.target.value; this.setLines(ls => ls.map(x => x.id === l.id ? { ...x, qty: v } : x)); }, onQtyKey: qtyKey,
+          err, ...errStyle(err), showPrice: !isTransfer, priceEdit: true, priceFixed: false, priceStr: l.priceStr ?? money(l.price),
+          onPrice: e => { const v = e.target.value; this.setLines(ls => ls.map(x => x.id === l.id ? { ...x, priceStr: v, price: parseFloat(v.replace(/,/g, '')) || 0 } : x)); },
+          suggested: isSale && l.price === it.sell, value: money(value), canDel: true, del: () => { this.setLines(ls => ls.filter(x => x.id !== l.id)); this.focusBc(); } };
+      });
+    }
+    const hasDiscount = isSale || isPurchase;
+    const disc = hasDiscount ? (parseFloat(String(s.disc[t]).replace(/,/g, '')) || 0) : 0;
+    const invResults = isReturn ? INV[t].filter(i => i.no.toLowerCase().includes(s.invQ[t].toLowerCase())).map(i => ({ no: i.no, party: i.party, date: i.date, total: money(i.lines.reduce((a, [, q, p]) => a + r2(q * p), 0)) + ' ل.س', pick: () => this.setState(st => ({ inv: { ...st.inv, [t]: i.no } })) })) : [];
+    const partyOpts = isPurchase ? [{ v: '', l: 'اختر المورد…' }, { v: 'مؤسسة الشام للمواد الغذائية', l: 'مؤسسة الشام للمواد الغذائية' }, { v: 'شركة الفرات للتوريد', l: 'شركة الفرات للتوريد' }] : [{ v: '', l: 'بدون عميل (بيع نقدي)' }, { v: 'سامر الحلبي', l: 'سامر الحلبي' }, { v: 'محل أبو خالد', l: 'محل أبو خالد' }];
+    const notes = {
+      purchase: 'الكمية بتنضاف لرصيد المستودع عند الحفظ. سعر الشراء الجديد بيحدّث السعر المقترح حسب نسبة التسعير.',
+      sale: 'السعر بيتعبّى بالسعر المقترح وفيك تعدّله. الحفظ ممنوع إذا الكمية أكبر من الرصيد.',
+      preturn: 'المرتجع ما بيتجاوز الكمية الأصلية ناقص اللي انرجع قبل، ولا رصيد المستودع الحالي. الحسم الأصلي بينخصم نسبياً.',
+      sreturn: 'السعر ثابت من الفاتورة الأصلية. الكمية المتاحة = الأصلية − المرتجع سابقاً.',
+      transfer: 'الكمية بتطلع من مستودعك وبتدخل المستودع المستقبِل فوراً، بدون قيمة نقدية.'
+    };
+    const vals = {
+      rootRef: this.rootRef, bcRef: this.bcRef, role, isOwner: role === 'owner', isWarehouse: role !== 'owner',
+      topWh: role === 'owner' ? 'كل المستودعات' : 'مستودع المدينة',
+      tabs: TYPES.map(x => { const on = x.k === t; return { label: x.label, dot: `oklch(0.6 0.13 ${x.hue})`, bg: on ? '#fff' : 'transparent', fg: on ? 'var(--color-primary)' : '#2B3038', fw: on ? 700 : 500, shadow: on ? '0 1px 3px rgba(0,0,0,.12)' : 'none', pick: () => { this.setState({ type: x.k, saveErr: '', bcErr: '', bcFlash: '', partyErr: false }); this.focusBc(); } }; }),
+      txNo: T.no, isPurchase, isReturn, notReturn: !isReturn, isTransfer, notTransfer: !isTransfer, hasDiscount,
+      docNo: s.docNo, onDoc: e => this.setState({ docNo: e.target.value }),
+      showPartySelect: isSale || isPurchase, partyLabel: isPurchase || t === 'preturn' ? (isPurchase ? 'المورد *' : 'المورد') : (isSale ? 'العميل (اختياري)' : 'العميل'),
+      party: s.party[t] ?? '', partyOpts, partyErr: isPurchase && s.partyErr && !s.party.purchase, partyBorder: isPurchase && s.partyErr && !s.party.purchase ? '#C81E1E' : '#C9CDD3',
+      onParty: e => { const v = e.target.value; this.setState(st => ({ party: { ...st.party, [t]: v }, partyErr: false })); },
+      retParty: inv ? inv.party : '— يتحدد من الفاتورة —',
+      whLabel: isTransfer ? 'المستودع المرسِل' : 'المستودع', whFrom: s.whFrom, whTo, onWhFrom: e => this.setState({ whFrom: e.target.value }),
+      bc: s.bc, onBc: e => this.setState({ bc: e.target.value, bcErr: '' }), onBcKey: e => { if (e.key === 'Enter') { e.preventDefault(); this.addCode(s.bc); } }, addBc: () => this.addCode(s.bc),
+      bcErr: s.bcErr, bcFlash: s.bcFlash,
+      demoCodes: Object.values(CAT).map(i => ({ code: i.code, name: i.name, scan: () => this.addCode(i.code) })),
+      inv: inv ? { no: inv.no, party: inv.party, date: inv.date, total: money(inv.lines.reduce((a, [, q, p]) => a + r2(q * p), 0)) } : null, noInv: isReturn && !inv,
+      invQ: s.invQ[t] ?? '', invPh: t === 'sreturn' ? 'رقم فاتورة البيع، مثال: S-0142' : 'رقم فاتورة الشراء، مثال: P-0087',
+      onInvQ: e => { const v = e.target.value; this.setState(st => ({ invQ: { ...st.invQ, [t]: v } })); },
+      invResults, noResults: isReturn && invResults.length === 0,
+      clearInv: () => this.setState(st => ({ inv: { ...st.inv, [t]: null } })),
+      cols, heads: heads.map((h, i) => ({ label: h, align: i < 2 ? 'right' : 'left' })), rows,
+      emptyLines: rows.length === 0, emptyTitle: isReturn ? 'اختر الفاتورة الأصلية أولاً' : 'ما في بنود لسا', emptySub: isReturn ? 'بعدها بتظهر بنودها مع الكمية المتاحة للإرجاع.' : 'امسح باركود أول مادة، أو اكتب اسمها واضغط Enter.',
+      sumStr: money(sum), disc: s.disc[t] ?? '', onDisc: e => { const v = e.target.value; this.setState(st => ({ disc: { ...st.disc, [t]: v } })); },
+      netStr: money(Math.max(0, sum - disc)), netLabel: isReturn ? 'المردود نقداً' : (isSale ? 'المقبوض نقداً' : 'المدفوع نقداً'),
+      lineCount: rows.filter(r => parseFloat(r.qty) > 0).length, errCount,
+      saveErr: s.saveErr, typeNote: notes[t], toast: s.toast, save: this.save,
+      reset: () => { if (isReturn) this.setState(st => ({ ret: { ...st.ret, [t]: {} } })); else this.setLines(() => []); this.focusBc(); },
+      noop: () => {}
+    };
+    this.lastVals = vals;
+    return vals;
+  }
+}
+</script>
+</body>
+</html>

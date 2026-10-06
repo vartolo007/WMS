@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E6E8EB;font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;color:#16191D;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#1F4E79;text-decoration:none;font-weight:500}
+a:hover{text-decoration:underline}
+code{unicode-bidi:isolate;direction:ltr}
+button,input,select{font-family:inherit}
+</style>
+</helmet>
+<div dir="rtl" style="padding:64px;display:flex;flex-direction:column;gap:72px;width:1568px">
+
+<header style="display:flex;justify-content:space-between;align-items:flex-end">
+  <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;color:#5B6270;font-weight:500">منصة إدارة المستودعات · الدفعة 7 من 7</div><h1 style="margin:0;font-size:36px">المنصة</h1></div>
+  <nav style="display:flex;gap:20px;font-size:15px"><a href="#s19">19 · إدارة الشركات</a><a href="#s20">20 · الاشتراك الموقوف</a></nav>
+</header>
+
+<section id="s19" style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:center;gap:12px"><span style="background:#16191D;color:#fff;font-weight:700;font-size:14px;padding:4px 10px;border-radius:6px">19</span><h2 style="margin:0;font-size:26px">إدارة الشركات</h2><span style="color:#5B6270;font-size:15px">— مدير المنصة · الأزرار شغّالة</span></div>
+  <div style="width:1440px;height:840px;background:#F5F6F7;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,.08);position:relative">
+    <dc-import name="Topbar" role="admin" hint-size="100%,64px"></dc-import>
+    <div style="flex:1;display:flex;min-height:0">
+      <dc-import name="Sidebar" role="admin" active="companies" hint-size="248px,100%" style="flex:none;width:248px;height:100%"></dc-import>
+      <main style="flex:1;padding:28px 40px;display:flex;flex-direction:column;gap:20px;min-width:0">
+        <h1 style="margin:0;font-size:28px">الشركات</h1>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+          <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+            <button onClick="{{ s.pick }}" style="text-align:right;background:#fff;border:{{ s.border }};border-radius:12px;padding:16px 20px;display:flex;flex-direction:column;gap:4px;cursor:pointer"><span style="font-size:14px;color:#5B6270">{{ s.label }}</span><b style="font-size:26px;font-variant-numeric:tabular-nums;color:{{ s.fg }}">{{ s.n }}</b></button>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:12px"><input value="{{ q }}" onChange="{{ onQ }}" placeholder="بحث باسم الشركة أو صاحبها أو البريد" style="width:420px;height:44px;border:1px solid #C9CDD3;border-radius:8px;padding:0 14px;font-size:15px;background:#fff"></div>
+        <div style="flex:1;background:#fff;border:1px solid #E3E5E8;border-radius:12px;overflow:auto;min-height:0">
+          <table style="width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums">
+            <thead><tr style="background:#F5F6F7;color:#5B6270;font-size:13px"><th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">الشركة</th><th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">صاحبها</th><th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">تاريخ التسجيل</th><th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">الحالة</th><th style="text-align:right;font-weight:500;padding:12px 16px;border-bottom:1px solid #E3E5E8">انتهاء التجربة</th><th style="border-bottom:1px solid #E3E5E8"></th></tr></thead>
+            <tbody>
+              <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+                <tr style="background:{{ r.bg }}">
+                  <td style="padding:12px 16px;border-bottom:1px solid #EEF0F2;box-shadow:{{ r.edge }}"><span style="display:flex;align-items:center;gap:10px"><span style="width:32px;height:32px;border-radius:8px;background:{{ r.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex:none">{{ r.initial }}</span><b style="font-weight:600">{{ r.name }}</b></span></td>
+                  <td style="padding:12px 16px;border-bottom:1px solid #EEF0F2"><span style="display:flex;flex-direction:column"><span>{{ r.owner }}</span><span style="font-size:12px;color:#5B6270;direction:ltr;text-align:right">{{ r.email }}</span></span></td>
+                  <td style="padding:12px 16px;border-bottom:1px solid #EEF0F2;color:#5B6270">{{ r.reg }}</td>
+                  <td style="padding:12px 16px;border-bottom:1px solid #EEF0F2"><span style="display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap;background:{{ r.sBg }};color:{{ r.sFg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ r.sDot }}"></span>{{ r.status }}</span></td>
+                  <td style="padding:12px 16px;border-bottom:1px solid #EEF0F2"><span style="display:flex;flex-direction:column"><span style="color:{{ r.endFg }};font-weight:{{ r.endFw }}">{{ r.end }}</span><span style="font-size:12px;color:{{ r.endFg }};font-weight:600">{{ r.endNote }}</span></span></td>
+                  <td style="padding:6px 16px;border-bottom:1px solid #EEF0F2;text-align:left;white-space:nowrap"><span style="display:inline-flex;gap:4px">
+                    <sc-if value="{{ r.canActivate }}" hint-placeholder-val="{{ true }}"><button onClick="{{ r.activate }}" style="height:32px;padding:0 12px;border-radius:6px;border:0;background:#15803D;color:#fff;font-size:13px;font-weight:600;cursor:pointer">تفعيل</button></sc-if>
+                    <sc-if value="{{ r.canExtend }}" hint-placeholder-val="{{ true }}"><button onClick="{{ r.extend }}" style="height:32px;padding:0 12px;border-radius:6px;border:1px solid #C9CDD3;background:#fff;font-size:13px;font-weight:500;cursor:pointer">تمديد التجربة</button></sc-if>
+                    <sc-if value="{{ r.canSuspend }}" hint-placeholder-val="{{ true }}"><button onClick="{{ r.suspend }}" style="height:32px;padding:0 12px;border-radius:6px;border:0;background:transparent;color:#C81E1E;font-size:13px;font-weight:600;cursor:pointer">إيقاف</button></sc-if>
+                  </span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+          <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}"><div style="padding:56px;text-align:center;display:flex;flex-direction:column;gap:6px"><b style="font-size:17px">ما في شركات بهالفلتر</b><span style="font-size:14px;color:#5B6270">امسح البحث أو اختر "الكل".</span></div></sc-if>
+        </div>
+      </main>
+    </div>
+    <sc-if value="{{ modal }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(22,25,29,.45);display:flex;align-items:center;justify-content:center">
+        <div style="background:#fff;border-radius:12px;width:440px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 40px rgba(0,0,0,.2)">
+          <div style="font-size:18px;font-weight:700">{{ mTitle }}</div>
+          <div style="font-size:14px;color:#5B6270;line-height:1.7">{{ mBody }}</div>
+          <sc-if value="{{ mExtend }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:8px">
+              <sc-for list="{{ dayOpts }}" as="d" hint-placeholder-count="3"><button onClick="{{ d.pick }}" style="flex:1;height:44px;border-radius:8px;border:{{ d.border }};background:#fff;font-size:15px;font-weight:{{ d.fw }};cursor:pointer">{{ d.label }}</button></sc-for>
+            </div>
+            <span style="font-size:13px;color:#5B6270;font-variant-numeric:tabular-nums">الانتهاء الجديد: <b style="color:#16191D">{{ newEnd }}</b></span>
+          </sc-if>
+          <div style="display:flex;gap:8px;margin-top:6px"><button onClick="{{ confirm }}" style="height:40px;padding:0 18px;border-radius:8px;border:0;background:{{ mBtnBg }};color:#fff;font-size:15px;font-weight:600;cursor:pointer">{{ mBtn }}</button><button onClick="{{ close }}" style="height:40px;padding:0 18px;border-radius:8px;border:1px solid #C9CDD3;background:#fff;font-size:15px;cursor:pointer">تراجع</button></div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+  <div style="font-size:15px;color:#2B3038;line-height:1.8;max-width:1100px">الشركات اللي انتهت تجربتها بتنميّز بخلفية حمراء فاتحة وخط جانبي، وبتطلع أول القائمة. مدير المنصة ما بيشوف أي حركات أو مواد. <b>موبايل:</b> كل شركة بطاقة فيها الحالة والتاريخ وقائمة "⋯" للإجراءات.</div>
+</section>
+
+<section id="s20" style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:center;gap:12px"><span style="background:#16191D;color:#fff;font-weight:700;font-size:14px;padding:4px 10px;border-radius:6px">20</span><h2 style="margin:0;font-size:26px">صفحة الاشتراك الموقوف</h2><span style="color:#5B6270;font-size:15px">— بتظهر بعد الدخول لأي مستخدم بشركة موقوفة</span></div>
+  <div style="display:flex;gap:40px;align-items:flex-start">
+    <div style="width:1100px;height:720px;background:#F5F6F7;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,.08)">
+      <div style="height:64px;background:#fff;border-bottom:1px solid #E3E5E8;display:flex;align-items:center;gap:12px;padding:0 24px">
+        <span style="width:36px;height:36px;border-radius:8px;background:#0F766E;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px">ب</span><b style="font-size:17px">بقاليات الريحان</b><span style="flex:1"></span><a href="#" style="color:#5B6270;font-size:15px">تسجيل الخروج</a>
+      </div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px">
+        <div style="width:560px;background:#fff;border:1px solid #E3E5E8;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:18px">
+          <span style="display:inline-flex;width:fit-content;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:999px;font-size:13px;font-weight:600;background:#FEE2E2;color:#991B1B"><span style="width:6px;height:6px;border-radius:50%;background:#C81E1E"></span>موقوف</span>
+          <h1 style="margin:0;font-size:28px;line-height:1.4">اشتراك شركتك موقوف</h1>
+          <p style="margin:0;font-size:16px;line-height:1.9;color:#2B3038">انتهت الفترة التجريبية بتاريخ <b style="font-variant-numeric:tabular-nums">2026-09-28</b>. بياناتك كلها محفوظة — الحركات والمواد والتقارير — وبترجع فوراً بعد التفعيل.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;padding:18px 20px;background:#F5F6F7;border-radius:12px">
+            <b style="font-size:15px">للتفعيل تواصل معنا</b>
+            <div style="display:flex;justify-content:space-between;font-size:15px"><span style="color:#5B6270">الهاتف / واتساب</span><b style="direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums">+963 11 000 0000</b></div>
+            <div style="display:flex;justify-content:space-between;font-size:15px"><span style="color:#5B6270">البريد</span><b style="direction:ltr;unicode-bidi:isolate">support@raff.app</b></div>
+            <div style="display:flex;justify-content:space-between;font-size:15px"><span style="color:#5B6270">ساعات الدوام</span><b>9 الصبح – 5 المسا، الأحد للخميس</b></div>
+          </div>
+          <div style="display:flex;gap:8px"><a href="#" style="height:44px;padding:0 20px;border-radius:8px;background:#0F766E;color:#fff;font-size:15px;font-weight:600;display:inline-flex;align-items:center;text-decoration:none">راسلنا على واتساب</a><a href="#" style="height:44px;padding:0 18px;border-radius:8px;border:1px solid #C9CDD3;background:#fff;color:#16191D;font-size:15px;display:inline-flex;align-items:center;text-decoration:none">تسجيل الخروج</a></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:360px;font-size:15px;line-height:1.8;color:#2B3038">
+      <h3 style="margin:0;font-size:18px">ملاحظات</h3>
+      <ul style="margin:0;padding-right:20px">
+        <li>معروضة بلون شركة تانية (<code>#0F766E</code>) لأنها بتاخد لون الشركة.</li>
+        <li>بدون قائمة جانبية؛ أي رابط داخلي بيرجع لهالصفحة (middleware).</li>
+        <li>لحساب المستودع نفس الصفحة مع جملة "تواصل مع صاحب الشركة" بدل أرقام التواصل.</li>
+        <li>أرقام وبريد الدعم افتراضية.</li>
+        <li>موبايل: البطاقة بعرض الشاشة، والأزرار فوق بعض بعرض كامل.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const TODAY = '2026-10-05';
+const COS = [
+  { id: 1, name: 'شركة النور', owner: 'أحمد النوري', email: 'ahmad@alnoor.sy', reg: '2026-09-28', st: 'trial', end: '2026-10-14', color: '#1F4E79' },
+  { id: 2, name: 'بقاليات الريحان', owner: 'ليلى الخطيب', email: 'layla@rayhan.sy', reg: '2026-09-14', st: 'suspended', end: '2026-09-28', color: '#0F766E' },
+  { id: 3, name: 'مؤسسة الياسمين', owner: 'خالد العمر', email: 'khaled@yasmin.sy', reg: '2026-09-18', st: 'trial', end: '2026-10-02', color: '#7E22CE' },
+  { id: 4, name: 'شركة البيدر للتجارة', owner: 'رامي الشامي', email: 'rami@baydar.sy', reg: '2026-06-02', st: 'active', end: '2026-06-16', color: '#15803D' },
+  { id: 5, name: 'مستودعات الساحل', owner: 'نور حداد', email: 'nour@sahel.sy', reg: '2026-10-01', st: 'trial', end: '2026-10-15', color: '#B45309' },
+  { id: 6, name: 'محلات القلعة', owner: 'سليم دياب', email: 'salim@qalaa.sy', reg: '2026-04-11', st: 'active', end: '2026-04-25', color: '#374151' }
+];
+const addDays = (d, n) => { const x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
+const diff = (a, b) => Math.round((new Date(a) - new Date(b)) / 864e5);
+class Component extends DCLogic {
+  state = { cos: COS, filter: 'all', q: '', modal: null, days: 14 };
+  upd(id, patch) { this.setState(s => ({ cos: s.cos.map(c => c.id === id ? { ...c, ...patch } : c), modal: null })); }
+  renderVals() {
+    const s = this.state;
+    const isExp = c => c.st === 'trial' && c.end < TODAY;
+    const counts = { all: s.cos.length, trial: s.cos.filter(c => c.st === 'trial' && !isExp(c)).length, expired: s.cos.filter(isExp).length, active: s.cos.filter(c => c.st === 'active').length };
+    const stat = (k, label, fg) => ({ label, n: counts[k], fg, border: s.filter === k ? '2px solid #16191D' : '1px solid #E3E5E8', pick: () => this.setState({ filter: k }) });
+    const list = s.cos.filter(c => (s.filter === 'all' || (s.filter === 'expired' ? isExp(c) : s.filter === 'trial' ? c.st === 'trial' && !isExp(c) : c.st === s.filter)) && (!s.q || (c.name + c.owner + c.email).includes(s.q)))
+      .sort((a, b) => (isExp(b) - isExp(a)));
+    const S = { trial: ['تجريبي', '#FEF3C7', '#92400E', '#D97706'], active: ['فعّال', '#DCFCE7', '#166534', '#15803D'], suspended: ['موقوف', '#FEE2E2', '#991B1B', '#C81E1E'] };
+    const rows = list.map(c => {
+      const exp = isExp(c), [status, sBg, sFg, sDot] = S[c.st], left = diff(c.end, TODAY);
+      return { ...c, initial: c.name.replace('شركة ', '')[0], status, sBg, sFg, sDot, bg: exp ? '#FEF6F6' : '#fff', edge: exp ? 'inset -4px 0 0 #C81E1E' : 'none',
+        end: c.st === 'active' ? '—' : c.end, endNote: c.st === 'trial' ? (exp ? `انتهت من ${-left} أيام` : `باقي ${left} أيام`) : (c.st === 'suspended' ? 'انتهت التجربة' : ''),
+        endFg: exp ? '#C81E1E' : (c.st === 'trial' && left <= 3 ? '#92400E' : '#5B6270'), endFw: exp ? 600 : 400,
+        canActivate: c.st !== 'active', canExtend: c.st !== 'active', canSuspend: c.st !== 'suspended',
+        activate: () => this.setState({ modal: { k: 'activate', c } }), extend: () => this.setState({ modal: { k: 'extend', c }, days: 14 }), suspend: () => this.setState({ modal: { k: 'suspend', c } }) };
+    });
+    const m = s.modal, base = m ? (m.c.end > TODAY ? m.c.end : TODAY) : TODAY;
+    const M = m ? {
+      activate: ['تفعيل ' + m.c.name + '؟', 'الاشتراك بيصير فعّال، ومستخدمي الشركة بيقدروا يدخلوا ويشتغلوا فوراً.', 'تفعيل', '#15803D'],
+      extend: ['تمديد تجربة ' + m.c.name, 'التمديد بيبدأ من تاريخ الانتهاء الحالي، أو من اليوم إذا كانت منتهية. الحالة بترجع "تجريبي".', 'تمديد', '#1F4E79'],
+      suspend: ['إيقاف ' + m.c.name + '؟', 'مستخدمي الشركة ما رح يقدروا يدخلوا وبتظهرلهم صفحة الاشتراك الموقوف. البيانات بتضل محفوظة وفيك تفعّلها بأي وقت.', 'إيقاف', '#C81E1E']
+    }[m.k] : [];
+    return {
+      stats: [stat('all', 'كل الشركات', '#16191D'), stat('trial', 'تجريبي', '#92400E'), stat('expired', 'انتهت تجربتها', '#C81E1E'), stat('active', 'فعّال', '#166534')],
+      q: s.q, onQ: e => this.setState({ q: e.target.value }), rows, empty: rows.length === 0,
+      modal: !!m, mTitle: M[0], mBody: M[1], mBtn: M[2], mBtnBg: M[3], mExtend: m && m.k === 'extend',
+      dayOpts: [7, 14, 30].map(n => ({ label: n + ' يوم', border: s.days === n ? '2px solid #1F4E79' : '1px solid #C9CDD3', fw: s.days === n ? 700 : 400, pick: () => this.setState({ days: n }) })),
+      newEnd: addDays(base, s.days), close: () => this.setState({ modal: null }),
+      confirm: () => { if (!m) return; if (m.k === 'activate') this.upd(m.c.id, { st: 'active' }); else if (m.k === 'suspend') this.upd(m.c.id, { st: 'suspended' }); else this.upd(m.c.id, { st: 'trial', end: addDays(base, s.days) }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
