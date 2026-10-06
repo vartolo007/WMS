@@ -74,7 +74,8 @@ Screens: 7 (purchase / sale tabs), 8, 9, 10; balance and suggested-price columns
 - [ ] Invoice screen (Alpine.js): barcode input, rows, live totals, suggested price; quantity decimals per
       unit `allows_fraction`; discount above the subtotal is rejected, not clamped — screen 7
 - [ ] Movements list and movement details page (item count, no total quantity; no cancel action yet) — screens 8–9
-- [ ] Invoice print page (A4, company header, "ملغاة" stamp when cancelled) — screen 10
+- [ ] Movement print page for every type built so far (A4, company header with logo and warehouse,
+      "ملغاة" stamp when cancelled; SRS 2.3 FR-10) — screen 10
 - [ ] Products list: balance per warehouse and suggested price columns — screen 11
 
 **Done when:** purchase increases stock, sale decreases it, sale beyond stock is rejected,

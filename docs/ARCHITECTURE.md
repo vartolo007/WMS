@@ -1,6 +1,6 @@
 # Code Architecture
 
-This document turns SRS v2.2 into code structure. Table and column names come from `docs/schema.json`.
+This document turns SRS v2.3 into code structure. Table and column names come from `docs/schema.json`.
 If this document and `schema.json` ever disagree, `schema.json` wins and this document must be fixed.
 
 ## 1. Layers and responsibilities
@@ -169,7 +169,8 @@ for `(company_id, type)` in `movements`. No extra counters table (schema stays a
 
 ### 5.10 Subscription and roles
 
-- `EnsureSubscriptionActive`: if the user's company is `suspended` → logout with an Arabic message.
+- `EnsureSubscriptionActive`: if the user's company is `suspended` → every route except logout redirects to the
+  suspended-subscription page (no data page opens, SRS 2.3 FR-03). A deactivated account is refused at login (FR-05).
   `super_admin` bypasses. Trial expiry does NOT block automatically.
 - `EnsureRole:owner|warehouse|super_admin` for route groups. Fine-grained checks stay in Policies.
 - Registration (Breeze register, modified): in one transaction create `Company` (status trial,
