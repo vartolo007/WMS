@@ -11,9 +11,9 @@ enum CompanyStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Trial => 'تجريبية',
-            self::Active => 'فعّالة',
-            self::Suspended => 'موقوفة',
+            self::Trial => 'تجريبي',
+            self::Active => 'فعّال',
+            self::Suspended => 'موقوف',
         };
     }
 

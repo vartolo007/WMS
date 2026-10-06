@@ -34,12 +34,12 @@ the SRS wins over a design (see the design decisions in DECISIONS.md).
 
 ## Phase 2 — Master data and settings (FR-07 → FR-09, FR-25, FR-26)
 Screens: 1–4 (batch 1), 11–15 (batch 5), 19–20 (batch 7).
-- [ ] App shell and design system from `docs/design/01-design-system/` (design batch 1): Tailwind tokens,
+- [x] App shell and design system from `docs/design/01-design-system/` (design batch 1): Tailwind tokens,
       IBM Plex Sans Arabic, Blade components (button, input, select, badge, table, modal, toast, empty state),
       right sidebar per role (owner / warehouse / super admin), top bar, Alpine mobile menu — screens 1–2
-- [ ] Owner warehouse selector in the top bar, kept in the session (filters lists and reports;
+- [x] Owner warehouse selector in the top bar, kept in the session (filters lists and reports;
       "all warehouses" is not valid when creating a movement)
-- [ ] Login and register redesigned per the design (trial days from config, no terms link) — screens 3–4
+- [x] Login and register redesigned per the design (trial days from config, no terms link) — screens 3–4
 - [ ] Units in `config('wms.units')`, each with `allows_fraction` (لتر / كيلو yes, علبة / قطعة no)
 - [ ] products (barcode unique per company, location, min_stock, is_active; unit is a select from the config list;
       manual sale price field) — screen 11 without balance / suggested-price columns and "low only" filter
@@ -48,7 +48,7 @@ Screens: 1–4 (batch 1), 11–15 (batch 5), 19–20 (batch 7).
 - [ ] Company settings page (FR-25): name, logo upload, palette colour, currency symbol,
       markup_percent between 100 and 1000 — screen 14
 - [ ] Currency formatting component used for every amount
-- [ ] Profile page (FR-26) available to all roles; remove Breeze "delete account" — screen 15
+- [x] Profile page (FR-26) available to all roles; remove Breeze "delete account" — screen 15
 - [ ] Policies (Q2 default: owner and warehouses can manage products and parties)
 - [ ] Search products by name / barcode
 - [ ] Companies page per screen 19 (status cards, search, expired trials first); it is the super admin
@@ -129,3 +129,7 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-05 — 1 — Super admin seeder; admin companies page: activate / suspend / extend trial
 2026-10-05 — 1 — Owner manages warehouse accounts (create / edit / deactivate, no delete) with `UserPolicy`
 2026-10-05 — 1 — Role dashboards (shells) and role-based navigation; 76 tests pass, Pint clean
+2026-10-06 — 2 — Design batch 1: Tailwind tokens, IBM Plex Sans Arabic, `x-ui.*` Blade components, role shell + mobile menu
+2026-10-06 — 2 — Owner warehouse selector (`CurrentWarehouse`, session, re-checked on every read)
+2026-10-06 — 2 — Login / register / password pages per design; auth errors as one banner (`login` key)
+2026-10-06 — 2 — Profile page in the shell, account deletion removed; 98 tests pass, Pint clean, checked at 1440px and 375px

@@ -9,7 +9,7 @@
     ])>
         <span class="text-[13px] text-muted">المستودع:</span>
         <span class="flex-1 text-start font-semibold">{{ $currentWarehouse?->name ?? 'كل المستودعات' }}</span>
-        <span class="-mt-1 h-[7px] w-[7px] -rotate-45 border-b-2 border-s-2 border-muted"></span>
+        <span class="-mt-1 h-[7px] w-[7px] -rotate-45 border-b-2 border-l-2 border-muted"></span>
     </button>
 
     <form x-show="open" x-cloak x-transition method="POST" action="{{ route('warehouse-context') }}"
