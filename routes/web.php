@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WarehouseContextController;
 use App\Http\Controllers\WarehouseController;
@@ -16,6 +17,14 @@ Route::middleware(['auth', 'subscription'])->group(function () {
     // FR-26. No account deletion: nothing is hard-deleted (T12).
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // Q2: the catalogue is managed by the owner and by warehouse users (ProductPolicy decides).
+    Route::middleware('role:owner,warehouse')->group(function () {
+        Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+        Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+        Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+        Route::patch('/products/{product}/toggle', [ProductController::class, 'toggle'])->name('products.toggle');
+    });
 
     Route::middleware('role:owner')->group(function () {
         Route::post('/warehouse-context', WarehouseContextController::class)->name('warehouse-context');

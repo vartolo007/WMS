@@ -31,3 +31,12 @@ test('dates use Levantine month names', function () {
         ->and(Format::date($date, withWeekday: true))->toBe('الاثنين 5 تشرين الأول 2026')
         ->and(Format::date(Carbon::create(2027, 1, 31)))->toBe('31 كانون الثاني 2027');
 });
+
+test('plain drops padding zeros of a stored decimal', function () {
+    expect(Format::plain('20.000'))->toBe('20')
+        ->and(Format::plain('50.500'))->toBe('50.5')
+        ->and(Format::plain('15.00'))->toBe('15')
+        ->and(Format::plain('100'))->toBe('100')
+        ->and(Format::plain('0.125'))->toBe('0.125')
+        ->and(Format::plain(null))->toBe('');
+});

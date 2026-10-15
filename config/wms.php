@@ -25,6 +25,17 @@ return [
     'default_color' => '#1F4E79',
 
     /*
+    | Approved product units (SRS FR-07, 13.2.14). The key is what products.unit stores;
+    | allows_fraction decides whether quantities may have decimals (up to 3).
+    */
+    'units' => [
+        'liter' => ['label' => 'لتر', 'allows_fraction' => true],
+        'kilo' => ['label' => 'كيلو', 'allows_fraction' => true],
+        'box' => ['label' => 'علبة', 'allows_fraction' => false],
+        'piece' => ['label' => 'قطعة', 'allows_fraction' => false],
+    ],
+
+    /*
     | Platform owner (super admin) created by SuperAdminSeeder.
     */
     'admin' => [

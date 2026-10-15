@@ -19,6 +19,7 @@ class Navigation
     public static function for(User $user): array
     {
         $dashboard = self::item('لوحة التحكم', 'dashboard');
+        $products = self::item('دليل المواد', 'products.index', 'products.*');
 
         return match ($user->role) {
             Role::SuperAdmin => [
@@ -26,11 +27,11 @@ class Navigation
                 'company' => [],
             ],
             Role::Owner => [
-                'main' => [$dashboard],
+                'main' => [$dashboard, $products],
                 'company' => [self::item('المستودعات', 'warehouses.index', 'warehouses.*')],
             ],
             Role::Warehouse => [
-                'main' => [$dashboard],
+                'main' => [$dashboard, $products],
                 'company' => [],
             ],
         };

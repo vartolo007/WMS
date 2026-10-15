@@ -43,6 +43,11 @@ class Company extends Model
         return $this->users()->where('role', Role::Warehouse);
     }
 
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
     public function owner(): HasOne
     {
         return $this->hasOne(User::class)->where('role', Role::Owner);

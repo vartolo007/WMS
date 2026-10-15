@@ -38,6 +38,20 @@ class Format
     }
 
     /**
+     * A stored decimal without its padding zeros, for form fields: "20.000" → "20", "50.500" → "50.5".
+     */
+    public static function plain(string|int|null $value): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        $decimal = BigDecimal::of($value);
+
+        return (string) $decimal->toScale(max(0, $decimal->strippedOfTrailingZeros()->getScale()));
+    }
+
+    /**
      * "5 تشرين الأول 2026", or "الأحد 5 تشرين الأول 2026" with the weekday.
      */
     public static function date(DateTimeInterface $date, bool $withWeekday = false): string
