@@ -40,8 +40,8 @@ Screens: 1–4 (batch 1), 11–15 (batch 5), 19–20 (batch 7).
 - [x] Owner warehouse selector in the top bar, kept in the session (filters lists and reports;
       "all warehouses" is not valid when creating a movement)
 - [x] Login and register redesigned per the design (trial days from config, no terms link) — screens 3–4
-- [ ] Units in `config('wms.units')`, each with `allows_fraction` (لتر / كيلو yes, علبة / قطعة no)
-- [ ] products (barcode unique per company, location, min_stock, is_active; unit is a select from the config list;
+- [x] Units in `config('wms.units')`, each with `allows_fraction` (لتر / كيلو yes, علبة / قطعة no)
+- [x] products (barcode unique per company, location, min_stock, is_active; unit is a select from the config list;
       manual sale price field) — screen 11 without balance / suggested-price columns and "low only" filter
 - [ ] parties (customer / supplier, is_active; PartyType enum) — screen 12 without the "حركته" link
 - [ ] Warehouses page per screen 13 (form beside the list; no "last login" column)
@@ -49,8 +49,8 @@ Screens: 1–4 (batch 1), 11–15 (batch 5), 19–20 (batch 7).
       markup_percent between 100 and 1000 — screen 14
 - [ ] Currency formatting component used for every amount
 - [x] Profile page (FR-26) available to all roles; remove Breeze "delete account" — screen 15
-- [ ] Policies (Q2 default: owner and warehouses can manage products and parties)
-- [ ] Search products by name / barcode
+- [ ] Policies (Q2 default: owner and warehouses can manage products and parties) — `ProductPolicy` done; `PartyPolicy` with parties
+- [x] Search products by name / barcode
 - [ ] Companies page per screen 19 (status cards, search, expired trials first); it is the super admin
       dashboard (FR-24)
 - [ ] Suspended subscription page per screen 20: users of a suspended company may sign in, then every
@@ -133,3 +133,5 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-06 — 2 — Owner warehouse selector (`CurrentWarehouse`, session, re-checked on every read)
 2026-10-06 — 2 — Login / register / password pages per design; auth errors as one banner (`login` key)
 2026-10-06 — 2 — Profile page in the shell, account deletion removed; 98 tests pass, Pint clean, checked at 1440px and 375px
+2026-10-15 — 2 — Units in `config('wms.units')` + `Units` helper; `products` migration, `Product` model (tenant scope), `ProductPolicy` (Q2 in one method)
+2026-10-15 — 2 — Product catalogue screen 11: search by name / barcode, inactive toggle, `x-ui.drawer` form, stop with confirmation; 129 tests pass, Pint clean, checked at 1440px and 375px

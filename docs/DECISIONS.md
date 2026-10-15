@@ -86,3 +86,9 @@ Add new decisions here: `YYYY-MM-DD — decision — reason`.
 - 2026-10-06 — Authentication failures (wrong credentials, throttle, inactive account, suspended company) are thrown on the `login` key and shown as one banner above the form; shape errors stay under their fields — design batch 1 and security (no hint which field was wrong).
 - 2026-10-06 — Subscription status labels follow the design: تجريبي / فعّال / موقوف (the subscription, masculine), one place in `CompanyStatus::label()`.
 - 2026-10-06 — Display formatting in `App\Support\Format` (money, quantity, Levantine dates) uses brick/math strings only, never floats; arithmetic stays for `Money` in Phase 3.
+- 2026-10-15 — `products.unit` stores the stable unit key (`liter`, `kilo`, `box`, `piece`), the Arabic label comes from `Units::label()` — renaming a label in the config never breaks stored data.
+- 2026-10-15 — An empty barcode is stored as NULL, so many products can have none while the unique (`company_id`, `barcode`) index still protects real barcodes.
+- 2026-10-15 — `min_stock` must be a whole number when the unit takes no fractions (SRS 13.2.14 applied to the minimum); form fields show stored decimals through `Format::plain()` ("12.000" → "12") so an unchanged product can always be saved again.
+- 2026-10-15 — No `ProductService` yet: create / update / deactivate hold no business rule. It is added when a rule appears (Phase 3: refuse a unit change once the product has movements).
+- 2026-10-15 — `ProductPolicy::manage()` is the single place for Q2; the other abilities call it, so flipping the answer is one line. `custom_sale_price` accepts 0 or more (SRS 7 rejects only negative prices).
+- 2026-10-15 — Product form lives in a reusable `x-ui.drawer` (design screen 11); after a failed save the drawer stays open with the old input and errors, and closing it reloads the page for a clean form.
