@@ -169,9 +169,12 @@ for `(company_id, type)` in `movements`. No extra counters table (schema stays a
 
 ### 5.10 Subscription and roles
 
-- `EnsureSubscriptionActive`: if the user's company is `suspended` → every route except logout redirects to the
-  suspended-subscription page (no data page opens, SRS 2.3 FR-03). A deactivated account is refused at login (FR-05).
-  `super_admin` bypasses. Trial expiry does NOT block automatically.
+- `EnsureSubscriptionActive` (alias `subscription`, on every signed-in route group including the Breeze ones; only
+  `logout` stays outside): if `User::companyIsSuspended()` → redirect to `subscription.suspended`, the one page
+  that stays open (no data page opens, SRS 2.3 FR-03). Users of a suspended company can sign in. A deactivated
+  account (`User::isDeactivated()`) is refused at login and loses its session (FR-05). `super_admin` bypasses.
+  Trial expiry does NOT block automatically. A test walks every route, so a new route cannot skip the middleware.
+- The suspended page shows the platform contact (`config('wms.support')`, from `.env`) to the owner only.
 - `EnsureRole:owner|warehouse|super_admin` for route groups. Fine-grained checks stay in Policies.
 - Registration (Breeze register, modified): in one transaction create `Company` (status trial,
   `trial_ends_at = today + config('wms.trial_days')`) and `User` (role owner).

@@ -1,6 +1,6 @@
 # Implementation Plan
 
-**Current phase: 2**
+**Current phase: 3** — ⚠ before any posting code, the user reviews `PostingService::post()` with Mr. Kamal (see DECISIONS)
 
 Each phase: plan mode → user approval → code + tests → `php artisan test` and `pint` green → tick tasks → log line.
 
@@ -51,9 +51,9 @@ Screens: 1–4 (batch 1), 11–15 (batch 5), 19–20 (batch 7).
 - [x] Profile page (FR-26) available to all roles; remove Breeze "delete account" — screen 15
 - [x] Policies (Q2 default: owner and warehouses can manage products and parties) — one `CatalogPolicy::manage()`
 - [x] Search products by name / barcode
-- [ ] Companies page per screen 19 (status cards, search, expired trials first); it is the super admin
+- [x] Companies page per screen 19 (status cards, search, expired trials first); it is the super admin
       dashboard (FR-24)
-- [ ] Suspended subscription page per screen 20: users of a suspended company may sign in, then every
+- [x] Suspended subscription page per screen 20: users of a suspended company may sign in, then every
       route except logout redirects to it and no data page opens (test covers every route); warehouse
       users see "contact the owner" instead of the platform contact (contact details in config)
 
@@ -140,3 +140,6 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-15 — 2 — Warehouses page per screen 13: list with the create / edit form beside it, separate create page removed; 156 tests pass, Pint clean, checked at 1440px and 375px
 2026-10-15 — 2 — Company settings page (screen 14): name, logo, palette colour, currency symbol, pricing ratio 100–1000, live preview; `CompanySettingsService`, `CompanyPolicy`
 2026-10-15 — 2 — `x-ui.money` component; `Company::logoUrl()`; owner sidebar link; 200 tests pass, Pint clean, checked at 1440px and 375px
+2026-10-15 — 2 — Suspended subscription (FR-03): users of a suspended company sign in, then every route but logout redirects to screen 20; a test walks every signed-in route and guards against public ones
+2026-10-15 — 2 — Companies page (screen 19) is the platform dashboard: five filter cards with counts, search, expired trials first, activate / extend (7 / 14 / 30 days with the new end date) / suspend dialogs, mobile cards
+2026-10-15 — 2 — Phase 2 complete: 237 tests pass, Pint clean, checked at 1440px and 375px
