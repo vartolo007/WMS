@@ -186,9 +186,13 @@ for `(company_id, type)` in `movements`. No extra counters table (schema stays a
 - Theme: the base layout prints `<style>:root{--color-primary: …}</style>` from the company setting;
   Tailwind's `primary` colour maps to `var(--color-primary)`. Lighter/darker shades via CSS `color-mix()`.
   The layout is built this way from Phase 0, so the setting only fills the variable later.
-- Logo: `mimes:png,jpg,jpeg,webp` + `max:1024` (KB); SVG rejected (can carry scripts). Stored on the `public`
-  disk under `companies/{company_id}/logo.{ext}`; replacing a logo deletes the old file.
-- Currency: a Blade helper / component formats every amount with `currency_symbol`; never concatenate in views.
+- Logo: `image` + `mimes:png,jpg,jpeg,webp` (checks the real content type) + `max:1024` (KB); SVG rejected (can carry
+  scripts). Stored on the `public` disk under `companies/{company_id}/logo-{random}.{ext}` by `CompanySettingsService`
+  (a fresh name per upload, so browsers never show a cached old logo); replacing a logo deletes the old file after the
+  save worked. `Company::logoUrl()` builds the URL with `asset('storage/…')` (needs `php artisan storage:link`).
+- Currency: `<x-ui.money :amount="…" />` formats every amount with the company's `currency_symbol`; never concatenate in views.
+- The settings page is `GET/PUT /settings` (owner only, `CompanyPolicy::updateSettings`); it edits only the logged-in
+  owner's company, so there is no company id in the request.
 - Profile (FR-26): Breeze profile page (name, email, password with current password). Available to all roles.
 
 ## 6. Migration rules

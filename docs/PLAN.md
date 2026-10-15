@@ -45,9 +45,9 @@ Screens: 1–4 (batch 1), 11–15 (batch 5), 19–20 (batch 7).
       manual sale price field) — screen 11 without balance / suggested-price columns and "low only" filter
 - [x] parties (customer / supplier, is_active; PartyType enum) — screen 12 without the "حركته" link
 - [x] Warehouses page per screen 13 (form beside the list; no "last login" column)
-- [ ] Company settings page (FR-25): name, logo upload, palette colour, currency symbol,
+- [x] Company settings page (FR-25): name, logo upload, palette colour, currency symbol,
       markup_percent between 100 and 1000 — screen 14
-- [ ] Currency formatting component used for every amount
+- [x] Currency formatting component used for every amount — `x-ui.money` exists; the first amounts on screen come with Phase 3
 - [x] Profile page (FR-26) available to all roles; remove Breeze "delete account" — screen 15
 - [x] Policies (Q2 default: owner and warehouses can manage products and parties) — one `CatalogPolicy::manage()`
 - [x] Search products by name / barcode
@@ -138,3 +138,5 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-15 — 2 — Parties: `PartyType` enum, `parties` migration, `Party` model, `PartyPolicy`; screen 12 with tabs, search, modal form, mobile cards
 2026-10-15 — 2 — `CatalogPolicy` shared by products and parties (Q2 in one place); `recordForm` Alpine component shared by the drawer and modal pages
 2026-10-15 — 2 — Warehouses page per screen 13: list with the create / edit form beside it, separate create page removed; 156 tests pass, Pint clean, checked at 1440px and 375px
+2026-10-15 — 2 — Company settings page (screen 14): name, logo, palette colour, currency symbol, pricing ratio 100–1000, live preview; `CompanySettingsService`, `CompanyPolicy`
+2026-10-15 — 2 — `x-ui.money` component; `Company::logoUrl()`; owner sidebar link; 200 tests pass, Pint clean, checked at 1440px and 375px

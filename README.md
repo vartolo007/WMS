@@ -19,6 +19,7 @@ cp .env.example .env
 php artisan key:generate
 # أنشئ قاعدتي البيانات wms و wms_testing ثم:
 php artisan migrate:fresh --seed
+php artisan storage:link   # يعرض شعار الشركة (مجلد public/storage)
 composer run dev
 ```
 
