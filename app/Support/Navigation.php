@@ -29,7 +29,10 @@ class Navigation
             ],
             Role::Owner => [
                 'main' => [$dashboard, $products, $parties],
-                'company' => [self::item('المستودعات', 'warehouses.index', 'warehouses.*')],
+                'company' => [
+                    self::item('المستودعات', 'warehouses.index', 'warehouses.*'),
+                    self::item('إعدادات الشركة', 'settings.edit', 'settings.*'),
+                ],
             ],
             Role::Warehouse => [
                 'main' => [$dashboard, $products, $parties],

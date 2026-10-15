@@ -36,8 +36,8 @@
                 </button>
 
                 <a href="{{ route('dashboard') }}" class="flex min-w-0 items-center gap-3 lg:w-[200px]">
-                    @if ($company?->logo_path)
-                        <img src="{{ Storage::url($company->logo_path) }}" alt="" class="h-8 w-8 flex-none rounded-lg object-contain lg:h-9 lg:w-9">
+                    @if ($company?->logoUrl())
+                        <img src="{{ $company->logoUrl() }}" alt="" class="h-8 w-8 flex-none rounded-lg object-contain lg:h-9 lg:w-9">
                     @else
                         <span @class([
                             'flex h-8 w-8 flex-none items-center justify-center rounded-lg text-base font-bold lg:h-9 lg:w-9 lg:text-lg',

@@ -58,6 +58,15 @@ class Company extends Model
         return $this->hasOne(User::class)->where('role', Role::Owner);
     }
 
+    /**
+     * Public URL of the logo, or null when the company has none. Built from the current request host
+     * (`asset`), so it works whatever APP_URL says.
+     */
+    public function logoUrl(): ?string
+    {
+        return $this->logo_path ? asset('storage/'.$this->logo_path) : null;
+    }
+
     public function isTrialExpired(): bool
     {
         return $this->status === CompanyStatus::Trial && $this->trial_ends_at->lt(today());

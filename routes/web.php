@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\CompanySettingsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PartyController;
 use App\Http\Controllers\ProductController;
@@ -34,6 +35,9 @@ Route::middleware(['auth', 'subscription'])->group(function () {
 
     Route::middleware('role:owner')->group(function () {
         Route::post('/warehouse-context', WarehouseContextController::class)->name('warehouse-context');
+
+        Route::get('/settings', [CompanySettingsController::class, 'edit'])->name('settings.edit');
+        Route::put('/settings', [CompanySettingsController::class, 'update'])->name('settings.update');
 
         Route::get('/warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
         Route::post('/warehouses', [WarehouseController::class, 'store'])->name('warehouses.store');
