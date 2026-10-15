@@ -40,3 +40,12 @@ test('plain drops padding zeros of a stored decimal', function () {
         ->and(Format::plain('0.125'))->toBe('0.125')
         ->and(Format::plain(null))->toBe('');
 });
+
+test('days are counted the Arabic way', function () {
+    expect(Format::days(1))->toBe('يوم')
+        ->and(Format::days(2))->toBe('يومين')
+        ->and(Format::days(3))->toBe('3 أيام')
+        ->and(Format::days(10))->toBe('10 أيام')
+        ->and(Format::days(11))->toBe('11 يوم')
+        ->and(Format::days(30))->toBe('30 يوم');
+});

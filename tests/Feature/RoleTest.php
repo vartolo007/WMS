@@ -9,8 +9,13 @@ test('each role lands on its own dashboard', function (string $state, string $vi
 })->with([
     'owner' => ['owner', 'dashboard.owner'],
     'warehouse' => ['warehouse', 'dashboard.warehouse'],
-    'super admin' => ['superAdmin', 'dashboard.admin'],
 ]);
+
+test('the super admin dashboard is the companies page', function () {
+    $this->actingAs(User::factory()->superAdmin()->create())
+        ->get('/dashboard')
+        ->assertRedirect(route('admin.companies.index'));
+});
 
 test('a warehouse cannot manage warehouses', function () {
     $this->actingAs(User::factory()->warehouse()->create())

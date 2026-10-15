@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\CompanyStatus;
 use App\Enums\Role;
-use App\Models\Company;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -13,15 +12,13 @@ use Illuminate\View\View;
  */
 class DashboardController extends Controller
 {
-    public function __invoke(Request $request): View
+    public function __invoke(Request $request): View|RedirectResponse
     {
         $user = $request->user();
 
         return match ($user->role) {
-            Role::SuperAdmin => view('dashboard.admin', [
-                'counts' => Company::toBase()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
-                'expiredTrials' => Company::where('status', CompanyStatus::Trial)->whereDate('trial_ends_at', '<', today())->count(),
-            ]),
+            // The companies page carries the platform statistics (FR-24), so it is the platform dashboard.
+            Role::SuperAdmin => redirect()->route('admin.companies.index'),
             Role::Owner => view('dashboard.owner', [
                 'company' => $user->company,
                 'hasWarehouses' => $user->company->warehouses()->exists(),

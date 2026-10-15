@@ -2,25 +2,36 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\CompanyFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ExtendTrialRequest;
 use App\Models\Company;
 use App\Services\CompanySubscriptionService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Platform owner: company list and subscription status (FR-02). Guarded by `role:super_admin`.
+ * Platform owner: company list, subscription status and the platform dashboard (FR-02, FR-24).
+ * Guarded by `role:super_admin`.
  */
 class CompanyController extends Controller
 {
     public function __construct(private CompanySubscriptionService $subscriptions) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $companies = Company::with('owner')->latest()->paginate(20);
+        $filter = CompanyFilter::tryFrom((string) $request->query('status')) ?? CompanyFilter::All;
 
-        return view('admin.companies.index', compact('companies'));
+        $query = Company::query()->with('owner')->search($request->query('q'));
+        $filter->apply($query);
+
+        return view('admin.companies.index', [
+            'companies' => $query->expiredFirst()->latest()->paginate(20)->withQueryString(),
+            'filter' => $filter,
+            'search' => (string) $request->query('q'),
+            'counts' => $this->subscriptions->overview(),
+        ]);
     }
 
     public function activate(Company $company): RedirectResponse

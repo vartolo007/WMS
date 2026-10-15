@@ -79,19 +79,20 @@ class User extends Authenticatable
     }
 
     /**
-     * Why this user may not use the system right now, as a translation key, or null if allowed.
-     * Used by login and by EnsureSubscriptionActive. An expired trial does not block (FR-03).
+     * A deactivated account may not sign in or stay signed in at all (FR-05).
+     * Used by login and by EnsureSubscriptionActive.
      */
-    public function accessBlockReason(): ?string
+    public function isDeactivated(): bool
     {
-        if (! $this->is_active) {
-            return 'auth.inactive';
-        }
+        return ! $this->is_active;
+    }
 
-        if (! $this->isSuperAdmin() && $this->company?->status === CompanyStatus::Suspended) {
-            return 'auth.suspended';
-        }
-
-        return null;
+    /**
+     * Users of a suspended company may sign in but reach only the suspended-subscription page (FR-03).
+     * The platform owner has no company and is never affected; an expired trial does not count.
+     */
+    public function companyIsSuspended(): bool
+    {
+        return ! $this->isSuperAdmin() && $this->company?->status === CompanyStatus::Suspended;
     }
 }

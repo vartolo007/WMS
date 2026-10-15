@@ -24,7 +24,8 @@ class Navigation
 
         return match ($user->role) {
             Role::SuperAdmin => [
-                'main' => [$dashboard, self::item('الشركات', 'admin.companies.index', 'admin.companies.*')],
+                // The companies page is the platform dashboard (FR-24): one item.
+                'main' => [self::item('الشركات', 'admin.companies.index', 'admin.companies.*')],
                 'company' => [],
             ],
             Role::Owner => [

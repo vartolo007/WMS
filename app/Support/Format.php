@@ -61,6 +61,19 @@ class Format
         return $withWeekday ? self::WEEKDAYS[(int) $date->format('w')].' '.$text : $text;
     }
 
+    /**
+     * Arabic count of days: 1 "يوم", 2 "يومين", 3–10 "N أيام", more "N يوم".
+     */
+    public static function days(int $days): string
+    {
+        return match (true) {
+            $days === 1 => 'يوم',
+            $days === 2 => 'يومين',
+            $days >= 3 && $days <= 10 => "{$days} أيام",
+            default => "{$days} يوم",
+        };
+    }
+
     private static function number(string|int $value, int $scale): string
     {
         $decimal = BigDecimal::of($value)->toScale($scale, RoundingMode::HALF_UP);

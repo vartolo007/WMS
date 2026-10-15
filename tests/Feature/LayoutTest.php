@@ -28,7 +28,10 @@ test('a warehouse sees neither company management nor the warehouse selector', f
 test('the super admin sees the platform shell', function () {
     $admin = User::factory()->superAdmin()->create();
 
-    $this->actingAs($admin)->get('/dashboard')
+    // The companies page is the platform dashboard (FR-24).
+    $this->actingAs($admin)->get('/dashboard')->assertRedirect(route('admin.companies.index'));
+
+    $this->get('/admin/companies')
         ->assertOk()
         ->assertSee('لوحة إدارة المنصة')
         ->assertSee(route('admin.companies.index'))
@@ -44,7 +47,7 @@ test('company users get the company colour, guests and the admin get the default
         $this->actingAs($user)->get('/dashboard')->assertSee('--color-primary: #0F766E', false);
     }
 
-    $this->actingAs(User::factory()->superAdmin()->create())->get('/dashboard')
+    $this->actingAs(User::factory()->superAdmin()->create())->get('/admin/companies')
         ->assertSee('--color-primary: '.config('wms.default_color'), false);
 
     auth()->logout();

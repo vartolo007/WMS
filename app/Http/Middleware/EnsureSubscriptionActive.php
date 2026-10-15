@@ -8,23 +8,29 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Ends the session of a user who was deactivated or whose company was suspended
- * after logging in (FR-03). Super admins are never blocked.
+ * Checked on every request of a signed-in user (FR-03, FR-05):
+ * - a deactivated account loses its session and goes to the login page;
+ * - a user of a suspended company is sent to the suspended-subscription page, the only page that stays open
+ *   (besides logging out, which is outside this middleware). The platform owner is never blocked.
  */
 class EnsureSubscriptionActive
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $reason = $request->user()?->accessBlockReason();
+        $user = $request->user();
 
-        if ($reason === null) {
-            return $next($request);
+        if ($user?->isDeactivated()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login')->withErrors(['login' => trans('auth.inactive')]);
         }
 
-        Auth::guard('web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        if ($user?->companyIsSuspended() && ! $request->routeIs('subscription.suspended')) {
+            return redirect()->route('subscription.suspended');
+        }
 
-        return redirect()->route('login')->withErrors(['login' => trans($reason)]);
+        return $next($request);
     }
 }

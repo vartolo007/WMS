@@ -36,6 +36,16 @@ return [
     ],
 
     /*
+    | How users of a suspended company reach the platform owner (SRS FR-03, shown to company owners only).
+    | The defaults are placeholders from the design: set the real values in .env.
+    */
+    'support' => [
+        'phone' => env('WMS_SUPPORT_PHONE', '+963 11 000 0000'),
+        'email' => env('WMS_SUPPORT_EMAIL', 'support@raff.app'),
+        'hours' => env('WMS_SUPPORT_HOURS', '9 الصبح – 5 المسا، الأحد للخميس'),
+    ],
+
+    /*
     | Platform owner (super admin) created by SuperAdminSeeder.
     */
     'admin' => [

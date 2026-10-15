@@ -41,7 +41,7 @@ test('a guest is sent to login', function () {
 test('a suspended company cannot reach the catalogue', function () {
     $suspended = User::factory()->for(Company::factory()->suspended())->create();
 
-    $this->actingAs($suspended)->get('/products')->assertRedirect('/login');
+    $this->actingAs($suspended)->get('/products')->assertRedirect(route('subscription.suspended'));
 });
 
 // --- Fields and validation ---------------------------------------------------------------------

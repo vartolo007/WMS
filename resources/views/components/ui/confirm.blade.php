@@ -1,6 +1,6 @@
 {{--
     Confirmation dialog from design batch 1: focus starts on the cancel button, Esc or a click outside closes it.
-    Slots: `trigger` (what opens it), default slot (explanation).
+    Slots: `trigger` (what opens it), default slot (explanation), optional `fields` (inputs inside the form).
 --}}
 @props([
     'title',
@@ -32,11 +32,14 @@
                 <div class="text-lg font-bold text-ink">{{ $title }}</div>
                 <div class="text-sm leading-7 text-muted">{{ $slot }}</div>
 
-                <form method="POST" action="{{ $action }}" class="mt-2 flex gap-2">
+                <form method="POST" action="{{ $action }}" class="mt-2 flex flex-wrap gap-2">
                     @csrf
                     @if (strtoupper($method) !== 'POST')
                         @method($method)
                     @endif
+                    @isset($fields)
+                        <div class="basis-full">{{ $fields }}</div>
+                    @endisset
                     <x-ui.button :variant="$tone === 'danger' ? 'danger' : 'primary'">{{ $confirmLabel }}</x-ui.button>
                     <x-ui.button variant="secondary" type="button" data-cancel @click="open = false">{{ $cancelLabel }}</x-ui.button>
                 </form>

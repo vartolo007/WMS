@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PartyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SuspendedSubscriptionController;
 use App\Http\Controllers\WarehouseContextController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,9 @@ Route::redirect('/', '/dashboard');
 
 Route::middleware(['auth', 'subscription'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+    // FR-03: the only page of a suspended company's users (`subscription` lets it through).
+    Route::get('/subscription/suspended', SuspendedSubscriptionController::class)->name('subscription.suspended');
 
     // FR-26. No account deletion: nothing is hard-deleted (T12).
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

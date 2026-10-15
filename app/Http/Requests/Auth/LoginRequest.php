@@ -56,22 +56,21 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Reject a deactivated account or a suspended company after valid credentials (FR-03, FR-05).
+     * Reject a deactivated account after valid credentials (FR-05). A suspended company is not refused here:
+     * its users sign in and are sent to the suspended-subscription page by EnsureSubscriptionActive (FR-03).
      *
      * @throws ValidationException
      */
     protected function ensureAccessAllowed(): void
     {
-        $reason = Auth::user()->accessBlockReason();
-
-        if ($reason === null) {
+        if (! Auth::user()->isDeactivated()) {
             return;
         }
 
         Auth::guard('web')->logout();
 
         throw ValidationException::withMessages([
-            'login' => trans($reason),
+            'login' => trans('auth.inactive'),
         ]);
     }
 

@@ -23,7 +23,9 @@ test('the admin sees all companies with their owner and status', function () {
 test('expired trials are highlighted', function () {
     Company::factory()->trialExpired()->create();
 
-    $this->actingAs($this->admin)->get('/admin/companies')->assertSee('انتهت التجربة');
+    $this->actingAs($this->admin)->get('/admin/companies')
+        ->assertSee('انتهت من 3 أيام')
+        ->assertSee('bg-danger-soft', false);
 });
 
 test('the admin activates and suspends a company', function () {
