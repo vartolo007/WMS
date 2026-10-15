@@ -43,13 +43,13 @@ Screens: 1–4 (batch 1), 11–15 (batch 5), 19–20 (batch 7).
 - [x] Units in `config('wms.units')`, each with `allows_fraction` (لتر / كيلو yes, علبة / قطعة no)
 - [x] products (barcode unique per company, location, min_stock, is_active; unit is a select from the config list;
       manual sale price field) — screen 11 without balance / suggested-price columns and "low only" filter
-- [ ] parties (customer / supplier, is_active; PartyType enum) — screen 12 without the "حركته" link
-- [ ] Warehouses page per screen 13 (form beside the list; no "last login" column)
+- [x] parties (customer / supplier, is_active; PartyType enum) — screen 12 without the "حركته" link
+- [x] Warehouses page per screen 13 (form beside the list; no "last login" column)
 - [ ] Company settings page (FR-25): name, logo upload, palette colour, currency symbol,
       markup_percent between 100 and 1000 — screen 14
 - [ ] Currency formatting component used for every amount
 - [x] Profile page (FR-26) available to all roles; remove Breeze "delete account" — screen 15
-- [ ] Policies (Q2 default: owner and warehouses can manage products and parties) — `ProductPolicy` done; `PartyPolicy` with parties
+- [x] Policies (Q2 default: owner and warehouses can manage products and parties) — one `CatalogPolicy::manage()`
 - [x] Search products by name / barcode
 - [ ] Companies page per screen 19 (status cards, search, expired trials first); it is the super admin
       dashboard (FR-24)
@@ -135,3 +135,6 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-06 — 2 — Profile page in the shell, account deletion removed; 98 tests pass, Pint clean, checked at 1440px and 375px
 2026-10-15 — 2 — Units in `config('wms.units')` + `Units` helper; `products` migration, `Product` model (tenant scope), `ProductPolicy` (Q2 in one method)
 2026-10-15 — 2 — Product catalogue screen 11: search by name / barcode, inactive toggle, `x-ui.drawer` form, stop with confirmation; 129 tests pass, Pint clean, checked at 1440px and 375px
+2026-10-15 — 2 — Parties: `PartyType` enum, `parties` migration, `Party` model, `PartyPolicy`; screen 12 with tabs, search, modal form, mobile cards
+2026-10-15 — 2 — `CatalogPolicy` shared by products and parties (Q2 in one place); `recordForm` Alpine component shared by the drawer and modal pages
+2026-10-15 — 2 — Warehouses page per screen 13: list with the create / edit form beside it, separate create page removed; 156 tests pass, Pint clean, checked at 1440px and 375px

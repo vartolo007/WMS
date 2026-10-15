@@ -92,3 +92,9 @@ Add new decisions here: `YYYY-MM-DD — decision — reason`.
 - 2026-10-15 — No `ProductService` yet: create / update / deactivate hold no business rule. It is added when a rule appears (Phase 3: refuse a unit change once the product has movements).
 - 2026-10-15 — `ProductPolicy::manage()` is the single place for Q2; the other abilities call it, so flipping the answer is one line. `custom_sale_price` accepts 0 or more (SRS 7 rejects only negative prices).
 - 2026-10-15 — Product form lives in a reusable `x-ui.drawer` (design screen 11); after a failed save the drawer stays open with the old input and errors, and closing it reloads the page for a clean form.
+- 2026-10-15 — `CatalogPolicy` is the one place for Q2 (products and parties both extend it); flipping who may manage the shared catalogues is a one-line change in `manage()`.
+- 2026-10-15 — Parties: name is not unique (two customers may share a name), phone is optional digits / spaces / `+ - ( )` up to 30 characters, and the list shows every party with a status badge (design) — stopping a party is added to the design because SRS FR-08 requires it.
+- 2026-10-15 — Changing a party's type is allowed for now; Phase 3 must refuse it once the party has movements (a purchase needs a supplier), like the product unit.
+- 2026-10-15 — Parties use a centered `x-ui.modal` and products a side `x-ui.drawer`, as designed; both are driven by one `recordForm` Alpine component (fill fields, create / update action, reopen after a failed save, reload on close).
+- 2026-10-15 — Warehouses page is one screen: `GET /warehouses` is the list + create form, `GET /warehouses/{id}/edit` the same screen switched to that warehouse; the separate create page is gone.
+- 2026-10-15 — The duplicate-email error on the warehouse form stays generic (design names the warehouse): emails are unique across the whole platform, so naming one would leak another company's data.
