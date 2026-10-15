@@ -20,6 +20,7 @@ class Navigation
     {
         $dashboard = self::item('لوحة التحكم', 'dashboard');
         $products = self::item('دليل المواد', 'products.index', 'products.*');
+        $parties = self::item('العملاء والموردون', 'parties.index', 'parties.*');
 
         return match ($user->role) {
             Role::SuperAdmin => [
@@ -27,11 +28,11 @@ class Navigation
                 'company' => [],
             ],
             Role::Owner => [
-                'main' => [$dashboard, $products],
+                'main' => [$dashboard, $products, $parties],
                 'company' => [self::item('المستودعات', 'warehouses.index', 'warehouses.*')],
             ],
             Role::Warehouse => [
-                'main' => [$dashboard, $products],
+                'main' => [$dashboard, $products, $parties],
                 'company' => [],
             ],
         };

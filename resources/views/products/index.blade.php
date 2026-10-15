@@ -1,26 +1,14 @@
 {{-- Screen 11 (design batch 5): product catalogue. Balance / suggested-price columns and "low only" come with Phases 3 and 5. --}}
 <x-app-layout title="دليل المواد">
     <div
-        x-data="{
+        x-data="recordForm({
             open: {{ Js::from($errors->any()) }},
-            hadErrors: {{ Js::from($errors->any()) }},
             editingId: {{ Js::from(old('editing_id')) }},
             editingName: {{ Js::from(old('name')) }},
             storeUrl: {{ Js::from(route('products.store')) }},
             updateUrl: {{ Js::from(route('products.update', '__ID__')) }},
-            get action() { return this.editingId ? this.updateUrl.replace('__ID__', this.editingId) : this.storeUrl },
-            fill(product) {
-                const fields = this.$refs.form.elements;
-                for (const key of ['name', 'barcode', 'location', 'min_stock', 'custom_sale_price']) {
-                    fields[key].value = product[key] ?? '';
-                }
-                fields.unit.value = product.unit ?? fields.unit.options[0].value;
-            },
-            create() { this.editingId = null; this.editingName = null; this.fill({}); this.open = true; },
-            edit(product) { this.editingId = product.id; this.editingName = product.name; this.fill(product); this.open = true; },
-            // After a failed save the form shows old input and errors: reload gives a clean form.
-            close() { this.open = false; if (this.hadErrors) window.location.reload(); },
-        }"
+            fields: ['name', 'barcode', 'unit', 'location', 'min_stock', 'custom_sale_price'],
+        })"
         class="flex flex-col gap-6"
     >
         <x-ui.page-header title="دليل المواد" subtitle="الدليل مشترك لكل مستودعات الشركة.">

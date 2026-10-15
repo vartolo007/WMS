@@ -19,7 +19,7 @@
 
         @if (! $hasWarehouses)
             <x-ui.empty-state title="أضف أول مستودع" description="كل مستودع إله حساب دخول خاص، وبتشتغل عليه الفواتير والنقل.">
-                <x-ui.button :href="route('warehouses.create')">+ مستودع جديد</x-ui.button>
+                <x-ui.button :href="route('warehouses.index')">+ مستودع جديد</x-ui.button>
             </x-ui.empty-state>
         @else
             <x-ui.empty-state title="ما في حركات اليوم" description="صافي مبيعات اليوم والمواد المنخفضة والراكدة بيظهروا هون بعد إضافة الحركات." />

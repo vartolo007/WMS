@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\CompanyStatus;
+use App\Enums\PartyType;
 use App\Enums\Role;
 use App\Models\Company;
 use Illuminate\Database\Seeder;
@@ -41,6 +42,18 @@ class DemoSeeder extends Seeder
 
         foreach ($products as $product) {
             $company->products()->create($product);
+        }
+
+        $parties = [
+            ['name' => 'محمد الأحمد', 'phone' => '0944 111 222', 'type' => PartyType::Customer],
+            ['name' => 'مطعم الياسمين', 'phone' => '011 222 3344', 'type' => PartyType::Customer],
+            ['name' => 'شركة الشام للتوريد', 'phone' => '0933 555 666', 'type' => PartyType::Supplier],
+            ['name' => 'مورد الجملة', 'type' => PartyType::Supplier],
+            ['name' => 'عميل قديم (متوقف)', 'type' => PartyType::Customer, 'is_active' => false],
+        ];
+
+        foreach ($parties as $party) {
+            $company->parties()->create($party);
         }
     }
 }

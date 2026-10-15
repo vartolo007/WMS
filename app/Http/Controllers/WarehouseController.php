@@ -22,16 +22,14 @@ class WarehouseController extends Controller
     {
         Gate::authorize('manageWarehouses', User::class);
 
-        $warehouses = $request->user()->company->warehouses()->orderBy('name')->get();
-
-        return view('warehouses.index', compact('warehouses'));
+        return $this->page($request, null);
     }
 
-    public function create(): View
+    public function edit(Request $request, User $warehouse): View
     {
-        Gate::authorize('manageWarehouses', User::class);
+        Gate::authorize('update', $warehouse);
 
-        return view('warehouses.create');
+        return $this->page($request, $warehouse);
     }
 
     public function store(StoreWarehouseRequest $request): RedirectResponse
@@ -39,13 +37,6 @@ class WarehouseController extends Controller
         $this->accounts->create($request->user()->company, $request->validated());
 
         return redirect()->route('warehouses.index')->with('status', 'تم إنشاء المستودع.');
-    }
-
-    public function edit(User $warehouse): View
-    {
-        Gate::authorize('update', $warehouse);
-
-        return view('warehouses.edit', compact('warehouse'));
     }
 
     public function update(UpdateWarehouseRequest $request, User $warehouse): RedirectResponse
@@ -62,5 +53,16 @@ class WarehouseController extends Controller
         $this->accounts->setActive($warehouse, ! $warehouse->is_active);
 
         return back()->with('status', $warehouse->is_active ? 'تم تفعيل المستودع.' : 'تم إيقاف المستودع.');
+    }
+
+    /**
+     * Screen 13: the list with the form beside it. `$editing` is null for a new warehouse.
+     */
+    private function page(Request $request, ?User $editing): View
+    {
+        return view('warehouses.index', [
+            'warehouses' => $request->user()->company->warehouses()->orderBy('name')->get(),
+            'editing' => $editing,
+        ]);
     }
 }

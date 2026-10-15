@@ -113,3 +113,39 @@ test('the owner cannot edit owner or admin accounts through warehouse pages', fu
     $this->patch("/warehouses/{$admin->id}/toggle")->assertForbidden();
     $this->patch("/warehouses/{$this->owner->id}/toggle")->assertForbidden();
 });
+
+test('the list page has the create form beside the warehouses', function () {
+    User::factory()->warehouse()->for($this->owner->company)->create(['name' => 'مستودعنا']);
+
+    $this->actingAs($this->owner)->get('/warehouses')
+        ->assertOk()
+        ->assertSee('مستودعنا')
+        ->assertSee('مستودع جديد')
+        ->assertSee(route('warehouses.store'), false);
+});
+
+test('the edit page is the same screen with the form switched to that warehouse', function () {
+    $warehouse = User::factory()->warehouse()->for($this->owner->company)->create(['name' => 'مستودع الريف']);
+
+    $this->actingAs($this->owner)->get("/warehouses/{$warehouse->id}/edit")
+        ->assertOk()
+        ->assertSee('تعديل مستودع الريف')
+        ->assertSee(route('warehouses.update', $warehouse), false);
+});
+
+test('there is no separate create page any more', function () {
+    $this->actingAs($this->owner)->get('/warehouses/create')->assertStatus(405);
+});
+
+test('a new company is invited to create its first warehouse', function () {
+    $this->actingAs($this->owner)->get('/warehouses')->assertSee('ما عندك مستودعات لسا');
+});
+
+test('the duplicate email message does not name any warehouse', function () {
+    User::factory()->warehouse()->create(['name' => 'مستودع شركة ثانية', 'email' => 'city@example.com']);
+
+    $response = $this->actingAs($this->owner)->post('/warehouses', warehouseData());
+
+    $response->assertSessionHasErrors('email');
+    expect(session('errors')->first('email'))->not->toContain('مستودع شركة ثانية');
+});

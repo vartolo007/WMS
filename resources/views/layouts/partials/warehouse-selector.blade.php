@@ -33,7 +33,7 @@
             </button>
         @endforeach
         @if ($warehouseOptions->isEmpty())
-            <a href="{{ route('warehouses.create') }}" class="px-3 py-2.5 text-sm">+ أضف أول مستودع</a>
+            <a href="{{ route('warehouses.index') }}" class="px-3 py-2.5 text-sm">+ أضف أول مستودع</a>
         @endif
     </form>
 </div>
