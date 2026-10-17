@@ -3,8 +3,10 @@
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\CompanySettingsController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MovementController;
 use App\Http\Controllers\PartyController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductLookupController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SuspendedSubscriptionController;
 use App\Http\Controllers\WarehouseContextController;
@@ -30,6 +32,14 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
         Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
         Route::patch('/products/{product}/toggle', [ProductController::class, 'toggle'])->name('products.toggle');
+
+        // FR-10 → FR-14: purchase and sale invoices. Saved movements are never edited or deleted.
+        Route::get('/products/lookup', ProductLookupController::class)->name('products.lookup');
+        Route::get('/movements', [MovementController::class, 'index'])->name('movements.index');
+        Route::get('/movements/create', [MovementController::class, 'create'])->name('movements.create');
+        Route::post('/movements', [MovementController::class, 'store'])->name('movements.store');
+        Route::get('/movements/{movement}', [MovementController::class, 'show'])->name('movements.show');
+        Route::get('/movements/{movement}/print', [MovementController::class, 'print'])->name('movements.print');
 
         Route::get('/parties', [PartyController::class, 'index'])->name('parties.index');
         Route::post('/parties', [PartyController::class, 'store'])->name('parties.store');

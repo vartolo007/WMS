@@ -2,6 +2,7 @@
 
 use App\Enums\CompanyStatus;
 use App\Models\Company;
+use App\Models\Movement;
 use App\Models\Party;
 use App\Models\Product;
 use App\Models\User;
@@ -25,6 +26,7 @@ function routeParameterValues(): array
     return [
         'product' => Product::factory()->for($company)->create()->id,
         'party' => Party::factory()->for($company)->create()->id,
+        'movement' => Movement::factory()->for($company)->create(['warehouse_id' => test()->warehouse->id, 'created_by' => test()->warehouse->id])->id,
         'warehouse' => test()->warehouse->id,
         'company' => $company->id,
     ];

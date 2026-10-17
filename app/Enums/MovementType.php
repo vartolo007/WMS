@@ -91,6 +91,88 @@ enum MovementType: string
     }
 
     /**
+     * Badge colour of the type (design batch 4): one fixed tone per type, never the company colour.
+     */
+    public function tone(): string
+    {
+        return match ($this) {
+            self::Purchase => 'blue',
+            self::Sale => 'success',
+            self::PurchaseReturn => 'warning',
+            self::SaleReturn => 'danger',
+            self::Transfer => 'purple',
+        };
+    }
+
+    /**
+     * What the net amount means in cash terms (every movement is cash, FR-10).
+     */
+    public function netLabel(): string
+    {
+        return match ($this) {
+            self::Purchase => 'المدفوع نقداً',
+            self::Sale => 'المقبوض نقداً',
+            self::PurchaseReturn, self::SaleReturn => 'المردود نقداً',
+            self::Transfer => 'بدون قيمة نقدية',
+        };
+    }
+
+    /**
+     * Label of the party field: the supplier of a purchase, the customer of a sale.
+     */
+    public function partyLabel(): string
+    {
+        return match ($this->partyType()) {
+            PartyType::Supplier => 'المورد',
+            PartyType::Customer => 'العميل',
+            null => 'الطرف',
+        };
+    }
+
+    /**
+     * Who is on the other side, for lists and printouts: the party, "cash sale" for an anonymous sale,
+     * or the receiving warehouse of a transfer.
+     */
+    public function counterpartLabel(?string $partyName, ?string $targetWarehouseName): string
+    {
+        return match ($this) {
+            self::Transfer => '← '.($targetWarehouseName ?? '—'),
+            self::Sale => $partyName ?? 'بيع نقدي',
+            default => $partyName ?? '—',
+        };
+    }
+
+    /**
+     * The two signature lines at the bottom of the printed copy (design screen 10).
+     *
+     * @return array{0: string, 1: string}
+     */
+    public function signatures(): array
+    {
+        return match ($this) {
+            self::Purchase => ['توقيع المورد', 'توقيع المستلم'],
+            self::Sale => ['توقيع المستلم', 'توقيع البائع'],
+            self::PurchaseReturn => ['توقيع المورد', 'توقيع المسلِّم'],
+            self::SaleReturn => ['توقيع المسلِّم', 'توقيع المستلم'],
+            self::Transfer => ['توقيع المستلم', 'توقيع المرسِل'],
+        };
+    }
+
+    /**
+     * The type behind a display prefix ("S" → sale), or null when no type uses it.
+     */
+    public static function fromPrefix(string $prefix): ?self
+    {
+        foreach (self::cases() as $type) {
+            if (strcasecmp($type->prefix(), $prefix) === 0) {
+                return $type;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Display prefix only; the database keeps a plain integer number.
      */
     public function prefix(): string

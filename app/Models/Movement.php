@@ -6,6 +6,7 @@ use App\Enums\MovementStatus;
 use App\Enums\MovementType;
 use App\Models\Concerns\BelongsToCompany;
 use App\Models\Scopes\WarehouseScope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -96,6 +97,51 @@ class Movement extends Model
     public function returns(): HasMany
     {
         return $this->hasMany(self::class, 'related_movement_id');
+    }
+
+    /**
+     * The filters of the movements list (all optional). A warehouse restriction also matches the
+     * receiving side of a transfer, so a warehouse sees its incoming transfers too.
+     *
+     * @param  array{type?: ?string, status?: ?string, from?: ?string, to?: ?string, q?: ?string}  $filters
+     */
+    public function scopeFilter(Builder $query, array $filters, ?int $warehouseId = null): void
+    {
+        $query
+            ->when($filters['type'] ?? null, fn (Builder $q, string $type) => $q->where('type', $type))
+            ->when($filters['status'] ?? null, fn (Builder $q, string $status) => $q->where('status', $status))
+            ->when($filters['from'] ?? null, fn (Builder $q, string $from) => $q->whereDate('date', '>=', $from))
+            ->when($filters['to'] ?? null, fn (Builder $q, string $to) => $q->whereDate('date', '<=', $to))
+            ->when($warehouseId, fn (Builder $q, int $id) => $q->where(
+                fn (Builder $w) => $w->where('warehouse_id', $id)->orWhere('target_warehouse_id', $id)
+            ))
+            ->search($filters['q'] ?? null);
+    }
+
+    /**
+     * By movement number ("S-0142", "s142", "142"), document number, or party name.
+     * LIKE wildcards typed by the user are taken literally.
+     */
+    public function scopeSearch(Builder $query, ?string $term): void
+    {
+        $term = trim((string) $term);
+
+        if ($term === '') {
+            return;
+        }
+
+        $like = '%'.addcslashes($term, '\\%_').'%';
+
+        $query->where(function (Builder $q) use ($term, $like) {
+            $q->where('document_no', 'like', $like)
+                ->orWhereHas('party', fn (Builder $party) => $party->where('name', 'like', $like));
+
+            if (preg_match('/^([A-Za-z]{1,2})-?(\d+)$/', $term, $m) && ($type = MovementType::fromPrefix($m[1]))) {
+                $q->orWhere(fn (Builder $n) => $n->where('type', $type)->where('number', (int) $m[2]));
+            } elseif (ctype_digit($term)) {
+                $q->orWhere('number', (int) $term);
+            }
+        });
     }
 
     public function isCancelled(): bool

@@ -7,9 +7,9 @@ use App\Models\User;
 
 /**
  * Sidebar items per role, in one place. Only screens that exist are listed;
- * movements and reports join here in their phases.
+ * reports join here in their phase.
  *
- * @phpstan-type Item array{label: string, route: string, active: string}
+ * @phpstan-type Item array{label: string, route: string, active: string|list<string>}
  */
 class Navigation
 {
@@ -19,6 +19,8 @@ class Navigation
     public static function for(User $user): array
     {
         $dashboard = self::item('لوحة التحكم', 'dashboard');
+        $newMovement = self::item('حركة جديدة', 'movements.create');
+        $movements = self::item('الحركات', 'movements.index', ['movements.index', 'movements.show']);
         $products = self::item('دليل المواد', 'products.index', 'products.*');
         $parties = self::item('العملاء والموردون', 'parties.index', 'parties.*');
 
@@ -29,14 +31,14 @@ class Navigation
                 'company' => [],
             ],
             Role::Owner => [
-                'main' => [$dashboard, $products, $parties],
+                'main' => [$dashboard, $newMovement, $movements, $products, $parties],
                 'company' => [
                     self::item('المستودعات', 'warehouses.index', 'warehouses.*'),
                     self::item('إعدادات الشركة', 'settings.edit', 'settings.*'),
                 ],
             ],
             Role::Warehouse => [
-                'main' => [$dashboard, $products, $parties],
+                'main' => [$dashboard, $newMovement, $movements, $products, $parties],
                 'company' => [],
             ],
         };
@@ -45,7 +47,7 @@ class Navigation
     /**
      * @return Item
      */
-    private static function item(string $label, string $route, ?string $active = null): array
+    private static function item(string $label, string $route, string|array|null $active = null): array
     {
         return ['label' => $label, 'route' => $route, 'active' => $active ?? $route];
     }

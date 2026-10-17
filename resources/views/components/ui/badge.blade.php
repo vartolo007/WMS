@@ -11,6 +11,8 @@
         'danger' => ['bg-red-100 text-red-800', 'bg-danger'],
         'orange' => ['bg-orange-100 text-orange-800', 'bg-warning'],
         'slate' => ['bg-slate-200 text-slate-600', 'bg-slate-500'],
+        'blue' => ['bg-blue-100 text-blue-800', 'bg-blue-600'],
+        'purple' => ['bg-purple-100 text-purple-800', 'bg-purple-600'],
         'neutral' => ['bg-canvas text-muted', 'bg-subtle'],
     ];
     [$colors, $dot] = $tones[$tone];

@@ -71,10 +71,10 @@ Screens: 7 (purchase / sale tabs), 8, 9, 10; balance and suggested-price columns
 - [x] `Money`, `NumberGenerator`, `StockService`, `PricingService`
 - [x] `PostingService::post()` with discount distribution
 - [x] `MovementService::purchase()` and `sale()`
-- [ ] Invoice screen (Alpine.js): barcode input, rows, live totals, suggested price; quantity decimals per
+- [x] Invoice screen (Alpine.js): barcode input, rows, live totals, suggested price; quantity decimals per
       unit `allows_fraction`; discount above the subtotal is rejected, not clamped — screen 7
-- [ ] Movements list and movement details page (item count, no total quantity; no cancel action yet) — screens 8–9
-- [ ] Movement print page for every type built so far (A4, company header with logo and warehouse,
+- [x] Movements list and movement details page (item count, no total quantity; no cancel action yet) — screens 8–9
+- [x] Movement print page for every type built so far (A4, company header with logo and warehouse,
       "ملغاة" stamp when cancelled; SRS 2.3 FR-10) — screen 10
 - [ ] Products list: balance per warehouse and suggested price columns — screen 11
 
@@ -145,3 +145,4 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-15 — 2 — Phase 2 complete: 237 tests pass, Pint clean, checked at 1440px and 375px
 2026-10-17 — 3 — Batch A: `Money`, `MovementType` / `MovementStatus`, movements / movement_items / operations migrations + models + factories, `WarehouseScope`; 254 tests pass, Pint clean
 2026-10-17 — 3 — Batch B: `NumberGenerator`, `StockService`, `PricingService`, `PostingService::post()` (SRS 6.2 discount split), `MovementService::purchase()` / `sale()`; rule-1 guard test; 277 tests pass, Pint clean
+2026-10-17 — 3 — Batch C: invoice screen (Alpine, JSON save, barcode lookup), movements list / details / A4 print, sidebar + dashboard quick buttons; checked at 1440px and 375px

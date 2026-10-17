@@ -1,11 +1,13 @@
 import './bootstrap';
 
 import Alpine from 'alpinejs';
+import invoiceForm from './invoice-form';
 import recordForm from './record-form';
 import settingsPreview from './settings-preview';
 
 window.Alpine = Alpine;
 
+Alpine.data('invoiceForm', invoiceForm);
 Alpine.data('recordForm', recordForm);
 Alpine.data('settingsPreview', settingsPreview);
 

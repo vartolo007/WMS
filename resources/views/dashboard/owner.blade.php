@@ -1,7 +1,10 @@
 @php($current = app(\App\Support\CurrentWarehouse::class)->get())
 <x-app-layout title="لوحة التحكم">
     <div class="flex flex-col gap-6">
-        <x-ui.page-header title="لوحة التحكم" :subtitle="\App\Support\Format::date(today(), withWeekday: true).' · '.($current?->name ?? 'كل المستودعات')" />
+        <x-ui.page-header title="لوحة التحكم" :subtitle="\App\Support\Format::date(today(), withWeekday: true).' · '.($current?->name ?? 'كل المستودعات')">
+            <x-ui.button :href="route('movements.create', ['type' => 'purchase'])" variant="secondary">+ فاتورة شراء</x-ui.button>
+            <x-ui.button :href="route('movements.create', ['type' => 'sale'])">+ فاتورة بيع</x-ui.button>
+        </x-ui.page-header>
 
         <div class="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-white px-5 py-4">
             <span class="font-semibold">{{ $company->name }}</span>

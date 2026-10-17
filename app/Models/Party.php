@@ -34,6 +34,11 @@ class Party extends Model
         ];
     }
 
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('is_active', true);
+    }
+
     public function scopeOfType(Builder $query, ?PartyType $type): void
     {
         if ($type !== null) {
