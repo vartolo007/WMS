@@ -68,9 +68,9 @@ Screens: 7 (purchase / sale tabs), 8, 9, 10; balance and suggested-price columns
 - [x] Enum MovementType with `effects()` and helpers (incl. display prefix S- / P- / …); MovementStatus
 - [x] Migrations + models: movements, movement_items, operations
 - [x] `WarehouseScope` on movements and operations (incoming transfers visible to the target)
-- [ ] `Money`, `NumberGenerator`, `StockService`, `PricingService`
-- [ ] `PostingService::post()` with discount distribution
-- [ ] `MovementService::purchase()` and `sale()`
+- [x] `Money`, `NumberGenerator`, `StockService`, `PricingService`
+- [x] `PostingService::post()` with discount distribution
+- [x] `MovementService::purchase()` and `sale()`
 - [ ] Invoice screen (Alpine.js): barcode input, rows, live totals, suggested price; quantity decimals per
       unit `allows_fraction`; discount above the subtotal is rejected, not clamped — screen 7
 - [ ] Movements list and movement details page (item count, no total quantity; no cancel action yet) — screens 8–9
@@ -144,3 +144,4 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-15 — 2 — Companies page (screen 19) is the platform dashboard: five filter cards with counts, search, expired trials first, activate / extend (7 / 14 / 30 days with the new end date) / suspend dialogs, mobile cards
 2026-10-15 — 2 — Phase 2 complete: 237 tests pass, Pint clean, checked at 1440px and 375px
 2026-10-17 — 3 — Batch A: `Money`, `MovementType` / `MovementStatus`, movements / movement_items / operations migrations + models + factories, `WarehouseScope`; 254 tests pass, Pint clean
+2026-10-17 — 3 — Batch B: `NumberGenerator`, `StockService`, `PricingService`, `PostingService::post()` (SRS 6.2 discount split), `MovementService::purchase()` / `sale()`; rule-1 guard test; 277 tests pass, Pint clean
