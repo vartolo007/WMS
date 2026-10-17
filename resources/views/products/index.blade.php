@@ -1,4 +1,4 @@
-{{-- Screen 11 (design batch 5): product catalogue. Balance / suggested-price columns and "low only" come with Phases 3 and 5. --}}
+{{-- Screen 11 (design batch 5): product catalogue. The "low only" filter comes with Phase 5. --}}
 <x-app-layout title="دليل المواد">
     <div
         x-data="recordForm({
@@ -11,7 +11,7 @@
         })"
         class="flex flex-col gap-6"
     >
-        <x-ui.page-header title="دليل المواد" subtitle="الدليل مشترك لكل مستودعات الشركة.">
+        <x-ui.page-header title="دليل المواد" :subtitle="'الدليل مشترك لكل مستودعات الشركة · الرصيد: '.$balanceScope">
             <x-ui.button type="button" @click="create()">+ مادة</x-ui.button>
         </x-ui.page-header>
 
@@ -41,6 +41,8 @@
                         <x-ui.th>الباركود</x-ui.th>
                         <x-ui.th>الوحدة</x-ui.th>
                         <x-ui.th>الموقع</x-ui.th>
+                        <x-ui.th numeric>الرصيد</x-ui.th>
+                        <x-ui.th numeric>السعر المقترح</x-ui.th>
                         <x-ui.th></x-ui.th>
                     </tr>
                 </thead>
@@ -62,6 +64,17 @@
                             </x-ui.td>
                             <x-ui.td>{{ $product->unitLabel() }}</x-ui.td>
                             <x-ui.td>{{ $product->location ?? '—' }}</x-ui.td>
+                            <x-ui.td numeric class="whitespace-nowrap font-semibold">
+                                <bdi dir="ltr">{{ $product->displayQuantity($balances[$product->id]) }}</bdi>
+                                <span class="text-xs font-normal text-muted">{{ $product->unitLabel() }}</span>
+                            </x-ui.td>
+                            <x-ui.td numeric>
+                                @if ($suggestedPrices[$product->id] !== null)
+                                    <x-ui.money :amount="$suggestedPrices[$product->id]" />
+                                @else
+                                    <span class="text-subtle">—</span>
+                                @endif
+                            </x-ui.td>
                             <x-ui.td class="whitespace-nowrap text-left">
                                 <div class="inline-flex items-center gap-1">
                                     <x-ui.button size="sm" variant="ghost" type="button"

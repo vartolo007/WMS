@@ -22,15 +22,17 @@ class StockService
     }
 
     /**
-     * Balances of several products in one warehouse, one query. Every requested id is in the result.
+     * Balances of several products in one warehouse, or in the whole company when `$warehouseId`
+     * is null (SRS 6.2: a company balance is the sum of its warehouses'). One query; every
+     * requested id is in the result.
      *
      * @param  list<int>  $productIds
      * @return array<int, string> product id => balance
      */
-    public function balances(array $productIds, int $warehouseId, ?CarbonInterface $asOf = null): array
+    public function balances(array $productIds, ?int $warehouseId, ?CarbonInterface $asOf = null): array
     {
         $rows = Operation::query()
-            ->where('warehouse_id', $warehouseId)
+            ->when($warehouseId !== null, fn ($query) => $query->where('warehouse_id', $warehouseId))
             ->whereIn('product_id', $productIds)
             ->when($asOf, fn ($query) => $query->whereDate('date', '<=', $asOf->toDateString()))
             ->groupBy('product_id')

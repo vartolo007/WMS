@@ -6,6 +6,7 @@ use App\Enums\PartyType;
 use App\Http\Requests\StorePartyRequest;
 use App\Http\Requests\UpdatePartyRequest;
 use App\Models\Party;
+use App\Services\PartyService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -43,9 +44,9 @@ class PartyController extends Controller
         return redirect()->route('parties.index')->with('status', 'تمت إضافة الطرف.');
     }
 
-    public function update(UpdatePartyRequest $request, Party $party): RedirectResponse
+    public function update(UpdatePartyRequest $request, Party $party, PartyService $parties): RedirectResponse
     {
-        $party->update($request->validated());
+        $parties->update($party, $request->validated());
 
         return redirect()->route('parties.index')->with('status', 'تم حفظ الطرف.');
     }

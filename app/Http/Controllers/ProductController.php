@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use App\Services\PricingService;
+use App\Services\ProductService;
+use App\Services\StockService;
+use App\Support\CurrentWarehouse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -15,7 +19,7 @@ use Illuminate\View\View;
  */
 class ProductController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, CurrentWarehouse $current, StockService $stock, PricingService $pricing): View
     {
         Gate::authorize('viewAny', Product::class);
 
@@ -28,8 +32,16 @@ class ProductController extends Controller
             ->paginate(25)
             ->withQueryString();
 
+        // Balance of the warehouse in view (own warehouse, or the owner's top-bar choice); the whole
+        // company when the owner looks at all warehouses. Always computed from operations (rule 8).
+        $warehouse = $current->get();
+        $ids = $products->getCollection()->pluck('id')->all();
+
         return view('products.index', [
             'products' => $products,
+            'balances' => $stock->balances($ids, $warehouse?->id),
+            'suggestedPrices' => $pricing->suggestedPrices($products->getCollection()),
+            'balanceScope' => $warehouse?->name ?? 'كل المستودعات',
             'search' => (string) $request->query('q'),
             'showInactive' => $showInactive,
         ]);
@@ -42,9 +54,9 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('status', 'تمت إضافة المادة.');
     }
 
-    public function update(UpdateProductRequest $request, Product $product): RedirectResponse
+    public function update(UpdateProductRequest $request, Product $product, ProductService $products): RedirectResponse
     {
-        $product->update($request->validated());
+        $products->update($product, $request->validated());
 
         return redirect()->route('products.index')->with('status', 'تم حفظ المادة.');
     }

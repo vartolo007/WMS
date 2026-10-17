@@ -1,6 +1,6 @@
 # Implementation Plan
 
-**Current phase: 3** — ⚠ before any posting code, the user reviews `PostingService::post()` with Mr. Kamal (see DECISIONS)
+**Current phase: 4** — Phase 3 is complete (see the phase log); Phase 6 stays ⚠ BLOCKED (Q3, Q5)
 
 Each phase: plan mode → user approval → code + tests → `php artisan test` and `pint` green → tick tasks → log line.
 
@@ -76,7 +76,7 @@ Screens: 7 (purchase / sale tabs), 8, 9, 10; balance and suggested-price columns
 - [x] Movements list and movement details page (item count, no total quantity; no cancel action yet) — screens 8–9
 - [x] Movement print page for every type built so far (A4, company header with logo and warehouse,
       "ملغاة" stamp when cancelled; SRS 2.3 FR-10) — screen 10
-- [ ] Products list: balance per warehouse and suggested price columns — screen 11
+- [x] Products list: balance per warehouse and suggested price columns — screen 11
 
 **Done when:** purchase increases stock, sale decreases it, sale beyond stock is rejected,
 Σ net_value = movement total, the SRS 6.2 examples pass as tests.
@@ -146,3 +146,5 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-17 — 3 — Batch A: `Money`, `MovementType` / `MovementStatus`, movements / movement_items / operations migrations + models + factories, `WarehouseScope`; 254 tests pass, Pint clean
 2026-10-17 — 3 — Batch B: `NumberGenerator`, `StockService`, `PricingService`, `PostingService::post()` (SRS 6.2 discount split), `MovementService::purchase()` / `sale()`; rule-1 guard test; 277 tests pass, Pint clean
 2026-10-17 — 3 — Batch C: invoice screen (Alpine, JSON save, barcode lookup), movements list / details / A4 print, sidebar + dashboard quick buttons; checked at 1440px and 375px
+2026-10-17 — 3 — Batch D: products list with balance (own / chosen / all warehouses) and suggested price columns, `ProductService` (unit fixed once movements exist), `PartyService` (type fixed once movements exist)
+2026-10-17 — 3 — Phase 3 complete: 305 tests pass, Pint clean; purchase + sale checked end to end in the browser (1.25 × 19,999.50 = 24,999.38) at 1440px and 375px

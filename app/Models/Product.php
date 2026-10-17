@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToCompany;
+use App\Support\Format;
 use App\Support\Units;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -64,6 +65,18 @@ class Product extends Model
     public function allowsFraction(): bool
     {
         return Units::allowsFraction($this->unit);
+    }
+
+    /**
+     * A quantity of this product as shown on screen: three decimals for units that take fractions,
+     * a whole number for the others (SRS 13.2.14).
+     */
+    public function displayQuantity(string $quantity): string
+    {
+        $formatted = Format::quantity($quantity);
+
+        // "1,250.000" stays; for a unit without fractions "1,250.000" becomes "1,250".
+        return $this->allowsFraction() ? $formatted : substr($formatted, 0, -4);
     }
 
     public function unitLabel(): string
