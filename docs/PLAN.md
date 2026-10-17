@@ -65,9 +65,9 @@ a suspended company reaches nothing but the suspended page and logout.
 ## Phase 3 — Purchases, sales, posting (FR-10 → FR-14, FR-18) ⚠ review posting with Kamal first
 Screens: 7 (purchase / sale tabs), 8, 9, 10; balance and suggested-price columns of screen 11;
 "+ فاتورة بيع / شراء" quick buttons of screen 5.
-- [ ] Enum MovementType with `effects()` and helpers (incl. display prefix S- / P- / …); MovementStatus
-- [ ] Migrations + models: movements, movement_items, operations
-- [ ] `WarehouseScope` on movements and operations (incoming transfers visible to the target)
+- [x] Enum MovementType with `effects()` and helpers (incl. display prefix S- / P- / …); MovementStatus
+- [x] Migrations + models: movements, movement_items, operations
+- [x] `WarehouseScope` on movements and operations (incoming transfers visible to the target)
 - [ ] `Money`, `NumberGenerator`, `StockService`, `PricingService`
 - [ ] `PostingService::post()` with discount distribution
 - [ ] `MovementService::purchase()` and `sale()`
@@ -143,3 +143,4 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-15 — 2 — Suspended subscription (FR-03): users of a suspended company sign in, then every route but logout redirects to screen 20; a test walks every signed-in route and guards against public ones
 2026-10-15 — 2 — Companies page (screen 19) is the platform dashboard: five filter cards with counts, search, expired trials first, activate / extend (7 / 14 / 30 days with the new end date) / suspend dialogs, mobile cards
 2026-10-15 — 2 — Phase 2 complete: 237 tests pass, Pint clean, checked at 1440px and 375px
+2026-10-17 — 3 — Batch A: `Money`, `MovementType` / `MovementStatus`, movements / movement_items / operations migrations + models + factories, `WarehouseScope`; 254 tests pass, Pint clean
