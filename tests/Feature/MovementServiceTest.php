@@ -21,6 +21,7 @@ beforeEach(function () {
     $this->customer = Party::factory()->for($this->company)->create();
     $this->productA = Product::factory()->for($this->company)->create(['name' => 'مادة أ']);
     $this->productB = Product::factory()->for($this->company)->create(['name' => 'مادة ب']);
+    $this->productC = Product::factory()->for($this->company)->create(['name' => 'مادة ج']);
 
     $this->actingAs($this->owner);
     $this->service = app(MovementService::class);
@@ -74,16 +75,15 @@ test('a sale takes the goods out and is rejected beyond the stock', function () 
         ->and(Movement::where('type', MovementType::Sale)->count())->toBe(1);
 });
 
-test('two lines of one product are checked together against the stock', function () {
-    ($this->purchase)([['product_id' => $this->productA->id, 'quantity' => '5', 'unit_price' => '5']]);
-
-    $errors = ($this->errorsOf)(fn () => ($this->sale)([
+test('a product repeated on an invoice is rejected, so a return can point at one original line', function () {
+    $errors = ($this->errorsOf)(fn () => ($this->purchase)([
         ['product_id' => $this->productA->id, 'quantity' => '3', 'unit_price' => '9'],
         ['product_id' => $this->productA->id, 'quantity' => '3', 'unit_price' => '9'],
     ]));
 
-    expect($errors)->toHaveKey('items.0.quantity')
-        ->and(($this->balance)($this->productA))->toBe('5.000');
+    expect($errors)->toHaveKey('items.1.product_id')
+        ->and(Movement::count())->toBe(0)
+        ->and(($this->balance)($this->productA))->toBe('0.000');
 });
 
 test('SRS 6.2: a discount is shared between the lines and the nets add up to the total', function () {
@@ -104,7 +104,7 @@ test('the last line absorbs the rounding difference', function () {
     $movement = ($this->purchase)([
         ['product_id' => $this->productA->id, 'quantity' => '1', 'unit_price' => '3.33'],
         ['product_id' => $this->productB->id, 'quantity' => '1', 'unit_price' => '3.33'],
-        ['product_id' => $this->productA->id, 'quantity' => '1', 'unit_price' => '3.34'],
+        ['product_id' => $this->productC->id, 'quantity' => '1', 'unit_price' => '3.34'],
     ], ['discount' => '0.01']);
 
     $nets = Operation::orderBy('id')->pluck('net_value')->all();
@@ -118,7 +118,7 @@ test('net values sum exactly to the total for awkward ratios', function () {
     $movement = ($this->purchase)([
         ['product_id' => $this->productA->id, 'quantity' => '1', 'unit_price' => '33.33'],
         ['product_id' => $this->productB->id, 'quantity' => '1', 'unit_price' => '33.33'],
-        ['product_id' => $this->productA->id, 'quantity' => '1', 'unit_price' => '33.34'],
+        ['product_id' => $this->productC->id, 'quantity' => '1', 'unit_price' => '33.34'],
     ], ['discount' => '10']);
 
     $sum = Operation::orderBy('id')->pluck('net_value')->reduce(fn ($carry, $v) => bcadd($carry, $v, 2), '0');

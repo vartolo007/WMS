@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\MovementStatus;
 use App\Models\Movement;
 use App\Models\User;
 
@@ -24,5 +25,15 @@ class MovementPolicy
     public function create(User $user): bool
     {
         return $this->viewAny($user);
+    }
+
+    /**
+     * A return starts from a confirmed purchase or sale the user can see (FR-15).
+     */
+    public function createReturn(User $user, Movement $original): bool
+    {
+        return $this->view($user, $original)
+            && $original->type->returnType() !== null
+            && $original->status === MovementStatus::Confirmed;
     }
 }

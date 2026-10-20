@@ -149,7 +149,10 @@ for `(company_id, type)` in `movements`. No extra counters table (schema stays a
 ### 5.8 Returns
 
 - The original invoice must be confirmed and of `type->originalType()`.
-- Returnable quantity per original item = item quantity − quantities in confirmed returns of that item.
+- An invoice holds each product once (`MovementService` rejects a repeated product), so the product is the "original item":
+  returnable quantity = its quantity on the invoice − its quantity in confirmed returns of that invoice (`ReturnService::lines()`).
+- `MovementService::return()` locks product rows (purchase return only) → the original movement row → the company row (number),
+  and posts through the unchanged `PostingService::post()`.
 - Unit price = original item `unit_price` (not editable).
 - `subtotal = Σ qty × unit_price`; `total = round(subtotal × original.total ÷ original.subtotal, 2)`
   (0 if original subtotal is 0); `discount = subtotal − total`.

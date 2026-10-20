@@ -57,6 +57,9 @@
                 <div class="flex flex-col gap-0.5"><span class="text-muted">التاريخ</span><b class="tabular-nums">{{ \App\Support\Format::date($movement->date) }}</b></div>
                 <div class="flex flex-col gap-0.5"><span class="text-muted">{{ $movement->type->partyLabel() }}</span><b>{{ $movement->type->counterpartLabel($movement->party?->name, $movement->targetWarehouse?->name) }}</b></div>
                 <div class="flex flex-col gap-0.5"><span class="text-muted">الدفع</span><b>نقدي</b></div>
+                @if ($movement->relatedMovement)
+                    <div class="flex flex-col gap-0.5"><span class="text-muted">الفاتورة الأصلية</span><b dir="ltr" class="text-right">{{ $movement->relatedMovement->displayNumber() }}</b></div>
+                @endif
                 @if ($movement->document_no)
                     <div class="flex flex-col gap-0.5"><span class="text-muted">رقم الوثيقة</span><b dir="ltr" class="text-right">{{ $movement->document_no }}</b></div>
                 @endif

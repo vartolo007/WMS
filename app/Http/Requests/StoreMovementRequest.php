@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Enums\MovementType;
+use App\Http\Requests\Concerns\ChecksWholeQuantities;
 use App\Models\Movement;
-use App\Models\Product;
-use App\Support\Money;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
@@ -18,6 +17,8 @@ use Illuminate\Validation\Rule;
  */
 class StoreMovementRequest extends FormRequest
 {
+    use ChecksWholeQuantities;
+
     /** The types this screen can create. Returns and transfers join in later phases. */
     private const TYPES = [MovementType::Purchase, MovementType::Sale];
 
@@ -54,27 +55,11 @@ class StoreMovementRequest extends FormRequest
     }
 
     /**
-     * A unit that takes no fractions (box, piece) takes whole quantities only (SRS 3.4.2, 13.2.14).
+     * @return array<callable>
      */
     public function after(): array
     {
-        return [function (Validator $validator) {
-            $items = (array) $this->input('items', []);
-            $products = Product::query()->whereIn('id', array_filter(array_column($items, 'product_id'), 'is_numeric'))->get()->keyBy('id');
-
-            foreach ($items as $index => $item) {
-                $product = $products->get($item['product_id'] ?? null);
-                $quantity = (string) ($item['quantity'] ?? '');
-
-                if ($product === null || ! is_numeric($quantity) || $product->allowsFraction()) {
-                    continue;
-                }
-
-                if (Money::compare($quantity, (string) (int) $quantity) !== 0) {
-                    $validator->errors()->add("items.{$index}.quantity", 'هالوحدة ما بتقبل كسور، اكتب عدد صحيح.');
-                }
-            }
-        }];
+        return [fn (Validator $validator) => $this->checkWholeQuantities($validator)];
     }
 
     /**

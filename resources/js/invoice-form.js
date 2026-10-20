@@ -1,4 +1,5 @@
 import { format, lineValue, normalize, plain, toUnits } from './decimal';
+import postJson, { failureMessage } from './post-json';
 
 /**
  * Alpine behaviour of the invoice screen (screen 7, purchase and sale): barcode input, lines,
@@ -291,59 +292,38 @@ export default function invoiceForm({ type, lookupUrl, storeUrl, warehouseId, pa
 
             this.saving = true;
 
-            try {
-                const response = await fetch(storeUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Accept: 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    },
-                    body: JSON.stringify({
-                        type: this.type,
-                        warehouse_id: this.warehouseId,
-                        party_id: this.partyId || null,
-                        date: this.date || null,
-                        document_no: this.documentNo.trim() || null,
-                        discount: normalize(this.discount) || null,
-                        items: this.lines.map((line) => ({
-                            product_id: line.productId,
-                            quantity: normalize(line.quantity),
-                            unit_price: normalize(line.price) || null,
-                        })),
-                    }),
-                });
+            const { ok, status, data } = await postJson(storeUrl, {
+                type: this.type,
+                warehouse_id: this.warehouseId,
+                party_id: this.partyId || null,
+                date: this.date || null,
+                document_no: this.documentNo.trim() || null,
+                discount: normalize(this.discount) || null,
+                items: this.lines.map((line) => ({
+                    product_id: line.productId,
+                    quantity: normalize(line.quantity),
+                    unit_price: normalize(line.price) || null,
+                })),
+            });
 
-                const data = await response.json().catch(() => ({}));
+            this.saving = false;
 
-                if (response.ok) {
-                    window.location.href = data.redirect;
-
-                    return;
-                }
-
-                if (response.status === 422) {
-                    this.showServerErrors(data.errors ?? {}, data.message);
-                } else {
-                    this.formError = response.status === 419 ? 'انتهت الجلسة، حدّث الصفحة وجرّب مرة تانية.' : 'صار خطأ بالحفظ، جرّب مرة تانية.';
-                }
-            } catch {
-                this.formError = 'تعذّر الاتصال بالخادم.';
-            } finally {
-                this.saving = false;
+            if (ok) {
+                window.location.href = data.redirect;
+            } else if (status === 422) {
+                this.showServerErrors(data.errors ?? {});
+            } else {
+                this.formError = failureMessage(status);
             }
         },
 
         // Server messages are Arabic and keyed like `items.0.quantity`; put each one beside its field.
-        showServerErrors(errors, fallback) {
+        showServerErrors(errors) {
             const top = {};
-            let firstMessage = fallback ?? '';
 
             for (const [key, messages] of Object.entries(errors)) {
                 const message = messages[0];
                 const lineMatch = /^items\.(\d+)\.(\w+)$/.exec(key);
-
-                firstMessage ||= message;
 
                 if (lineMatch && this.lines[Number(lineMatch[1])]) {
                     this.lines[Number(lineMatch[1])].errors[lineMatch[2]] = message;

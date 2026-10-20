@@ -57,6 +57,18 @@ export function lineValue(quantityUnits, priceUnits) {
 }
 
 /**
+ * value × total ÷ subtotal rounded half up, all in hundredths (the proportional discount of a return,
+ * SRS 6.2). With a zero subtotal the value stays as it is.
+ */
+export function ratio(valueUnits, totalUnits, subtotalUnits) {
+    if (subtotalUnits === 0n) {
+        return valueUnits;
+    }
+
+    return (valueUnits * totalUnits * 2n + subtotalUnits) / (subtotalUnits * 2n);
+}
+
+/**
  * Plain text for sending to the server: 12500n/3 → "12.500".
  */
 export function plain(units, scale) {

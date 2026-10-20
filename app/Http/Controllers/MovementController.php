@@ -8,7 +8,9 @@ use App\Http\Requests\StoreMovementRequest;
 use App\Models\Movement;
 use App\Models\Party;
 use App\Services\MovementService;
+use App\Services\ReturnService;
 use App\Support\CurrentWarehouse;
+use App\Support\Money;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -63,7 +65,6 @@ class MovementController extends Controller
 
         return view('movements.create', [
             'type' => $type,
-            'types' => self::CREATABLE,
             'parties' => Party::query()->active()->ofType($type->partyType())->orderBy('name')->get(['id', 'name']),
             'warehouses' => $user->isOwner()
                 ? $user->company->warehouses()->where('is_active', true)->orderBy('name')->get(['id', 'name'])
@@ -86,11 +87,23 @@ class MovementController extends Controller
         return $request->wantsJson() ? response()->json(['redirect' => $target]) : redirect($target);
     }
 
-    public function show(Movement $movement): View
+    public function show(Movement $movement, ReturnService $returns): View
     {
         Gate::authorize('view', $movement);
 
-        return view('movements.show', ['movement' => $this->loaded($movement)]);
+        $movement = $this->loaded($movement);
+        $isInvoice = $movement->type->returnType() !== null;
+        $returnLines = $isInvoice ? $returns->lines($movement) : collect();
+
+        return view('movements.show', [
+            'movement' => $movement,
+            // An invoice shows what was returned of each product, and the returns themselves.
+            'returnLines' => $returnLines,
+            'returns' => $isInvoice ? $movement->returns()->orderBy('date')->orderBy('id')->get() : collect(),
+            'canReturn' => $isInvoice
+                && Gate::allows('createReturn', $movement)
+                && $returnLines->contains(fn (array $line) => Money::isPositive($line['returnable'])),
+        ]);
     }
 
     public function print(Movement $movement): View
@@ -102,6 +115,6 @@ class MovementController extends Controller
 
     private function loaded(Movement $movement): Movement
     {
-        return $movement->load(['items.product', 'party', 'warehouse', 'targetWarehouse', 'creator', 'company']);
+        return $movement->load(['items.product', 'party', 'warehouse', 'targetWarehouse', 'creator', 'company', 'relatedMovement']);
     }
 }

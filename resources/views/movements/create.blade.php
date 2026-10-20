@@ -1,9 +1,8 @@
-{{-- Screen 7 (design batch 3): new purchase / sale invoice. Returns (Phase 4) and transfer (Phase 6) add their tabs later. --}}
+{{-- Screen 7 (design batch 3): new purchase / sale invoice. Returns have their own screens (returns/, movements/return); transfer (Phase 6) adds its tab later. --}}
 @php
     $isSale = $type === \App\Enums\MovementType::Sale;
     $isOwner = auth()->user()->isOwner();
     $symbol = auth()->user()->company->currency_symbol;
-    $dots = ['blue' => 'bg-blue-500', 'success' => 'bg-green-600', 'warning' => 'bg-amber-500', 'danger' => 'bg-red-500', 'purple' => 'bg-purple-500'];
 
     $select = 'h-10 w-full appearance-none rounded-lg border border-line-strong bg-white ps-3 pe-9 text-[15px] text-ink focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary-ring';
     $field = 'h-10 w-full rounded-lg border border-line-strong bg-white px-3 text-[15px] text-ink focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary-ring';
@@ -38,19 +37,7 @@
         >
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <h1 class="text-2xl font-bold lg:text-[28px]">حركة جديدة</h1>
-                <nav class="flex gap-1 overflow-x-auto rounded-[10px] bg-line-soft p-1" aria-label="نوع الحركة">
-                    @foreach ($types as $tab)
-                        <a href="{{ route('movements.create', ['type' => $tab->value]) }}"
-                           @class([
-                               'flex h-10 items-center gap-2 whitespace-nowrap rounded-[7px] px-[18px] text-[15px]',
-                               'bg-white font-bold text-primary shadow-sm' => $tab === $type,
-                               'font-medium text-ink' => $tab !== $type,
-                           ])
-                           @if ($tab === $type) aria-current="page" @endif>
-                            <span class="h-2 w-2 rounded-sm {{ $dots[$tab->tone()] }}"></span>{{ $tab === \App\Enums\MovementType::Sale ? 'بيع' : 'شراء' }}
-                        </a>
-                    @endforeach
-                </nav>
+                @include('movements.partials.type-tabs', ['active' => $type])
             </div>
 
             {{-- Header --}}

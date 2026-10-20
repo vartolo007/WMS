@@ -69,6 +69,18 @@ enum MovementType: string
     }
 
     /**
+     * The return type of an invoice; null for types that cannot be returned (returns, transfers).
+     */
+    public function returnType(): ?self
+    {
+        return match ($this) {
+            self::Purchase => self::PurchaseReturn,
+            self::Sale => self::SaleReturn,
+            default => null,
+        };
+    }
+
+    /**
      * Takes stock out of the movement's warehouse, so the stock must be checked first (SRS 7).
      */
     public function reducesSourceStock(): bool
@@ -101,6 +113,19 @@ enum MovementType: string
             self::PurchaseReturn => 'warning',
             self::SaleReturn => 'danger',
             self::Transfer => 'purple',
+        };
+    }
+
+    /**
+     * Short label for the tabs of the new-movement screen.
+     */
+    public function tabLabel(): string
+    {
+        return match ($this) {
+            self::Purchase => 'شراء',
+            self::Sale => 'بيع',
+            self::Transfer => 'نقل',
+            default => $this->label(),
         };
     }
 

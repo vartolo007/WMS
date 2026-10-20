@@ -1,6 +1,6 @@
 # Implementation Plan
 
-**Current phase: 4** — Phase 3 is complete (see the phase log); Phase 6 stays ⚠ BLOCKED (Q3, Q5)
+**Current phase: 5** — Phase 4 is complete (see the phase log); Phase 6 stays ⚠ BLOCKED (Q3, Q5)
 
 Each phase: plan mode → user approval → code + tests → `php artisan test` and `pint` green → tick tasks → log line.
 
@@ -83,10 +83,10 @@ Screens: 7 (purchase / sale tabs), 8, 9, 10; balance and suggested-price columns
 
 ## Phase 4 — Returns (FR-15)
 Screens: 7 (return tabs), 9 (returns on an invoice, link to the original invoice).
-- [ ] `MovementService::return()` for purchase_return and sale_return
-- [ ] Returnable quantity, original price, proportional discount (shown on the return screen)
-- [ ] Return screen starting from the original invoice — screen 7
-- [ ] Movement details: returns list on an invoice, original invoice on a return — screen 9
+- [x] `MovementService::return()` for purchase_return and sale_return
+- [x] Returnable quantity, original price, proportional discount (shown on the return screen)
+- [x] Return screen starting from the original invoice — screen 7
+- [x] Movement details: returns list on an invoice, original invoice on a return — screen 9
 
 **Done when:** returnable quantity is enforced and the 2,000 → 1,800 example passes.
 
@@ -148,3 +148,5 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-17 — 3 — Batch C: invoice screen (Alpine, JSON save, barcode lookup), movements list / details / A4 print, sidebar + dashboard quick buttons; checked at 1440px and 375px
 2026-10-17 — 3 — Batch D: products list with balance (own / chosen / all warehouses) and suggested price columns, `ProductService` (unit fixed once movements exist), `PartyService` (type fixed once movements exist)
 2026-10-17 — 3 — Phase 3 complete: 305 tests pass, Pint clean; purchase + sale checked end to end in the browser (1.25 × 19,999.50 = 24,999.38) at 1440px and 375px
+2026-10-20 — 4 — `MovementService::return()` + `ReturnService` (returnable per product, proportional discount), one product per invoice rule, `StoreReturnRequest`, `MovementPolicy::createReturn`
+2026-10-20 — 4 — Return screens (search the original, return form with live totals), shared type tabs, returns panel / returned column / original link on details, print shows the original; 331 tests pass, Pint clean; checked end to end at 1440px and 375px
