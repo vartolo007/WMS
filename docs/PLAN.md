@@ -1,6 +1,6 @@
 # Implementation Plan
 
-**Current phase: 6** — everything except Phase 6 is complete (see the phase log); Q3 / Q5 were decided on 2026-10-20 (transfer immediate, cancel deletes the rows), so Phase 6 is unblocked
+**Current phase: none** — every phase of the plan is complete (see the phase log); next: the "comfort pack" (to be planned)
 
 Each phase: plan mode → user approval → code + tests → `php artisan test` and `pint` green → tick tasks → log line.
 
@@ -104,10 +104,10 @@ Screens: 5, 6, 16–18; "low only" filter of screen 11; "حركته" link of scr
 
 ## Phase 6 — Transfers and cancellation (Q3 and Q5 decided 2026-10-20)
 Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on screens 8–9.
-- [ ] `MovementService::transfer()` (Q3: immediate) — transfer valued at the last purchase price
-- [ ] `MovementService::cancel()` + `PostingService::unpost()` (Q5: delete the rows)
-- [ ] Cancel actions (hidden for an invoice with active returns), confirmation text per movement type
-- [ ] "Cancelled at / by" on the details page (screen 9) — schema: `movements.cancelled_at`, `movements.cancelled_by` (approved)
+- [x] `MovementService::transfer()` (Q3: immediate) — transfer valued at the last purchase price
+- [x] `MovementService::cancel()` + `PostingService::unpost()` (Q5: delete the rows)
+- [x] Cancel actions (hidden for an invoice with active returns), confirmation text per movement type
+- [x] "Cancelled at / by" on the details page (screen 9) — schema: `movements.cancelled_at`, `movements.cancelled_by` (approved)
 
 ## Phase 7 — Hardening
 - [x] Daily database backup via Laravel Scheduler
@@ -158,3 +158,9 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-20 — 7 — Batch B: `docs/TRACEABILITY.md` (FR-01..26 and NFR 4.1–4.8), `ArchitectureRulesTest` and `SecurityTest` guard tests; fixes: returnable check moved to `ReturnService`, neutral hexes replaced by tokens
 2026-10-20 — 7 — Batch C: final README (setup, env keys, scheduler, backup and restore steps verified by hand); Phase 7 complete: 384 tests pass, Pint clean
 2026-10-20 — 6 — Q3 / Q5 decided; schema `cancelled_at` / `cancelled_by` added to schema.json and SRS 5.6
+2026-10-20 — 6 — Batch B: `PostingService::unpost()`, `MovementService::cancel()` (no negative balance where stock was added, no active return, confirmed only), `MovementPolicy::cancel()`; 395 tests pass
+2026-10-20 — 6 — Batch C: cancel button + dialog with the real stock effect on the details page and the list, cancelled notice (who and when), refusal banner
+2026-10-20 — 6 — Batch D: `MovementService::transfer()` (immediate, valued at the last purchase price, no party / discount / typed price), `StoreMovementRequest` rules for transfers
+2026-10-20 — 6 — Batch E: transfer tab and screen (receiving warehouse, line count, from ← to), estimated value on details / print, "+ نقل" on both dashboards
+2026-10-20 — 6 — Phase 6 complete: 419 tests pass, Pint clean; cancel and transfer checked in the browser at 1440px and 375px
+

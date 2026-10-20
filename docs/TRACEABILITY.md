@@ -23,8 +23,8 @@ The rules that can be checked mechanically live in `tests/Feature/ArchitectureRu
 | 13 | Sale invoice | `MovementService::sale()`, `StockService::lockAndCheck()` | `MovementServiceTest` | ✔ |
 | 14 | Pricing rule | `PricingService` | `PricingAndStockServiceTest`, `CatalogMovementRulesTest` | ✔ |
 | 15 | Returns | `ReturnService`, `MovementService::return()`, `MovementReturnController` | `ReturnServiceTest`, `ReturnScreensTest` | ✔ |
-| 16 | Transfer | Posting effects (`MovementType`), `WarehouseScope` target side and report support are ready; no service or screen | `MovementTypeTest`, `ReportServiceTest` (transfer rows) | ⚠ BLOCKED Q3 (Phase 6) |
-| 17 | Cancellation | `MovementStatus`, cancelled stamp on print, return-lock rules documented; no cancel action | — | ⚠ BLOCKED Q5 (Phase 6) |
+| 16 | Transfer | `MovementService::transfer()`, `StoreMovementRequest`, transfer tab on the movement screen, `WarehouseScope` target side | `TransferTest`, `TransferScreensTest`, `ReportServiceTest` (transfer rows) | ✔ (Q3: immediate) |
+| 17 | Cancellation | `MovementService::cancel()`, `PostingService::unpost()`, `MovementPolicy::cancel()`, `MovementCancelController`, dialog on details and list | `CancellationTest`, `CancelScreensTest` | ✔ (Q5: rows deleted) |
 | 18 | Posting | `PostingService::post()` (only writer of `operations`) | `MovementServiceTest` (incl. the guard that scans `app/`), `ReturnServiceTest` | ✔ |
 | 19 | Report engine | `ReportFilters`, `ReportKind`, `ReportService` | `ReportServiceTest` | ✔ |
 | 20 | Daily movements, net sales | `ReportService::dailySales()`, `ReportKind::DailyMovements` / `DailySales` | `ReportServiceTest`, `ReportScreensTest` | ✔ |
@@ -53,7 +53,7 @@ The rules that can be checked mechanically live in `tests/Feature/ArchitectureRu
 | 4.4 | Server-side validation | FormRequests + services, tests per screen | ✔ |
 | 4.4 | SVG logo refused, real file type checked | `CompanyLogoTest` | ✔ |
 | 4.4 | Login throttling | `SecurityTest` (5 attempts) | ✔ (added in this review) |
-| 4.5 | Creator and date on every movement; cancel instead of delete | `movements.created_by`, timestamps; no delete route exists | ✔ (cancel itself: FR-17) |
+| 4.5 | Creator and date on every movement; cancel instead of delete | `movements.created_by`, timestamps, `cancelled_by` / `cancelled_at`; no delete route exists | ✔ |
 | 4.6 | One place for movement-type behaviour | `MovementType` enum | ✔ |
 | 4.6 | UI colours from CSS variables only | `ArchitectureRulesTest` (no hex or rgb colour in any view) | ✔ (3 hard-coded neutral hexes replaced by tokens in this review) |
 | 4.6 | Three clear services | `MovementService`, `PostingService`, `ReportService`; controllers hold no maths, transactions or locks (`ArchitectureRulesTest`) | ✔ |
@@ -71,5 +71,5 @@ The rules that can be checked mechanically live in `tests/Feature/ArchitectureRu
 
 ## Still open
 
-- FR-16 (transfer) and FR-17 (cancellation) wait for Mr. Kamal's answers to Q3 and Q5; everything around them is ready (see DECISIONS).
+- Nothing blocks the SRS any more: Q3 and Q5 were decided on 2026-10-20 (see DECISIONS).
 - Quick-add of a party from the invoice screen is deferred (not in the SRS).
