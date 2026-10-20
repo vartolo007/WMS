@@ -627,6 +627,7 @@ Project: Warehouse Management System (WMS) – SaaS
 | logo_path                         | string                           | مسار شعار الشركة (اختياري)؛ PNG أو JPG أو WEBP، حتى 1 ميغا |
 | primary_color                     | string                           | اللون الأساسي للواجهة، من قائمة الألوان المعتمدة (افتراضيًا \#1F4E79)                                     |
 | currency_symbol                   | string                           | رمز العملة المعروض مع المبالغ، مثل ل.س أو \$ (اختياري)                                                                          |
+| low_stock_alerts                  | boolean                          | إرسال بريد يومي لصاحب الشركة عند انخفاض المواد (افتراضيًا نعم)                                                                  |
 
 ### 5.3 جدول المستخدمين (users)
 

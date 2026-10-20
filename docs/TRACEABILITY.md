@@ -72,4 +72,5 @@ The rules that can be checked mechanically live in `tests/Feature/ArchitectureRu
 ## Still open
 
 - Nothing blocks the SRS any more: Q3 and Q5 were decided on 2026-10-20 (see DECISIONS).
-- Quick-add of a party from the invoice screen is deferred (not in the SRS).
+- Quick-add of a party / product from the invoice screen was added later in the comfort pack (not in the SRS; same catalogue rules).
+- Comfort pack additions beyond the SRS: CSV import, camera scan, save-and-print, low-stock and failure e-mails (column `companies.low_stock_alerts`, SRS 5.2).

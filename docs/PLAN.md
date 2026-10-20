@@ -1,6 +1,6 @@
 # Implementation Plan
 
-**Current phase: none** — every phase of the plan is complete (see the phase log); next: the "comfort pack" (to be planned)
+**Current phase: none** — every phase of the plan is complete (see the phase log); the "comfort pack" is done too (see below)
 
 Each phase: plan mode → user approval → code + tests → `php artisan test` and `pint` green → tick tasks → log line.
 
@@ -114,6 +114,13 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 - [x] Full review against the SRS traceability matrix (section 12)
 - [x] Final README
 
+## Comfort pack (after Phase 7)
+- [x] A: add a product or a party from the invoice screen (JSON store, quick modals, same catalogue rules)
+- [x] B: "اطبع بعد الحفظ", same-type shortcuts, remembered owner warehouse
+- [x] C: camera barcode scan with the browser's `BarcodeDetector` (no package)
+- [x] D: CSV import of products and parties (all-or-nothing, re-validated on confirm, sample file)
+- [x] E: daily low-stock e-mail to the owner (`companies.low_stock_alerts`), admin e-mail when backup / restore check / alerts fail
+
 ## Phase log
 <!-- one line per finished task: YYYY-MM-DD — phase — what was done -->
 2026-10-05 — 0 — Breeze (Blade) + Pest 3 + brick/math installed; Tailwind v3 with Alpine from Breeze
@@ -164,3 +171,5 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-20 — 6 — Batch E: transfer tab and screen (receiving warehouse, line count, from ← to), estimated value on details / print, "+ نقل" on both dashboards
 2026-10-20 — 6 — Phase 6 complete: 419 tests pass, Pint clean; cancel and transfer checked in the browser at 1440px and 375px
 
+2026-10-20 — Comfort pack — A–D: quick-add of a product / party on the invoice screen, save-and-print + remembered settings, camera scan, CSV import of products and parties
+2026-10-20 — Comfort pack — E: `wms:alerts:low-stock` (08:00), `LowStockDigest`, `AdminAlert` on failed backup / restore check / alerts, `companies.low_stock_alerts` + settings checkbox; schema.json and SRS 5.2 updated

@@ -24,6 +24,7 @@ class Company extends Model
         'logo_path',
         'primary_color',
         'currency_symbol',
+        'low_stock_alerts',
     ];
 
     protected function casts(): array
@@ -32,6 +33,7 @@ class Company extends Model
             'status' => CompanyStatus::class,
             'trial_ends_at' => 'date',
             'markup_percent' => 'decimal:2',
+            'low_stock_alerts' => 'boolean',
         ];
     }
 

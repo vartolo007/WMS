@@ -81,6 +81,12 @@
                 </div>
             </section>
 
+            {{-- Daily low-stock e-mail to the owner --}}
+            <section class="flex flex-col gap-2 rounded-xl border border-line bg-white p-6">
+                <x-ui.checkbox name="low_stock_alerts" label="ابعتلي بريد يوميًا لما تنخفض المواد عن حدها الأدنى" :checked="old() ? old('low_stock_alerts', false) : $company->low_stock_alerts" />
+                <span class="text-[13px] text-muted">بيوصل على بريدك ({{ auth()->user()->email }}) الساعة 8 الصبح، وبس لما يكون في مواد منخفضة.</span>
+            </section>
+
             <div><x-ui.button class="h-11 px-[22px]">حفظ الإعدادات</x-ui.button></div>
         </div>
 

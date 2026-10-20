@@ -12,6 +12,12 @@ class UpdateCompanySettingsRequest extends FormRequest
         return $this->user()->can('updateSettings', $this->user()->company);
     }
 
+    protected function prepareForValidation(): void
+    {
+        // An unchecked checkbox sends nothing: that means "off".
+        $this->merge(['low_stock_alerts' => $this->boolean('low_stock_alerts')]);
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -22,6 +28,7 @@ class UpdateCompanySettingsRequest extends FormRequest
             'primary_color' => ['required', Rule::in(config('wms.palette'))],
             'currency_symbol' => ['nullable', 'string', 'max:10'],
             'markup_percent' => ['required', 'numeric', 'decimal:0,2', 'between:100,1000'],
+            'low_stock_alerts' => ['boolean'],
             // `mimes` checks the real content type, not only the extension; SVG is not in the list (SRS 4.4).
             'logo' => ['nullable', 'file', 'image', 'mimes:png,jpg,jpeg,webp', 'max:1024'],
         ];
