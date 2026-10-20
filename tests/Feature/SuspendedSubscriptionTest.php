@@ -26,6 +26,7 @@ function routeParameterValues(): array
     return [
         'product' => Product::factory()->for($company)->create()->id,
         'party' => Party::factory()->for($company)->create()->id,
+        'report' => 'stock',
         'movement' => Movement::factory()->for($company)->create(['warehouse_id' => test()->warehouse->id, 'created_by' => test()->warehouse->id])->id,
         'warehouse' => test()->warehouse->id,
         'company' => $company->id,
