@@ -56,7 +56,7 @@ test('the invoice screen opens for both types and refuses unknown ones', functio
 
     $this->get('/movements/create?type=sale')->assertOk()->assertSee('حركة جديدة')->assertSee('سامر الحلبي')->assertDontSee('مورد الشام');
     $this->get('/movements/create?type=purchase')->assertOk()->assertSee('مورد الشام')->assertDontSee('سامر الحلبي');
-    $this->get('/movements/create?type=transfer')->assertNotFound();
+    $this->get('/movements/create?type=sale_return')->assertNotFound();
     $this->get('/movements/create?type=nonsense')->assertNotFound();
 
     $this->actingAs($this->warehouse)->get('/movements/create')->assertOk();

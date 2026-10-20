@@ -3,6 +3,7 @@
     <div class="flex flex-col gap-6">
         <x-ui.page-header title="لوحة التحكم" :subtitle="\App\Support\Format::date(today(), withWeekday: true).' · '.($selected?->name ?? 'كل المستودعات')">
             @if ($hasWarehouses)
+                <x-ui.button :href="route('movements.create', ['type' => 'transfer'])" variant="secondary">+ نقل</x-ui.button>
                 <x-ui.button :href="route('movements.create', ['type' => 'purchase'])" variant="secondary">+ فاتورة شراء</x-ui.button>
                 <x-ui.button :href="route('movements.create', ['type' => 'sale'])">+ فاتورة بيع</x-ui.button>
             @endif

@@ -50,7 +50,9 @@
                 <div class="flex flex-col gap-1"><dt class="text-[13px] text-muted">رقم الوثيقة</dt><dd class="font-semibold" dir="ltr">{{ $movement->document_no }}</dd></div>
             @endif
             <div class="flex flex-col gap-1"><dt class="text-[13px] text-muted">سجّلها</dt><dd class="font-semibold">{{ $movement->creator->name }}</dd></div>
-            <div class="flex flex-col gap-1"><dt class="text-[13px] text-muted">الدفع</dt><dd class="font-semibold">نقدي</dd></div>
+            @if ($movement->type !== \App\Enums\MovementType::Transfer)
+                <div class="flex flex-col gap-1"><dt class="text-[13px] text-muted">الدفع</dt><dd class="font-semibold">نقدي</dd></div>
+            @endif
         </dl>
 
         <div @class(['grid items-start gap-5', 'lg:grid-cols-[minmax(0,1fr)_400px]' => $movement->type->returnType() !== null])>
@@ -92,13 +94,21 @@
             </div>
 
             <div class="ms-auto flex w-full flex-col gap-2.5 border-t border-line p-5 tabular-nums sm:w-[360px]">
-                <div class="flex justify-between text-[15px]"><span class="text-muted">المجموع</span><b><x-ui.money :amount="$movement->subtotal" /></b></div>
-                <div class="flex justify-between text-[15px]"><span class="text-muted">الحسم</span><b dir="ltr">−<x-ui.money :amount="$movement->discount" /></b></div>
-                <div class="h-px bg-line"></div>
-                <div class="flex items-end justify-between">
-                    <span class="flex flex-col"><b>الصافي</b><span class="text-[13px] text-muted">{{ $movement->type->netLabel() }}</span></span>
-                    <b class="text-[28px] font-bold text-primary"><x-ui.money :amount="$movement->total" /></b>
-                </div>
+                @if ($movement->type === \App\Enums\MovementType::Transfer)
+                    {{-- A transfer moves no cash: the value is only an estimate at the last purchase price (SRS 3.4.7). --}}
+                    <div class="flex items-end justify-between">
+                        <span class="flex flex-col"><b>القيمة التقديرية</b><span class="text-[13px] text-muted">بآخر سعر شراء، للتقييم فقط</span></span>
+                        <b class="text-[22px] font-bold"><x-ui.money :amount="$movement->subtotal" /></b>
+                    </div>
+                @else
+                    <div class="flex justify-between text-[15px]"><span class="text-muted">المجموع</span><b><x-ui.money :amount="$movement->subtotal" /></b></div>
+                    <div class="flex justify-between text-[15px]"><span class="text-muted">الحسم</span><b dir="ltr">−<x-ui.money :amount="$movement->discount" /></b></div>
+                    <div class="h-px bg-line"></div>
+                    <div class="flex items-end justify-between">
+                        <span class="flex flex-col"><b>الصافي</b><span class="text-[13px] text-muted">{{ $movement->type->netLabel() }}</span></span>
+                        <b class="text-[28px] font-bold text-primary"><x-ui.money :amount="$movement->total" /></b>
+                    </div>
+                @endif
             </div>
         </div>
 

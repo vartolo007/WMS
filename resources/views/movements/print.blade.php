@@ -56,7 +56,9 @@
             <div class="grid grid-cols-3 gap-3">
                 <div class="flex flex-col gap-0.5"><span class="text-muted">التاريخ</span><b class="tabular-nums">{{ \App\Support\Format::date($movement->date) }}</b></div>
                 <div class="flex flex-col gap-0.5"><span class="text-muted">{{ $movement->type->partyLabel() }}</span><b>{{ $movement->type->counterpartLabel($movement->party?->name, $movement->targetWarehouse?->name) }}</b></div>
-                <div class="flex flex-col gap-0.5"><span class="text-muted">الدفع</span><b>نقدي</b></div>
+                @if ($movement->type !== \App\Enums\MovementType::Transfer)
+                    <div class="flex flex-col gap-0.5"><span class="text-muted">الدفع</span><b>نقدي</b></div>
+                @endif
                 @if ($movement->relatedMovement)
                     <div class="flex flex-col gap-0.5"><span class="text-muted">الفاتورة الأصلية</span><b dir="ltr" class="text-right">{{ $movement->relatedMovement->displayNumber() }}</b></div>
                 @endif
@@ -93,12 +95,19 @@
             </table>
 
             <div class="ms-auto flex w-[300px] flex-col gap-1.5 text-sm tabular-nums">
-                <div class="flex justify-between"><span>المجموع</span><span>{{ \App\Support\Format::money($movement->subtotal) }}</span></div>
-                <div class="flex justify-between"><span>الحسم</span><span>{{ \App\Support\Format::money($movement->discount) }}</span></div>
-                <div class="flex justify-between border-t-2 border-ink pt-2 text-[17px] font-bold">
-                    <span>الصافي · {{ $movement->type->netLabel() }}</span>
-                    <span>{{ \App\Support\Format::money($movement->total, $symbol) }}</span>
-                </div>
+                @if ($movement->type === \App\Enums\MovementType::Transfer)
+                    <div class="flex justify-between border-t-2 border-ink pt-2 text-[15px] font-bold">
+                        <span>القيمة التقديرية (للتقييم فقط)</span>
+                        <span>{{ \App\Support\Format::money($movement->subtotal, $symbol) }}</span>
+                    </div>
+                @else
+                    <div class="flex justify-between"><span>المجموع</span><span>{{ \App\Support\Format::money($movement->subtotal) }}</span></div>
+                    <div class="flex justify-between"><span>الحسم</span><span>{{ \App\Support\Format::money($movement->discount) }}</span></div>
+                    <div class="flex justify-between border-t-2 border-ink pt-2 text-[17px] font-bold">
+                        <span>الصافي · {{ $movement->type->netLabel() }}</span>
+                        <span>{{ \App\Support\Format::money($movement->total, $symbol) }}</span>
+                    </div>
+                @endif
             </div>
 
             <div class="flex-1"></div>

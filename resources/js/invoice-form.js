@@ -8,12 +8,14 @@ import postJson, { failureMessage } from './post-json';
  * The server stays the judge: it re-checks stock, prices, party and discount. The checks here only
  * give early feedback (a red line, a disabled save) and use whole-unit arithmetic, never floats.
  */
-export default function invoiceForm({ type, lookupUrl, storeUrl, warehouseId, partyId, date, checksStock, lines = [] }) {
+export default function invoiceForm({ type, lookupUrl, storeUrl, warehouseId, partyId, date, checksStock, warehouseNames = {}, lines = [] }) {
     let nextKey = 1;
 
     return {
         type,
         warehouseId: warehouseId ?? '',
+        targetWarehouseId: '',
+        warehouseNames,
         partyId: partyId ?? '',
         date,
         documentNo: '',
@@ -105,7 +107,8 @@ export default function invoiceForm({ type, lookupUrl, storeUrl, warehouseId, pa
                 return;
             }
 
-            const price = this.type === 'sale' ? product.suggested_price : product.last_purchase_price;
+            // A transfer has no price: the server values it at the last purchase price.
+            const price = this.type === 'transfer' ? null : this.type === 'sale' ? product.suggested_price : product.last_purchase_price;
 
             this.lines.push({
                 key: nextKey++,
@@ -229,6 +232,10 @@ export default function invoiceForm({ type, lookupUrl, storeUrl, warehouseId, pa
         },
 
         priceError(line) {
+            if (this.type === 'transfer') {
+                return '';
+            }
+
             if (line.errors.unit_price) {
                 return line.errors.unit_price;
             }
@@ -265,6 +272,22 @@ export default function invoiceForm({ type, lookupUrl, storeUrl, warehouseId, pa
                 return;
             }
 
+            if (this.type === 'transfer') {
+                if (!this.targetWarehouseId) {
+                    this.errors = { target_warehouse_id: 'اختر المستودع المستقبِل.' };
+                    this.formError = 'اختر المستودع المستقبِل قبل الحفظ.';
+
+                    return;
+                }
+
+                if (String(this.targetWarehouseId) === String(this.warehouseId)) {
+                    this.errors = { target_warehouse_id: 'المستودع المستقبِل لازم يكون غير مستودع الإرسال.' };
+                    this.formError = this.errors.target_warehouse_id;
+
+                    return;
+                }
+            }
+
             if (this.type === 'purchase' && !this.partyId) {
                 this.errors = { party_id: 'اختر المورد، هالحقل إلزامي بالشراء.' };
                 this.formError = 'اختر المورد قبل الحفظ.';
@@ -292,17 +315,20 @@ export default function invoiceForm({ type, lookupUrl, storeUrl, warehouseId, pa
 
             this.saving = true;
 
+            const transfer = this.type === 'transfer';
+
             const { ok, status, data } = await postJson(storeUrl, {
                 type: this.type,
                 warehouse_id: this.warehouseId,
-                party_id: this.partyId || null,
                 date: this.date || null,
-                document_no: this.documentNo.trim() || null,
-                discount: normalize(this.discount) || null,
+                // a transfer has no party, document number, discount or typed price
+                ...(transfer
+                    ? { target_warehouse_id: this.targetWarehouseId }
+                    : { party_id: this.partyId || null, document_no: this.documentNo.trim() || null, discount: normalize(this.discount) || null }),
                 items: this.lines.map((line) => ({
                     product_id: line.productId,
                     quantity: normalize(line.quantity),
-                    unit_price: normalize(line.price) || null,
+                    ...(transfer ? {} : { unit_price: normalize(line.price) || null }),
                 })),
             });
 

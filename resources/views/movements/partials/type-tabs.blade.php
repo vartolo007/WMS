@@ -1,7 +1,7 @@
-{{-- Type tabs of the new-movement screens (design screen 7). Transfer joins in Phase 6. $active: the current MovementType. --}}
+{{-- Type tabs of the new-movement screens (design screen 7). $active: the current MovementType. --}}
 @php
     $dots = ['blue' => 'bg-blue-500', 'success' => 'bg-green-600', 'warning' => 'bg-amber-500', 'danger' => 'bg-red-500', 'purple' => 'bg-purple-500'];
-    $tabs = [\App\Enums\MovementType::Purchase, \App\Enums\MovementType::Sale, \App\Enums\MovementType::PurchaseReturn, \App\Enums\MovementType::SaleReturn];
+    $tabs = [\App\Enums\MovementType::Purchase, \App\Enums\MovementType::Sale, \App\Enums\MovementType::PurchaseReturn, \App\Enums\MovementType::SaleReturn, \App\Enums\MovementType::Transfer];
 @endphp
 
 <nav class="flex max-w-full gap-1 overflow-x-auto rounded-[10px] bg-line-soft p-1" aria-label="نوع الحركة">

@@ -1,18 +1,24 @@
-{{-- Screen 7 (design batch 3): new purchase / sale invoice. Returns have their own screens (returns/, movements/return); transfer (Phase 6) adds its tab later. --}}
+{{-- Screen 7 (design batch 3): new purchase / sale invoice or transfer. Returns have their own screens (returns/, movements/return). --}}
 @php
     $isSale = $type === \App\Enums\MovementType::Sale;
+    $isTransfer = $type === \App\Enums\MovementType::Transfer;
+    $showBalance = $type->reducesSourceStock();
     $isOwner = auth()->user()->isOwner();
     $symbol = auth()->user()->company->currency_symbol;
 
     $select = 'h-10 w-full appearance-none rounded-lg border border-line-strong bg-white ps-3 pe-9 text-[15px] text-ink focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary-ring';
     $field = 'h-10 w-full rounded-lg border border-line-strong bg-white px-3 text-[15px] text-ink focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary-ring';
     $locked = 'flex h-10 items-center rounded-lg border border-line bg-canvas px-3 text-[15px]';
-    $rowColumns = $isSale
-        ? 'lg:grid-cols-[110px_minmax(0,1fr)_130px_150px_170px_170px_48px]'
-        : 'lg:grid-cols-[110px_minmax(0,1fr)_150px_170px_170px_48px]';
-    $note = $isSale
-        ? 'السعر بيتعبّى بالسعر المقترح وفيك تعدّله. الحفظ ممنوع إذا الكمية أكبر من الرصيد.'
-        : 'الكمية بتنضاف لرصيد المستودع عند الحفظ. سعر الشراء الجديد بيحدّث السعر المقترح حسب نسبة التسعير.';
+    $rowColumns = match (true) {
+        $isTransfer => 'lg:grid-cols-[110px_minmax(0,1fr)_150px_170px_48px]',
+        $isSale => 'lg:grid-cols-[110px_minmax(0,1fr)_130px_150px_170px_170px_48px]',
+        default => 'lg:grid-cols-[110px_minmax(0,1fr)_150px_170px_170px_48px]',
+    };
+    $note = match (true) {
+        $isTransfer => 'الكمية بتطلع من مستودعك وبتدخل المستودع المستقبِل فوراً، بدون قيمة نقدية. الحفظ ممنوع إذا الكمية أكبر من الرصيد.',
+        $isSale => 'السعر بيتعبّى بالسعر المقترح وفيك تعدّله. الحفظ ممنوع إذا الكمية أكبر من الرصيد.',
+        default => 'الكمية بتنضاف لرصيد المستودع عند الحفظ. سعر الشراء الجديد بيحدّث السعر المقترح حسب نسبة التسعير.',
+    };
 @endphp
 
 <x-app-layout title="حركة جديدة">
@@ -32,6 +38,7 @@
                 'warehouseId' => $warehouseId,
                 'date' => today()->toDateString(),
                 'checksStock' => $type->reducesSourceStock(),
+                'warehouseNames' => $targetWarehouses->pluck('name', 'id'),
             ]) }})"
             class="flex flex-col gap-5 pb-28 lg:pb-0"
         >
@@ -52,14 +59,15 @@
                     <span class="{{ $locked }} justify-between text-muted"><span class="text-[13px]">يتولّد عند الحفظ</span><span class="text-xs">تلقائي</span></span>
                 </div>
 
-                @unless ($isSale)
+                @if ($type === \App\Enums\MovementType::Purchase)
                     <label class="col-span-2 flex flex-col gap-1.5 lg:col-span-1">
                         <span class="text-[13px] font-medium">رقم الوثيقة <span class="font-normal text-muted">(فاتورة المورد)</span></span>
                         <input x-model="documentNo" maxlength="100" placeholder="مثال: SH-2291" dir="ltr" class="{{ $field }} text-right">
                         <span x-show="errors.document_no" x-text="errors.document_no" class="text-[13px] font-medium text-danger"></span>
                     </label>
-                @endunless
+                @endif
 
+                @unless ($isTransfer)
                 <label class="col-span-2 flex flex-col gap-1.5 lg:col-span-1">
                     <span class="text-[13px] font-medium">{{ $type->partyLabel() }}{{ $isSale ? ' (اختياري)' : ' *' }}</span>
                     <select x-model="partyId" style="background-position: left 0.75rem center" :class="errors.party_id ? 'border-danger bg-danger-soft' : ''" class="{{ $select }}">
@@ -70,9 +78,10 @@
                     </select>
                     <span x-show="errors.party_id" x-text="errors.party_id" class="text-[13px] font-medium text-danger"></span>
                 </label>
+                @endunless
 
                 <label class="col-span-2 flex flex-col gap-1.5 lg:col-span-1">
-                    <span class="text-[13px] font-medium">المستودع</span>
+                    <span class="text-[13px] font-medium">{{ $isTransfer ? 'المستودع المرسِل' : 'المستودع' }}</span>
                     @if ($isOwner)
                         <select x-model="warehouseId" @change="warehouseChanged()" style="background-position: left 0.75rem center" :class="errors.warehouse_id ? 'border-danger bg-danger-soft' : ''" class="{{ $select }}">
                             <option value="">اختر المستودع…</option>
@@ -85,6 +94,19 @@
                     @endif
                     <span x-show="errors.warehouse_id" x-text="errors.warehouse_id" class="text-[13px] font-medium text-danger"></span>
                 </label>
+
+                @if ($isTransfer)
+                    <label class="col-span-2 flex flex-col gap-1.5 lg:col-span-1">
+                        <span class="text-[13px] font-medium">المستودع المستقبِل *</span>
+                        <select x-model="targetWarehouseId" style="background-position: left 0.75rem center" :class="errors.target_warehouse_id ? 'border-danger bg-danger-soft' : ''" class="{{ $select }}">
+                            <option value="">اختر المستودع…</option>
+                            @foreach ($targetWarehouses as $warehouse)
+                                <option value="{{ $warehouse->id }}" :disabled="String(warehouseId) === '{{ $warehouse->id }}'">{{ $warehouse->name }}</option>
+                            @endforeach
+                        </select>
+                        <span x-show="errors.target_warehouse_id" x-text="errors.target_warehouse_id" class="text-[13px] font-medium text-danger"></span>
+                    </label>
+                @endif
             </div>
 
             {{-- Barcode --}}
@@ -110,10 +132,12 @@
                 <div class="hidden items-center gap-3 border-b border-line bg-canvas px-5 py-2.5 text-[13px] font-medium text-muted lg:grid {{ $rowColumns }}">
                     <span>الرمز</span>
                     <span>اسم المادة</span>
-                    @if ($isSale)<span class="text-left">الرصيد المتوفر</span>@endif
+                    @if ($showBalance)<span class="text-left">الرصيد المتوفر</span>@endif
                     <span class="text-left">الكمية</span>
-                    <span class="text-left">سعر الوحدة</span>
-                    <span class="text-left">القيمة</span>
+                    @unless ($isTransfer)
+                        <span class="text-left">سعر الوحدة</span>
+                        <span class="text-left">القيمة</span>
+                    @endunless
                     <span></span>
                 </div>
 
@@ -127,7 +151,7 @@
                             <span class="text-xs text-muted"><span x-text="line.unit"></span><template x-if="line.location"><span> · رف <span x-text="line.location"></span></span></template></span>
                         </div>
 
-                        @if ($isSale)
+                        @if ($showBalance)
                             <div class="col-span-2 flex items-center justify-between lg:col-span-1 lg:block lg:pt-2 lg:text-left">
                                 <span class="text-xs text-muted lg:hidden">الرصيد المتوفر</span>
                                 <span class="font-semibold" :class="lineError(line) && !line.errors.quantity ? 'text-danger' : ''" x-text="formatBalance(line)"></span>
@@ -143,6 +167,7 @@
                             <span x-show="lineError(line)" x-text="lineError(line)" class="text-xs font-semibold text-danger"></span>
                         </label>
 
+                        @unless ($isTransfer)
                         <label class="flex flex-col gap-1">
                             <span class="text-xs text-muted lg:hidden">سعر الوحدة</span>
                             <input x-model="line.price" @input="clearLineErrors(line); line.suggested = false"
@@ -157,6 +182,7 @@
                             <span class="text-xs text-muted lg:hidden">القيمة</span>
                             <span class="text-[15px] font-bold" x-text="lineValueText(line)"></span>
                         </div>
+                        @endunless
 
                         <button type="button" @click="removeLine(line)" title="حذف السطر"
                                 class="absolute left-2 top-2 h-9 w-9 rounded-lg text-lg text-subtle hover:bg-danger-soft hover:text-danger lg:static lg:mt-0.5">✕</button>
@@ -183,6 +209,10 @@
                 </div>
 
                 <div class="flex flex-col gap-3 rounded-xl border border-line bg-white p-5 tabular-nums lg:w-[440px] lg:flex-none">
+                    @if ($isTransfer)
+                        <div class="flex justify-between text-[15px]"><span class="text-muted">عدد البنود</span><b x-text="lines.length"></b></div>
+                        <div class="flex justify-between gap-3 text-[15px]"><span class="text-muted">من ← إلى</span><b class="text-end" x-text="(warehouseNames[warehouseId] ?? '—') + ' ← ' + (warehouseNames[targetWarehouseId] ?? '—')"></b></div>
+                    @else
                     <div class="flex justify-between text-[15px]"><span class="text-muted">المجموع</span><b x-text="subtotalText"></b></div>
                     <div class="flex items-center justify-between gap-3 text-[15px]">
                         <span class="text-muted">الحسم</span>
@@ -198,6 +228,7 @@
                         <span class="flex flex-col"><b class="text-base">الصافي</b><span class="text-[13px] text-muted">{{ $type->netLabel() }}</span></span>
                         <span class="text-[34px] font-bold leading-tight text-primary"><span x-text="netText"></span>@if (filled($symbol)) <span class="text-[15px] font-medium text-muted">{{ $symbol }}</span>@endif</span>
                     </div>
+                    @endif
                     <div class="mt-1 hidden gap-2 lg:flex">
                         <x-ui.button type="button" size="lg" class="flex-1" ::disabled="saving" @click="save()"><span x-text="saving ? 'جاري الحفظ…' : 'حفظ الحركة'"></span></x-ui.button>
                         <x-ui.button type="button" size="lg" variant="secondary" @click="lines = []; focusBarcode()">إفراغ</x-ui.button>
@@ -208,8 +239,13 @@
             {{-- Mobile: net + save stay in reach --}}
             <div class="fixed inset-x-0 bottom-0 z-20 flex items-center gap-3 border-t border-line bg-white px-4 py-3 tabular-nums lg:hidden">
                 <div class="flex flex-1 flex-col leading-tight">
-                    <span class="text-xs text-muted">الصافي · {{ $type->netLabel() }}</span>
-                    <span class="text-xl font-bold text-primary"><span x-text="netText"></span>@if (filled($symbol)) <span class="text-xs font-medium text-muted">{{ $symbol }}</span>@endif</span>
+                    @if ($isTransfer)
+                        <span class="text-xs text-muted">عدد البنود</span>
+                        <span class="text-xl font-bold text-primary" x-text="lines.length"></span>
+                    @else
+                        <span class="text-xs text-muted">الصافي · {{ $type->netLabel() }}</span>
+                        <span class="text-xl font-bold text-primary"><span x-text="netText"></span>@if (filled($symbol)) <span class="text-xs font-medium text-muted">{{ $symbol }}</span>@endif</span>
+                    @endif
                 </div>
                 <x-ui.button type="button" size="lg" ::disabled="saving" @click="save()"><span x-text="saving ? 'جاري الحفظ…' : 'حفظ'"></span></x-ui.button>
             </div>

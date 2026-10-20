@@ -23,8 +23,8 @@ use Illuminate\View\View;
  */
 class MovementController extends Controller
 {
-    /** The types the invoice screen offers today; returns (Phase 4) and transfers (Phase 6) join later. */
-    private const CREATABLE = [MovementType::Purchase, MovementType::Sale];
+    /** The types this screen creates; returns have their own screens (MovementReturnController). */
+    private const CREATABLE = [MovementType::Purchase, MovementType::Sale, MovementType::Transfer];
 
     public function index(MovementFilterRequest $request, CurrentWarehouse $current): View
     {
@@ -66,11 +66,13 @@ class MovementController extends Controller
 
         return view('movements.create', [
             'type' => $type,
-            'parties' => Party::query()->active()->ofType($type->partyType())->orderBy('name')->get(['id', 'name']),
+            'parties' => $type->partyType() === null ? collect() : Party::query()->active()->ofType($type->partyType())->orderBy('name')->get(['id', 'name']),
             'warehouses' => $user->isOwner()
                 ? $user->company->warehouses()->where('is_active', true)->orderBy('name')->get(['id', 'name'])
                 : collect([$user]),
             'warehouseId' => $current->id(),
+            // Every active warehouse of the company: the receiving side of a transfer, and the names shown in its summary.
+            'targetWarehouses' => $user->company->warehouses()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
         ]);
     }
 
