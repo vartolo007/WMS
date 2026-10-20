@@ -8,6 +8,12 @@ return [
     'trial_days' => (int) env('WMS_TRIAL_DAYS', 14),
 
     /*
+    | A product with stock and no sale for this many days counts as stagnant on the dashboards (SRS 3.7).
+    | The stagnant report takes its own period from its filter.
+    */
+    'stagnant_days' => (int) env('WMS_STAGNANT_DAYS', 60),
+
+    /*
     | Approved primary colours (SRS FR-25, T15). All are readable with white text.
     | A company's primary_color must be one of these values.
     */

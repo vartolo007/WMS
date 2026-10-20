@@ -92,10 +92,10 @@ Screens: 7 (return tabs), 9 (returns on an invoice, link to the original invoice
 
 ## Phase 5 — Reports and dashboard (FR-19 → FR-24)
 Screens: 5, 6, 16–18; "low only" filter of screen 11; "حركته" link of screen 12.
-- [ ] `ReportFilters` + `ReportService` (summary, details, ledger, stock)
-- [ ] Daily movements and daily net sales per warehouse
-- [ ] Product ledger with opening balance (SRS 3.6.4 example as a test)
-- [ ] Party movement, stock report, below_min (balance ≤ min), moved, stagnant (period from the filter)
+- [x] `ReportFilters` + `ReportService` (summary, details, ledger, stock)
+- [x] Daily movements and daily net sales per warehouse
+- [x] Product ledger with opening balance (SRS 3.6.4 example as a test)
+- [x] Party movement, stock report, below_min (balance ≤ min), moved, stagnant (period from the filter)
 - [ ] Reports screen with all SRS 3.6.2 reports, filters; print-friendly view — screens 16–18
 - [ ] Dashboards filled per role; stagnant count uses `config('wms.stagnant_days', 60)` — screens 5–6
 - [ ] Products "low only" filter (screen 11) and party "حركته" link to the party report (screen 12)
@@ -150,3 +150,4 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-17 — 3 — Phase 3 complete: 305 tests pass, Pint clean; purchase + sale checked end to end in the browser (1.25 × 19,999.50 = 24,999.38) at 1440px and 375px
 2026-10-20 — 4 — `MovementService::return()` + `ReturnService` (returnable per product, proportional discount), one product per invoice rule, `StoreReturnRequest`, `MovementPolicy::createReturn`
 2026-10-20 — 4 — Return screens (search the original, return form with live totals), shared type tabs, returns panel / returned column / original link on details, print shows the original; 331 tests pass, Pint clean; checked end to end at 1440px and 375px
+2026-10-20 — 5 — Batch A: `ReportFilters`, `ReportKind` (the 14 reports), `StockFilter`, `ReportService` (summary, details, ledger, stock, daily sales, party summary), `wms.stagnant_days`; SRS 3.6.4 ledger example passes
