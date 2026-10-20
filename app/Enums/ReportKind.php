@@ -151,14 +151,6 @@ enum ReportKind: string
     }
 
     /**
-     * Product / party filters that are optional for this report (the required ones are `needs*`).
-     */
-    public function acceptsProduct(): bool
-    {
-        return $this->needsProduct() || $this === self::Returns;
-    }
-
-    /**
      * The filters of this report from a validated request, with this report's defaults for the period:
      * day reports → today; range reports → the last 30 days (stagnant: the dashboard period); as-of → today.
      * A warehouse user is always limited to their own warehouse.

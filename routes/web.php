@@ -9,6 +9,7 @@ use App\Http\Controllers\PartyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductLookupController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SuspendedSubscriptionController;
 use App\Http\Controllers\WarehouseContextController;
 use App\Http\Controllers\WarehouseController;
@@ -46,6 +47,11 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::get('/returns/create', [MovementReturnController::class, 'search'])->name('returns.create');
         Route::get('/movements/{movement}/return', [MovementReturnController::class, 'create'])->name('movements.return');
         Route::post('/movements/{movement}/return', [MovementReturnController::class, 'store'])->name('movements.return.store');
+
+        // FR-19 → FR-23: the reports centre, one engine, 14 reports. Read-only.
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
+        Route::get('/reports/{report}/print', [ReportController::class, 'print'])->name('reports.print');
 
         Route::get('/parties', [PartyController::class, 'index'])->name('parties.index');
         Route::post('/parties', [PartyController::class, 'store'])->name('parties.store');

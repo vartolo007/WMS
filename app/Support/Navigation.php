@@ -21,6 +21,7 @@ class Navigation
         $dashboard = self::item('لوحة التحكم', 'dashboard');
         $newMovement = self::item('حركة جديدة', 'movements.create');
         $movements = self::item('الحركات', 'movements.index', ['movements.index', 'movements.show']);
+        $reports = self::item('التقارير', 'reports.index', 'reports.*');
         $products = self::item('دليل المواد', 'products.index', 'products.*');
         $parties = self::item('العملاء والموردون', 'parties.index', 'parties.*');
 
@@ -31,14 +32,14 @@ class Navigation
                 'company' => [],
             ],
             Role::Owner => [
-                'main' => [$dashboard, $newMovement, $movements, $products, $parties],
+                'main' => [$dashboard, $newMovement, $movements, $reports, $products, $parties],
                 'company' => [
                     self::item('المستودعات', 'warehouses.index', 'warehouses.*'),
                     self::item('إعدادات الشركة', 'settings.edit', 'settings.*'),
                 ],
             ],
             Role::Warehouse => [
-                'main' => [$dashboard, $newMovement, $movements, $products, $parties],
+                'main' => [$dashboard, $newMovement, $movements, $reports, $products, $parties],
                 'company' => [],
             ],
         };
