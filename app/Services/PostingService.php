@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Movement;
 use App\Models\Operation;
+use App\Models\Scopes\WarehouseScope;
 use App\Support\Money;
 use Illuminate\Support\Facades\DB;
 use LogicException;
@@ -46,6 +47,19 @@ class PostingService
                 ])->save();
             }
         }
+    }
+
+    /**
+     * Remove the rows of a movement (cancellation, decision Q5). The warehouse scope is lifted: whoever cancels
+     * a transfer removes both of its rows, the one in the receiving warehouse too.
+     */
+    public function unpost(Movement $movement): void
+    {
+        if (DB::transactionLevel() === 0) {
+            throw new LogicException('Unposting must run inside the cancellation transaction.');
+        }
+
+        Operation::withoutGlobalScope(WarehouseScope::class)->where('movement_id', $movement->id)->delete();
     }
 
     /**

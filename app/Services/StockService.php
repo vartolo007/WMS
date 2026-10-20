@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exceptions\InsufficientStockException;
 use App\Models\Operation;
 use App\Models\Product;
+use App\Models\Scopes\WarehouseScope;
 use App\Support\Money;
 use Carbon\CarbonInterface;
 
@@ -24,14 +25,16 @@ class StockService
     /**
      * Balances of several products in one warehouse, or in the whole company when `$warehouseId`
      * is null (SRS 6.2: a company balance is the sum of its warehouses'). One query; every
-     * requested id is in the result.
+     * requested id is in the result. `$unscoped` lifts the warehouse user's own-warehouse scope: cancelling a
+     * transfer must see the balance of the receiving warehouse.
      *
      * @param  list<int>  $productIds
      * @return array<int, string> product id => balance
      */
-    public function balances(array $productIds, ?int $warehouseId, ?CarbonInterface $asOf = null): array
+    public function balances(array $productIds, ?int $warehouseId, ?CarbonInterface $asOf = null, bool $unscoped = false): array
     {
         $rows = Operation::query()
+            ->when($unscoped, fn ($query) => $query->withoutGlobalScope(WarehouseScope::class))
             ->when($warehouseId !== null, fn ($query) => $query->where('warehouse_id', $warehouseId))
             ->whereIn('product_id', $productIds)
             ->when($asOf, fn ($query) => $query->whereDate('date', '<=', $asOf->toDateString()))

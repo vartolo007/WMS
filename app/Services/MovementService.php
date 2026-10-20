@@ -7,8 +7,10 @@ use App\Enums\MovementType;
 use App\Enums\Role;
 use App\Exceptions\InsufficientStockException;
 use App\Models\Movement;
+use App\Models\Operation;
 use App\Models\Party;
 use App\Models\Product;
+use App\Models\Scopes\WarehouseScope;
 use App\Models\User;
 use App\Support\Format;
 use App\Support\Money;
@@ -148,6 +150,66 @@ class MovementService
     }
 
     /**
+     * Cancel a movement (FR-17): its operations rows are removed, the movement stays with status `cancelled`,
+     * who and when. Refused when it is already cancelled, when an invoice still has a confirmed return, or when
+     * it would leave a negative balance where the movement had added stock (a purchase, a sale return, the
+     * target side of a transfer). Lock order: product rows (ordered by id) → the movement row.
+     */
+    public function cancel(User $actor, Movement $movement): Movement
+    {
+        if ($movement->company_id !== $actor->company_id) {
+            throw ValidationException::withMessages(['cancel' => 'ما بتقدر تلغي هالحركة.']);
+        }
+
+        return DB::transaction(function () use ($actor, $movement) {
+            // Rows that added stock, whatever warehouse they are in (the actor may not see the target's rows).
+            $added = Operation::withoutGlobalScope(WarehouseScope::class)
+                ->where('movement_id', $movement->id)
+                ->where('qty_in', '>', 0)
+                ->get(['product_id', 'warehouse_id', 'qty_in']);
+
+            Product::query()->whereIn('id', $added->pluck('product_id')->unique()->sort()->all())->orderBy('id')->lockForUpdate()->get(['id']);
+
+            $locked = Movement::withoutGlobalScopes()->whereKey($movement->id)->lockForUpdate()->firstOrFail();
+
+            if ($locked->status !== MovementStatus::Confirmed) {
+                throw ValidationException::withMessages(['cancel' => 'هالحركة ملغاة من قبل.']);
+            }
+
+            if (Movement::withoutGlobalScopes()->where('related_movement_id', $locked->id)->where('status', MovementStatus::Confirmed)->exists()) {
+                throw ValidationException::withMessages(['cancel' => 'على هالفاتورة مرتجع فعّال. ألغِ المرتجع أولاً، بعدها بتقدر تلغي الفاتورة.']);
+            }
+
+            foreach ($added as $row) {
+                $balance = $this->stock->balances([$row->product_id], $row->warehouse_id, unscoped: true)[$row->product_id];
+
+                if (Money::compare(Money::subtractQuantity($balance, (string) $row->qty_in), '0') < 0) {
+                    $product = Product::query()->find($row->product_id);
+
+                    throw ValidationException::withMessages(['cancel' => sprintf(
+                        'ما بتقدر تلغي %s: رصيد «%s» بمستودع «%s» رح يصير سالب (الرصيد الحالي %s والمطلوب إزالته %s).',
+                        $locked->displayNumber(),
+                        $product->name,
+                        User::query()->whereKey($row->warehouse_id)->value('name'),
+                        $product->displayQuantity($balance),
+                        $product->displayQuantity((string) $row->qty_in),
+                    )]);
+                }
+            }
+
+            $this->posting->unpost($locked);
+
+            $locked->update([
+                'status' => MovementStatus::Cancelled,
+                'cancelled_at' => now(),
+                'cancelled_by' => $actor->id,
+            ]);
+
+            return $locked;
+        });
+    }
+
+    /**
      * Saves header and lines, takes the next number and posts. Runs inside the caller's transaction.
      *
      * @param  list<array{product_id: int, quantity: string, unit_price: string, line_total: string}>  $items
@@ -158,6 +220,7 @@ class MovementService
         $movement = new Movement([
             ...$header,
             'type' => $type,
+            'status' => MovementStatus::Confirmed,
             'created_by' => $actor->id,
         ]);
         $movement->company_id = $actor->company_id;

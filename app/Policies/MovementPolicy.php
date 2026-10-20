@@ -28,6 +28,17 @@ class MovementPolicy
     }
 
     /**
+     * Cancel a confirmed movement (FR-17): the owner, or the warehouse that owns it (for a transfer, the sending one;
+     * the receiving warehouse can see it but not cancel it).
+     */
+    public function cancel(User $user, Movement $movement): bool
+    {
+        return $this->view($user, $movement)
+            && $movement->status === MovementStatus::Confirmed
+            && ($user->isOwner() || ($user->isWarehouse() && $movement->warehouse_id === $user->id));
+    }
+
+    /**
      * A return starts from a confirmed purchase or sale the user can see (FR-15).
      */
     public function createReturn(User $user, Movement $original): bool
