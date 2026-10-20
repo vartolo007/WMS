@@ -53,6 +53,68 @@ class MovementService
     }
 
     /**
+     * A transfer (FR-16): from the actor's warehouse to another active warehouse of the same company, immediate (Q3).
+     * No party, no discount, no typed prices: each line is valued at the product's last purchase price (0.00 when it
+     * was never bought), for valuation only, so the total is the subtotal. The source stock is checked under the usual locks.
+     * `$data`: warehouse_id, target_warehouse_id, date?, items: list of {product_id, quantity}.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function transfer(User $actor, array $data): Movement
+    {
+        $rawItems = array_values($data['items'] ?? []);
+
+        if ($rawItems === []) {
+            throw ValidationException::withMessages(['items' => 'أضف بندًا واحدًا على الأقل.']);
+        }
+
+        $source = $this->warehouse($actor, $data['warehouse_id'] ?? null);
+        $target = $this->targetWarehouse($actor, $source, $data['target_warehouse_id'] ?? null);
+        $this->rejectRepeatedProducts($rawItems);
+        $items = $this->lines(MovementType::Transfer, $rawItems, $this->products($rawItems));
+        $subtotal = Money::sum(array_column($items, 'line_total'));
+
+        return DB::transaction(function () use ($actor, $data, $source, $target, $items, $subtotal) {
+            $this->checkStock($items, $source->id);
+
+            return $this->persist(MovementType::Transfer, $actor, $items, [
+                'warehouse_id' => $source->id,
+                'target_warehouse_id' => $target->id,
+                'date' => $data['date'] ?? today()->toDateString(),
+                'subtotal' => $subtotal,
+                'discount' => Money::money('0'),
+                'total' => $subtotal,
+            ]);
+        });
+    }
+
+    /**
+     * The receiving warehouse: active, a warehouse account of the actor's company, and not the source (SRS 7).
+     */
+    private function targetWarehouse(User $actor, User $source, mixed $targetId): User
+    {
+        if ($targetId === null || $targetId === '') {
+            throw ValidationException::withMessages(['target_warehouse_id' => 'اختر المستودع المستقبِل.']);
+        }
+
+        $target = User::query()
+            ->where('company_id', $actor->company_id)
+            ->where('role', Role::Warehouse)
+            ->where('is_active', true)
+            ->find($targetId);
+
+        if ($target === null) {
+            throw ValidationException::withMessages(['target_warehouse_id' => 'المستودع المستقبِل غير صالح أو موقوف.']);
+        }
+
+        if ($target->id === $source->id) {
+            throw ValidationException::withMessages(['target_warehouse_id' => 'المستودع المستقبِل لازم يكون غير مستودع الإرسال.']);
+        }
+
+        return $target;
+    }
+
+    /**
      * @param  array<string, mixed>  $data
      */
     private function create(MovementType $type, User $actor, array $data): Movement
@@ -377,9 +439,14 @@ class MovementService
                 throw ValidationException::withMessages(["items.{$index}.product_id" => "المادة «{$product->name}» موقوفة ولا تقبل حركات جديدة."]);
             }
 
-            $price = filled($raw['unit_price'] ?? null)
-                ? (string) $raw['unit_price']
-                : ($type === MovementType::Sale ? $this->pricing->suggestedPrice($product) : null);
+            // A transfer is valued at the last purchase price and nothing typed counts; an invoice takes the typed
+            // price, a sale falling back to the suggested one (FR-13, FR-14).
+            $price = match (true) {
+                $type === MovementType::Transfer => $this->pricing->lastPurchasePrice($product) ?? '0.00',
+                filled($raw['unit_price'] ?? null) => (string) $raw['unit_price'],
+                $type === MovementType::Sale => $this->pricing->suggestedPrice($product),
+                default => null,
+            };
 
             if ($price === null) {
                 throw ValidationException::withMessages(["items.{$index}.unit_price" => "لا يوجد سعر للمادة «{$product->name}»، أدخل السعر."]);

@@ -79,6 +79,7 @@ class MovementController extends Controller
         $movement = match ($request->movementType()) {
             MovementType::Purchase => $movements->purchase($request->user(), $request->movementData()),
             MovementType::Sale => $movements->sale($request->user(), $request->movementData()),
+            MovementType::Transfer => $movements->transfer($request->user(), $request->movementData()),
         };
 
         $target = route('movements.show', $movement);

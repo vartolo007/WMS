@@ -19,8 +19,8 @@ class StoreMovementRequest extends FormRequest
 {
     use ChecksWholeQuantities;
 
-    /** The types this screen can create. Returns and transfers join in later phases. */
-    private const TYPES = [MovementType::Purchase, MovementType::Sale];
+    /** The types this screen creates; returns have their own screen (StoreReturnRequest). */
+    private const TYPES = [MovementType::Purchase, MovementType::Sale, MovementType::Transfer];
 
     public function authorize(): bool
     {
@@ -40,17 +40,22 @@ class StoreMovementRequest extends FormRequest
      */
     public function rules(): array
     {
+        // A transfer has no party, document number, discount or typed price (SRS 3.4.7); it needs a target warehouse.
+        $transfer = $this->input('type') === MovementType::Transfer->value;
+        $notForTransfer = fn (array $rules) => $transfer ? ['prohibited'] : $rules;
+
         return [
             'type' => ['required', Rule::in(array_map(fn (MovementType $type) => $type->value, self::TYPES))],
             'warehouse_id' => ['required', 'integer'],
-            'party_id' => ['nullable', 'integer'],
+            'target_warehouse_id' => $transfer ? ['required', 'integer'] : ['prohibited'],
+            'party_id' => $notForTransfer(['nullable', 'integer']),
             'date' => ['nullable', 'date_format:Y-m-d'],
-            'document_no' => ['nullable', 'string', 'max:100'],
-            'discount' => ['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:9999999999.99'],
+            'document_no' => $notForTransfer(['nullable', 'string', 'max:100']),
+            'discount' => $notForTransfer(['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:9999999999.99']),
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'integer'],
             'items.*.quantity' => ['required', 'numeric', 'decimal:0,3', 'gt:0', 'max:999999999.999'],
-            'items.*.unit_price' => ['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:9999999999.99'],
+            'items.*.unit_price' => $notForTransfer(['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:9999999999.99']),
         ];
     }
 
@@ -70,6 +75,7 @@ class StoreMovementRequest extends FormRequest
         return [
             'type' => 'نوع الحركة',
             'warehouse_id' => 'المستودع',
+            'target_warehouse_id' => 'المستودع المستقبِل',
             'party_id' => 'الطرف',
             'date' => 'التاريخ',
             'document_no' => 'رقم الوثيقة',
@@ -90,6 +96,8 @@ class StoreMovementRequest extends FormRequest
             'items.required' => 'أضف بندًا واحدًا على الأقل.',
             'items.min' => 'أضف بندًا واحدًا على الأقل.',
             'warehouse_id.required' => 'اختر المستودع.',
+            'target_warehouse_id.required' => 'اختر المستودع المستقبِل.',
+            '*.prohibited' => 'هالحقل ما بينفع بحركة النقل.',
             'items.*.quantity.gt' => 'الكمية لازم تكون أكبر من صفر.',
             'items.*.quantity.decimal' => 'الكمية بحد أقصى 3 منازل عشرية.',
             'items.*.unit_price.decimal' => 'السعر بحد أقصى منزلتين عشريتين.',

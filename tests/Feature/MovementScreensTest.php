@@ -120,7 +120,7 @@ test('the shape of an invoice is validated', function () {
     $this->actingAs($this->owner);
 
     $this->postJson('/movements', ($this->payload)(['items' => []]))->assertJsonValidationErrors(['items']);
-    $this->postJson('/movements', ($this->payload)(['type' => 'transfer']))->assertJsonValidationErrors(['type']);
+    $this->postJson('/movements', ($this->payload)(['type' => 'sale_return']))->assertJsonValidationErrors(['type']);
     $this->postJson('/movements', ($this->payload)(['warehouse_id' => null]))->assertJsonValidationErrors(['warehouse_id']);
     $this->postJson('/movements', ($this->payload)(['items' => [['product_id' => $this->oil->id, 'quantity' => '0']]]))->assertJsonValidationErrors(['items.0.quantity']);
     $this->postJson('/movements', ($this->payload)(['items' => [['product_id' => $this->oil->id, 'quantity' => '-1']]]))->assertJsonValidationErrors(['items.0.quantity']);
