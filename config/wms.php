@@ -14,6 +14,20 @@ return [
     'stagnant_days' => (int) env('WMS_STAGNANT_DAYS', 60),
 
     /*
+    | Daily database backup (SRS 4.8) — see BackupService and the README.
+    | path: where the .sql.gz archives go (default storage/app/backups; keep it outside `public`); keep_days: archives older than this are
+    | deleted (the newest always stays); mysqldump / mysql: the client binaries (on XAMPP for Windows:
+    | C:\xampp\mysql\bin\mysqldump.exe); restore_database: the scratch database of the weekly restore check.
+    */
+    'backup' => [
+        'path' => env('WMS_BACKUP_PATH'), // default: storage/app/backups
+        'keep_days' => (int) env('WMS_BACKUP_KEEP_DAYS', 14),
+        'mysqldump' => env('WMS_MYSQLDUMP_PATH', 'mysqldump'),
+        'mysql' => env('WMS_MYSQL_PATH'),
+        'restore_database' => env('WMS_BACKUP_RESTORE_DATABASE', env('DB_DATABASE', 'wms').'_restore_check'),
+    ],
+
+    /*
     | Approved primary colours (SRS FR-25, T15). All are readable with white text.
     | A company's primary_color must be one of these values.
     */
