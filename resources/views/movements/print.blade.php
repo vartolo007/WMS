@@ -79,7 +79,7 @@
                 </thead>
                 <tbody>
                     @foreach ($movement->items as $item)
-                        <tr class="border-b border-[#D5D8DD]">
+                        <tr class="border-b border-line-strong">
                             <td class="px-1.5 py-2">{{ $loop->iteration }}</td>
                             <td class="px-1.5 py-2" dir="ltr">{{ $item->product->barcode ?? '—' }}</td>
                             <td class="px-1.5 py-2">{{ $item->product->name }}</td>

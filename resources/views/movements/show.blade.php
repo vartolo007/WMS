@@ -97,7 +97,7 @@
                 @empty
                     <div class="px-5 py-4 text-sm text-muted">ما في مرتجعات على هالفاتورة.</div>
                 @endforelse
-                <div class="border-t border-line-soft bg-[#FAFBFB] px-5 py-3 text-[13px] leading-7 text-muted">إذا الفاتورة عليها مرتجع مؤكد، لازم تلغي المرتجع أولاً قبل إلغائها.</div>
+                <div class="border-t border-line-soft bg-canvas px-5 py-3 text-[13px] leading-7 text-muted">إذا الفاتورة عليها مرتجع مؤكد، لازم تلغي المرتجع أولاً قبل إلغائها.</div>
             </div>
         @endif
         </div>

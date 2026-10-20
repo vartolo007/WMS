@@ -50,7 +50,7 @@ class PostingService
 
     /**
      * Net value of every line after its share of the movement discount.
-     * Lines 1..n-1: round(value × total ÷ subtotal, 2); the last line takes the rest, so the nets
+     * Lines 1..n-1: value × total ÷ subtotal rounded to 2 decimals; the last line takes the rest, so the nets
      * add up to the movement total exactly. With a zero subtotal nothing is shared.
      *
      * @param  array<int, string>  $values  item id => line total, in posting order

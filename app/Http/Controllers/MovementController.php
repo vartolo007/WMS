@@ -10,7 +10,6 @@ use App\Models\Party;
 use App\Services\MovementService;
 use App\Services\ReturnService;
 use App\Support\CurrentWarehouse;
-use App\Support\Money;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -102,7 +101,7 @@ class MovementController extends Controller
             'returns' => $isInvoice ? $movement->returns()->orderBy('date')->orderBy('id')->get() : collect(),
             'canReturn' => $isInvoice
                 && Gate::allows('createReturn', $movement)
-                && $returnLines->contains(fn (array $line) => Money::isPositive($line['returnable'])),
+                && $returns->anyReturnable($returnLines),
         ]);
     }
 

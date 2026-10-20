@@ -54,7 +54,17 @@ class ReturnService
     {
         return $original->status === MovementStatus::Confirmed
             && $original->type->returnType() !== null
-            && $this->lines($original)->contains(fn (array $line) => Money::isPositive($line['returnable']));
+            && $this->anyReturnable($this->lines($original));
+    }
+
+    /**
+     * Is there something left to return in lines already loaded by `lines()`?
+     *
+     * @param  Collection<int, array{returnable: string}>  $lines
+     */
+    public function anyReturnable(Collection $lines): bool
+    {
+        return $lines->contains(fn (array $line) => Money::isPositive($line['returnable']));
     }
 
     /**

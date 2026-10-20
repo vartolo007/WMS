@@ -96,7 +96,7 @@
                     </label>
                     <input id="barcode" x-ref="barcode" x-model="barcode" @keydown.enter.prevent="scan()" @input="barcodeError = ''"
                            placeholder="جاهز للمسح…" autocomplete="off" inputmode="search"
-                           class="h-12 min-w-0 flex-1 rounded-[10px] border border-line-strong bg-[#FAFBFB] px-4 text-lg font-semibold tracking-wide focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary-ring lg:h-14 lg:text-[22px]">
+                           class="h-12 min-w-0 flex-1 rounded-[10px] border border-line-strong bg-canvas px-4 text-lg font-semibold tracking-wide focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary-ring lg:h-14 lg:text-[22px]">
                     <x-ui.button type="button" size="lg" class="!h-12 lg:!h-14" @click="scan()">إضافة</x-ui.button>
                 </div>
                 <div class="min-h-[18px] text-[13px]">
