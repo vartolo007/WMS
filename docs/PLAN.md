@@ -1,6 +1,6 @@
 # Implementation Plan
 
-**Current phase: 6** — everything except Phase 6 is complete (see the phase log); Phase 6 stays ⚠ BLOCKED (Q3, Q5) until Mr. Kamal answers
+**Current phase: 6** — everything except Phase 6 is complete (see the phase log); Q3 / Q5 were decided on 2026-10-20 (transfer immediate, cancel deletes the rows), so Phase 6 is unblocked
 
 Each phase: plan mode → user approval → code + tests → `php artisan test` and `pint` green → tick tasks → log line.
 
@@ -102,12 +102,12 @@ Screens: 5, 6, 16–18; "low only" filter of screen 11; "حركته" link of scr
 
 **Done when:** every report in SRS 3.6.2 is reachable from the engine and matches hand-calculated data.
 
-## Phase 6 — Transfers and cancellation ⚠ BLOCKED (Q3, Q5)
+## Phase 6 — Transfers and cancellation (Q3 and Q5 decided 2026-10-20)
 Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on screens 8–9.
-- [ ] `MovementService::transfer()` (after Q3 is answered) — transfer valued at the last purchase price
-- [ ] `MovementService::cancel()` + `PostingService::unpost()` (after Q5 is answered)
+- [ ] `MovementService::transfer()` (Q3: immediate) — transfer valued at the last purchase price
+- [ ] `MovementService::cancel()` + `PostingService::unpost()` (Q5: delete the rows)
 - [ ] Cancel actions (hidden for an invoice with active returns), confirmation text per movement type
-- [ ] Decide "cancelled at / by" on the details page (screen 9) — needs a schema proposal first
+- [ ] "Cancelled at / by" on the details page (screen 9) — schema: `movements.cancelled_at`, `movements.cancelled_by` (approved)
 
 ## Phase 7 — Hardening
 - [x] Daily database backup via Laravel Scheduler
@@ -157,3 +157,4 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-20 — 7 — Batch A: `wms:backup` (mysqldump → gzip, MYSQL_PWD, retention) and `wms:backup:check` (restore into a scratch database), scheduled daily 02:00 and weekly; tried on the local database
 2026-10-20 — 7 — Batch B: `docs/TRACEABILITY.md` (FR-01..26 and NFR 4.1–4.8), `ArchitectureRulesTest` and `SecurityTest` guard tests; fixes: returnable check moved to `ReturnService`, neutral hexes replaced by tokens
 2026-10-20 — 7 — Batch C: final README (setup, env keys, scheduler, backup and restore steps verified by hand); Phase 7 complete: 384 tests pass, Pint clean
+2026-10-20 — 6 — Q3 / Q5 decided; schema `cancelled_at` / `cancelled_by` added to schema.json and SRS 5.6

@@ -126,7 +126,8 @@ Discount distribution (SRS 6.2):
   This guarantees Σ `net_value` = movement `total` exactly.
 - For a transfer, both rows of an item carry the same `value` and `net_value` (discount is 0).
 
-`unpost(Movement $m)`: ⚠ BLOCKED (see DECISIONS.md). Tentative: delete the movement's rows.
+`unpost(Movement $m)`: deletes the movement's rows (decision Q5). `MovementService::cancel()` calls it after the checks (confirmed only, no active return,
+no negative balance where the movement had added stock) and then sets `status = cancelled`, `cancelled_at`, `cancelled_by`.
 
 ### 5.5 StockService
 

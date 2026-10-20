@@ -35,6 +35,8 @@ class Movement extends Model
         'discount',
         'total',
         'created_by',
+        'cancelled_at',
+        'cancelled_by',
     ];
 
     protected static function booted(): void
@@ -53,6 +55,7 @@ class Movement extends Model
             'type' => MovementType::class,
             'status' => MovementStatus::class,
             'date' => 'date',
+            'cancelled_at' => 'datetime',
             'subtotal' => 'decimal:2',
             'discount' => 'decimal:2',
             'total' => 'decimal:2',
@@ -87,6 +90,11 @@ class Movement extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function canceller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
     }
 
     public function relatedMovement(): BelongsTo

@@ -31,11 +31,11 @@ Anything else → ask first.
 |---|---|---|---|---|
 | Q1 | Are purchases also cash only? | Yes | Non-blocking (no payments table exists) | — |
 | Q2 | Who can add products and parties? | Owner and warehouses | Non-blocking: implement in one Policy method so it can be flipped | Phase 2 |
-| Q3 | Does the receiving warehouse confirm a transfer? | No, immediate | ⚠ BLOCKED | Phase 6 (transfer) |
+| Q3 | Does the receiving warehouse confirm a transfer? | No, immediate | ✔ Decided by the user (2026-10-20): immediate | Phase 6 (transfer) |
 | Q4 | Trial period length? | `config('wms.trial_days', 14)` | Non-blocking: config value | Phase 1 |
 | Q7 | Platform name? (design uses the placeholder "رفّ") | `config('app.name')`, currently `WMS` | Non-blocking: one config value, shown on login / register / admin bar | Phase 2 |
 | Q6 | Product location per warehouse? (shared catalog, but shelves differ per warehouse) | One general `location` per product | Non-blocking: a per-warehouse location would need a new product–warehouse table | Phase 2 |
-| Q5 | Cancelling a posted movement: delete its `operations` rows or add reversing rows? | Delete rows | ⚠ BLOCKED | Phase 6 (cancel), `PostingService::unpost()` |
+| Q5 | Cancelling a posted movement: delete its `operations` rows or add reversing rows? | Delete rows | ✔ Decided by the user (2026-10-20): delete rows | Phase 6 (cancel), `PostingService::unpost()` |
 
 Kamal said the posting details will be discussed when we reach them: before Phase 3, the user reviews
 `PostingService::post()` with him. Do not start Phase 3 posting code until the user confirms.
@@ -65,7 +65,7 @@ Add new decisions here: `YYYY-MM-DD — decision — reason`.
 - 2026-10-05 — Owner warehouse selector: selection stored in the session, filters lists and reports; "all warehouses" is not valid for creating a movement, the owner picks one (FR-05).
 - 2026-10-05 — Movement number prefixes (S-, P-, …) are display only and live in `MovementType` — the schema keeps an unsigned int number (rule 4).
 - 2026-10-05 — Movements list shows the number of items, not a total quantity — quantities of different units cannot be summed (design deviation).
-- 2026-10-05 — Cancel confirmation text must describe the real stock effect per movement type, and the cancel action is hidden where the SRS refuses it (invoice with active returns); cancellation itself stays ⚠ BLOCKED (Q5).
+- 2026-10-05 — Cancel confirmation text must describe the real stock effect per movement type, and the cancel action is hidden where the SRS refuses it (invoice with active returns); cancellation itself arrived in Phase 6 (Q5 decided).
 - 2026-10-05 — No "terms of use" link on register — not in the SRS (design deviation).
 - 2026-10-05 — Trial length on the register page comes from `config('wms.trial_days')`, never hard-coded (Q4).
 - 2026-10-05 — Dates shown with Levantine month names (تشرين الأول …) as in the design, via one formatting helper.
@@ -138,4 +138,7 @@ Add new decisions here: `YYYY-MM-DD — decision — reason`.
 - 2026-10-20 — Restore test (SRS 4.8): `wms:backup:check` loads the newest archive into a scratch database (`<DB_DATABASE>_restore_check`) through a second connection (so the DDL never touches the main transaction), requires the same table set as the live database, prints restored vs live row counts, and drops the scratch database. Counts are shown, not compared for equality, because the live data legitimately moves on after the backup. Without `CREATE DATABASE` rights it falls back to checking that the archive is complete and creates every live table. `Schema::getTables()` needs the database name: without it MySQL lists every schema of the server.
 - 2026-10-20 — Schedule: backup daily 02:00, restore check Sunday 03:00 (`routes/console.php`); the scheduler needs `schedule:run` every minute (cron / Task Scheduler, README). The README also says to copy the archives off the machine.
 - 2026-10-20 — Phase 7 review result (`docs/TRACEABILITY.md`): all FRs are implemented and tested except FR-16 / FR-17 (Phase 6, blocked on Q3 / Q5). Mechanical rules became guard tests: SRS 5.9 indexes, `BelongsToCompany` on tenant models, no float casts / `round()` / `number_format()` in `app/` (Console output excluded) nor `parseFloat` / `toFixed` in JS, no hex / rgb colour in views, controllers without `Money` / `DB::` / locks / `Operation`, CSRF on every POST form, a role guard on every signed-in route except the shared ones.
+- 2026-10-20 — Q3 and Q5 decided by the user, who chose what is easiest for the customer instead of waiting for Mr. Kamal: a transfer is immediate (one step for the sender, no receipt confirmation); cancelling a movement deletes its `operations` rows and keeps the movement with status `cancelled` (every report, balance and the last purchase price stay correct without a status filter; the movement itself is the audit trail). Phase 6 is unblocked.
+- 2026-10-20 — Schema change approved with the Phase 6 plan (rule 11): `movements.cancelled_at` (timestamp, nullable) and `movements.cancelled_by` (FK users, nullable) — needed for "cancelled at / by" on the details page (screen 9). Added to `docs/schema.json` and SRS 5.6, migration `add_cancellation_to_movements_table`.
+- 2026-10-20 — Who may cancel: the owner (any warehouse) and the warehouse that owns the movement (`warehouse_id`; for a transfer, the sending warehouse). The receiving warehouse sees an incoming transfer but cannot cancel it. A cancel is refused when the movement is not confirmed, when an invoice still has a confirmed return, or when it would leave a negative balance in a warehouse where the movement had added stock (purchase, sale return, the target side of a transfer).
 
