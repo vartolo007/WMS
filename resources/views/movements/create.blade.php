@@ -127,6 +127,11 @@
                     <input id="barcode" x-ref="barcode" x-model="barcode" @keydown.enter.prevent="scan()" @input="barcodeError = ''"
                            placeholder="جاهز للمسح…" autocomplete="off" inputmode="search"
                            class="h-12 min-w-0 flex-1 rounded-[10px] border border-line-strong bg-canvas px-4 text-lg font-semibold tracking-wide focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary-ring lg:h-14 lg:text-[22px]">
+                    <button type="button" x-show="cameraSupported" x-cloak @click="openCamera()" title="مسح بالكاميرا" aria-label="مسح بالكاميرا"
+                            class="flex h-12 flex-none items-center gap-2 rounded-lg border border-line-strong bg-white px-3.5 text-[15px] font-medium text-ink hover:bg-canvas lg:h-14">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h5l1 1.5H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z"/><circle cx="12" cy="12.5" r="3.5"/></svg>
+                        <span class="hidden sm:inline">كاميرا</span>
+                    </button>
                     <x-ui.button type="button" size="lg" class="!h-12 lg:!h-14" @click="scan()">إضافة</x-ui.button>
                 </div>
                 <div class="min-h-[18px] text-[13px]">
@@ -249,6 +254,19 @@
                         <x-ui.button type="button" size="lg" variant="secondary" @click="lines = []; focusBarcode()">إفراغ</x-ui.button>
                     </div>
                 </div>
+            </div>
+
+            {{-- Camera scan: a full-screen viewfinder; the barcode it reads goes through the same scan() as a typed one --}}
+            <div x-show="cameraOpen" x-cloak class="fixed inset-0 z-50 flex flex-col bg-black" role="dialog" aria-modal="true" aria-label="مسح بالكاميرا">
+                <div class="flex items-center justify-between px-4 py-3 text-white">
+                    <b class="text-base">وجّه الكاميرا على الباركود</b>
+                    <button type="button" @click="closeCamera()" class="flex h-10 items-center rounded-lg bg-white/15 px-4 text-[15px] font-medium">إغلاق</button>
+                </div>
+                <div class="relative flex flex-1 items-center justify-center overflow-hidden">
+                    <video x-ref="cameraVideo" playsinline muted class="h-full w-full object-cover"></video>
+                    <div class="pointer-events-none absolute h-40 w-[80%] max-w-md rounded-2xl border-2 border-white/80"></div>
+                </div>
+                <p x-show="cameraError" x-text="cameraError" class="px-4 py-3 text-center text-sm text-red-200"></p>
             </div>
 
             @if ($type === \App\Enums\MovementType::Purchase)

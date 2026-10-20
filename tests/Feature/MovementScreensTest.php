@@ -331,3 +331,11 @@ test('a saved invoice answers with its print page, and the pages lead to a new m
 test('the invoice screen has the print-after-saving option', function () {
     $this->actingAs($this->owner)->get('/movements/create?type=sale')->assertOk()->assertSee('اطبع بعد الحفظ');
 });
+
+test('the invoice screen carries the camera scan, shown only where the browser can do it', function () {
+    $this->actingAs($this->owner)->get('/movements/create?type=sale')
+        ->assertOk()
+        ->assertSee('مسح بالكاميرا')
+        ->assertSee('x-show="cameraSupported"', false)
+        ->assertSee('x-ref="cameraVideo"', false);
+});

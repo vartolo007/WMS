@@ -1,4 +1,5 @@
 import { format, lineValue, normalize, plain, toUnits } from './decimal';
+import { cameraSupported, startCameraScan } from './barcode-camera';
 import postJson, { failureMessage } from './post-json';
 
 /**
@@ -64,6 +65,10 @@ export default function invoiceForm({
         quickProduct: { open: false, name: '', barcode: '', unit: Object.keys(units)[0] ?? '', location: '', errors: {}, saving: false },
         quickParty: { open: false, name: '', phone: '', errors: {}, saving: false },
         printAfter: false,
+        cameraSupported: false,
+        cameraOpen: false,
+        cameraError: '',
+        stopCamera: null,
         saving: false,
         formError: '',
         errors: {},
@@ -83,9 +88,14 @@ export default function invoiceForm({
                 this.$watch('warehouseId', (id) => id && remember('wms.lastWarehouse', String(id)));
             }
 
+            this.cameraSupported = cameraSupported();
             this.focusBarcode();
 
             window.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && this.cameraOpen) {
+                    this.closeCamera();
+                }
+
                 if (event.key === 'F2') {
                     event.preventDefault();
                     this.focusBarcode();
@@ -100,6 +110,32 @@ export default function invoiceForm({
 
         focusBarcode() {
             this.$nextTick(() => this.$refs.barcode?.focus({ preventScroll: true }));
+        },
+
+        // ---- camera --------------------------------------------------------------------------
+
+        async openCamera() {
+            this.cameraError = '';
+            this.cameraOpen = true;
+            await this.$nextTick();
+
+            try {
+                this.stopCamera = await startCameraScan(this.$refs.cameraVideo, (code) => {
+                    this.closeCamera();
+                    this.barcode = code;
+                    this.scan();
+                });
+            } catch (error) {
+                this.cameraError = error?.name === 'NotAllowedError'
+                    ? 'ما انعطى إذن الكاميرا. اسمح للموقع باستخدامها من إعدادات المتصفح.'
+                    : 'تعذّر تشغيل الكاميرا على هالجهاز.';
+            }
+        },
+
+        closeCamera() {
+            this.stopCamera?.();
+            this.stopCamera = null;
+            this.cameraOpen = false;
         },
 
         // ---- scanning ------------------------------------------------------------------------
