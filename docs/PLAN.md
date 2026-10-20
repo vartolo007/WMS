@@ -1,6 +1,6 @@
 # Implementation Plan
 
-**Current phase: 7** — Phases 3–5 are complete (see the phase log); Phase 6 stays ⚠ BLOCKED (Q3, Q5) until Mr. Kamal answers
+**Current phase: 6** — everything except Phase 6 is complete (see the phase log); Phase 6 stays ⚠ BLOCKED (Q3, Q5) until Mr. Kamal answers
 
 Each phase: plan mode → user approval → code + tests → `php artisan test` and `pint` green → tick tasks → log line.
 
@@ -110,9 +110,9 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 - [ ] Decide "cancelled at / by" on the details page (screen 9) — needs a schema proposal first
 
 ## Phase 7 — Hardening
-- [ ] Daily database backup via Laravel Scheduler
-- [ ] Full review against the SRS traceability matrix (section 12)
-- [ ] Final README
+- [x] Daily database backup via Laravel Scheduler
+- [x] Full review against the SRS traceability matrix (section 12)
+- [x] Final README
 
 ## Phase log
 <!-- one line per finished task: YYYY-MM-DD — phase — what was done -->
@@ -154,3 +154,6 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-20 — 5 — Batch B: reports centre (14 reports, filters, mobile select), print copy, `ReportPolicy`, `ReportFilterRequest`, sidebar link; 355 tests pass; checked at 1440px and 375px
 2026-10-20 — 5 — Batch C: warehouse and owner dashboards (`DashboardService` on the report engine): net sales per warehouse, today's movements, low stock, stagnant count, subscription card
 2026-10-20 — 5 — Batch D: products "low only" filter and party "حركته" link; Phase 5 complete: 364 tests pass, Pint clean, checked at 1440px and 375px
+2026-10-20 — 7 — Batch A: `wms:backup` (mysqldump → gzip, MYSQL_PWD, retention) and `wms:backup:check` (restore into a scratch database), scheduled daily 02:00 and weekly; tried on the local database
+2026-10-20 — 7 — Batch B: `docs/TRACEABILITY.md` (FR-01..26 and NFR 4.1–4.8), `ArchitectureRulesTest` and `SecurityTest` guard tests; fixes: returnable check moved to `ReturnService`, neutral hexes replaced by tokens
+2026-10-20 — 7 — Batch C: final README (setup, env keys, scheduler, backup and restore steps verified by hand); Phase 7 complete: 384 tests pass, Pint clean
