@@ -12,6 +12,7 @@ use App\Services\ReportService;
 use App\Services\StockService;
 use App\Support\CurrentWarehouse;
 use App\Support\ReportFilters;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -57,9 +58,14 @@ class ProductController extends Controller
         ]);
     }
 
-    public function store(StoreProductRequest $request): RedirectResponse
+    public function store(StoreProductRequest $request): JsonResponse|RedirectResponse
     {
-        Product::create($request->validated());
+        $product = Product::create($request->validated());
+
+        // The invoice screen adds a missing product without leaving the invoice.
+        if ($request->wantsJson()) {
+            return response()->json(['id' => $product->id, 'name' => $product->name], 201);
+        }
 
         return redirect()->route('products.index')->with('status', 'تمت إضافة المادة.');
     }

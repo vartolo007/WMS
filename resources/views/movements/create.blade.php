@@ -35,6 +35,11 @@
                 'type' => $type->value,
                 'lookupUrl' => route('products.lookup'),
                 'storeUrl' => route('movements.store'),
+                'productsUrl' => route('products.store'),
+                'partiesUrl' => route('parties.store'),
+                'partyType' => $type->partyType()?->value,
+                'parties' => $parties->map(fn ($party) => ['id' => $party->id, 'name' => $party->name])->values(),
+                'units' => \App\Support\Units::options(),
                 'warehouseId' => $warehouseId,
                 'date' => today()->toDateString(),
                 'checksStock' => $type->reducesSourceStock(),
@@ -70,12 +75,14 @@
                 @unless ($isTransfer)
                 <label class="col-span-2 flex flex-col gap-1.5 lg:col-span-1">
                     <span class="text-[13px] font-medium">{{ $type->partyLabel() }}{{ $isSale ? ' (اختياري)' : ' *' }}</span>
-                    <select x-model="partyId" style="background-position: left 0.75rem center" :class="errors.party_id ? 'border-danger bg-danger-soft' : ''" class="{{ $select }}">
-                        <option value="">{{ $isSale ? 'بدون عميل (بيع نقدي)' : 'اختر المورد…' }}</option>
-                        @foreach ($parties as $party)
-                            <option value="{{ $party->id }}">{{ $party->name }}</option>
-                        @endforeach
-                    </select>
+                    <div class="flex gap-2">
+                        <select x-model="partyId" style="background-position: left 0.75rem center" :class="errors.party_id ? 'border-danger bg-danger-soft' : ''" class="{{ $select }} min-w-0 flex-1">
+                            <option value="">{{ $isSale ? 'بدون عميل (بيع نقدي)' : 'اختر المورد…' }}</option>
+                            <template x-for="party in parties" :key="party.id"><option :value="party.id" x-text="party.name"></option></template>
+                        </select>
+                        <button type="button" @click.prevent="openQuickParty()" title="إضافة {{ $type->partyLabel() }} جديد" aria-label="إضافة {{ $type->partyLabel() }} جديد"
+                                class="h-10 w-10 flex-none rounded-lg border border-line-strong bg-white text-xl font-semibold text-primary hover:bg-canvas">+</button>
+                    </div>
                     <span x-show="errors.party_id" x-text="errors.party_id" class="text-[13px] font-medium text-danger"></span>
                 </label>
                 @endunless
@@ -124,6 +131,9 @@
                 <div class="min-h-[18px] text-[13px]">
                     <span x-show="barcodeError" x-text="barcodeError" class="font-medium text-danger"></span>
                     <span x-show="barcodeFlash && !barcodeError" x-text="barcodeFlash" class="font-medium text-success"></span>
+                    @if ($type === \App\Enums\MovementType::Purchase)
+                        <button type="button" x-show="notFound && barcodeError" @click="openQuickProduct()" class="ms-3 font-semibold text-primary underline underline-offset-2">+ أضف هالمادة</button>
+                    @endif
                 </div>
             </div>
 
@@ -235,6 +245,51 @@
                     </div>
                 </div>
             </div>
+
+            @if ($type === \App\Enums\MovementType::Purchase)
+                {{-- A product missing from the catalogue, added without leaving the invoice --}}
+                <x-ui.modal show="quickProduct.open" title="'مادة جديدة'">
+                    <form @submit.prevent="saveQuickProduct()" class="flex flex-col gap-4">
+                        <label class="flex flex-col gap-1.5"><span class="text-[13px] font-medium">اسم المادة</span>
+                            <input x-model="quickProduct.name" required maxlength="255" class="{{ $field }}" placeholder="مثال: زيت زيتون">
+                            <span x-show="quickProduct.errors.name" x-text="quickProduct.errors.name" class="text-[13px] font-medium text-danger"></span></label>
+                        <label class="flex flex-col gap-1.5"><span class="text-[13px] font-medium">الباركود <span class="font-normal text-muted">(اختياري)</span></span>
+                            <input x-model="quickProduct.barcode" maxlength="64" dir="ltr" autocomplete="off" class="{{ $field }} text-right">
+                            <span x-show="quickProduct.errors.barcode" x-text="quickProduct.errors.barcode" class="text-[13px] font-medium text-danger"></span></label>
+                        <label class="flex flex-col gap-1.5"><span class="text-[13px] font-medium">الوحدة</span>
+                            <select x-model="quickProduct.unit" style="background-position: left 0.75rem center" class="{{ $select }}">
+                                @foreach (\App\Support\Units::options() as $key => $label)
+                                    <option value="{{ $key }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            <span x-show="quickProduct.errors.unit" x-text="quickProduct.errors.unit" class="text-[13px] font-medium text-danger"></span></label>
+                        <label class="flex flex-col gap-1.5"><span class="text-[13px] font-medium">الموقع <span class="font-normal text-muted">(اختياري)</span></span>
+                            <input x-model="quickProduct.location" maxlength="255" class="{{ $field }}" placeholder="مثال: رف A3"></label>
+                        <div class="flex gap-2">
+                            <x-ui.button ::disabled="quickProduct.saving">حفظ وإضافة للفاتورة</x-ui.button>
+                            <x-ui.button type="button" variant="secondary" @click="quickProduct.open = false">إلغاء</x-ui.button>
+                        </div>
+                    </form>
+                </x-ui.modal>
+            @endif
+
+            @unless ($isTransfer)
+                {{-- A supplier / customer missing from the catalogue, added without leaving the invoice --}}
+                <x-ui.modal show="quickParty.open" title="'{{ $type->partyLabel() }} جديد'">
+                    <form @submit.prevent="saveQuickParty()" class="flex flex-col gap-4">
+                        <label class="flex flex-col gap-1.5"><span class="text-[13px] font-medium">الاسم</span>
+                            <input x-model="quickParty.name" required maxlength="255" class="{{ $field }}">
+                            <span x-show="quickParty.errors.name" x-text="quickParty.errors.name" class="text-[13px] font-medium text-danger"></span></label>
+                        <label class="flex flex-col gap-1.5"><span class="text-[13px] font-medium">الهاتف <span class="font-normal text-muted">(اختياري)</span></span>
+                            <input x-model="quickParty.phone" maxlength="30" dir="ltr" inputmode="tel" class="{{ $field }} text-right">
+                            <span x-show="quickParty.errors.phone" x-text="quickParty.errors.phone" class="text-[13px] font-medium text-danger"></span></label>
+                        <div class="flex gap-2">
+                            <x-ui.button ::disabled="quickParty.saving">حفظ</x-ui.button>
+                            <x-ui.button type="button" variant="secondary" @click="quickParty.open = false">إلغاء</x-ui.button>
+                        </div>
+                    </form>
+                </x-ui.modal>
+            @endunless
 
             {{-- Mobile: net + save stay in reach --}}
             <div class="fixed inset-x-0 bottom-0 z-20 flex items-center gap-3 border-t border-line bg-white px-4 py-3 tabular-nums lg:hidden">

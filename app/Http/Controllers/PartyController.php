@@ -7,6 +7,7 @@ use App\Http\Requests\StorePartyRequest;
 use App\Http\Requests\UpdatePartyRequest;
 use App\Models\Party;
 use App\Services\PartyService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -37,9 +38,14 @@ class PartyController extends Controller
         ]);
     }
 
-    public function store(StorePartyRequest $request): RedirectResponse
+    public function store(StorePartyRequest $request): JsonResponse|RedirectResponse
     {
-        Party::create($request->validated());
+        $party = Party::create($request->validated());
+
+        // The invoice screen adds a missing supplier / customer without leaving the invoice.
+        if ($request->wantsJson()) {
+            return response()->json(['id' => $party->id, 'name' => $party->name, 'type' => $party->type->value], 201);
+        }
 
         return redirect()->route('parties.index')->with('status', 'تمت إضافة الطرف.');
     }

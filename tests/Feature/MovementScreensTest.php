@@ -54,8 +54,12 @@ test('the platform owner has no access to movements', function () {
 test('the invoice screen opens for both types and refuses unknown ones', function () {
     $this->actingAs($this->owner);
 
-    $this->get('/movements/create?type=sale')->assertOk()->assertSee('حركة جديدة')->assertSee('سامر الحلبي')->assertDontSee('مورد الشام');
-    $this->get('/movements/create?type=purchase')->assertOk()->assertSee('مورد الشام')->assertDontSee('سامر الحلبي');
+    // the parties travel to Alpine as JSON (so a party added on the spot joins the list), hence the view data
+    $names = fn ($response) => $response->assertOk()->viewData('parties')->pluck('name')->all();
+
+    expect($names($this->get('/movements/create?type=sale')))->toBe(['سامر الحلبي'])
+        ->and($names($this->get('/movements/create?type=purchase')))->toBe(['مورد الشام']);
+    $this->get('/movements/create?type=sale')->assertSee('حركة جديدة');
     $this->get('/movements/create?type=sale_return')->assertNotFound();
     $this->get('/movements/create?type=nonsense')->assertNotFound();
 

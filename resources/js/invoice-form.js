@@ -8,7 +8,22 @@ import postJson, { failureMessage } from './post-json';
  * The server stays the judge: it re-checks stock, prices, party and discount. The checks here only
  * give early feedback (a red line, a disabled save) and use whole-unit arithmetic, never floats.
  */
-export default function invoiceForm({ type, lookupUrl, storeUrl, warehouseId, partyId, date, checksStock, warehouseNames = {}, lines = [] }) {
+export default function invoiceForm({
+    type,
+    lookupUrl,
+    storeUrl,
+    productsUrl,
+    partiesUrl,
+    warehouseId,
+    partyId,
+    partyType = null,
+    parties = [],
+    date,
+    checksStock,
+    warehouseNames = {},
+    units = {},
+    lines = [],
+}) {
     let nextKey = 1;
 
     return {
@@ -17,6 +32,7 @@ export default function invoiceForm({ type, lookupUrl, storeUrl, warehouseId, pa
         targetWarehouseId: '',
         warehouseNames,
         partyId: partyId ?? '',
+        parties,
         date,
         documentNo: '',
         discount: '',
@@ -24,6 +40,11 @@ export default function invoiceForm({ type, lookupUrl, storeUrl, warehouseId, pa
         barcode: '',
         barcodeError: '',
         barcodeFlash: '',
+        // a scan that found nothing offers to add the product (purchases only: a new product has no stock to sell)
+        notFound: false,
+        unknownTerm: '',
+        quickProduct: { open: false, name: '', barcode: '', unit: Object.keys(units)[0] ?? '', location: '', errors: {}, saving: false },
+        quickParty: { open: false, name: '', phone: '', errors: {}, saving: false },
         saving: false,
         formError: '',
         errors: {},
@@ -59,10 +80,12 @@ export default function invoiceForm({ type, lookupUrl, storeUrl, warehouseId, pa
 
             this.barcodeError = '';
             this.barcodeFlash = '';
+            this.notFound = false;
 
             const product = await this.fetchProduct({ q: term });
 
             if (!product) {
+                this.unknownTerm = this.notFound ? term : '';
                 this.$refs.barcode.select();
 
                 return;
@@ -82,6 +105,7 @@ export default function invoiceForm({ type, lookupUrl, storeUrl, warehouseId, pa
                 const data = await response.json();
 
                 if (!response.ok) {
+                    this.notFound = response.status === 404;
                     this.barcodeError = data.message ?? 'تعذّر البحث عن المادة.';
 
                     return null;
@@ -124,6 +148,93 @@ export default function invoiceForm({ type, lookupUrl, storeUrl, warehouseId, pa
                 suggested: this.type === 'sale' && price !== null,
                 errors: {},
             });
+        },
+
+        // ---- adding a missing product or party without leaving the invoice ------------------------------
+
+        // What was typed is the barcode when it looks like one (no spaces), otherwise the name.
+        openQuickProduct() {
+            const looksLikeBarcode = /^[0-9A-Za-z-]{4,}$/.test(this.unknownTerm);
+
+            this.quickProduct = {
+                ...this.quickProduct,
+                open: true,
+                name: looksLikeBarcode ? '' : this.unknownTerm,
+                barcode: looksLikeBarcode ? this.unknownTerm : '',
+                errors: {},
+            };
+        },
+
+        async saveQuickProduct() {
+            const form = this.quickProduct;
+            form.saving = true;
+            form.errors = {};
+
+            const { ok, status, data } = await postJson(productsUrl, {
+                name: form.name,
+                barcode: form.barcode || null,
+                unit: form.unit,
+                location: form.location || null,
+            });
+
+            form.saving = false;
+
+            if (status === 422) {
+                form.errors = Object.fromEntries(Object.entries(data.errors ?? {}).map(([key, messages]) => [key, messages[0]]));
+
+                return;
+            }
+
+            if (!ok) {
+                form.errors = { name: failureMessage(status) };
+
+                return;
+            }
+
+            const product = await this.fetchProduct({ product_id: data.id });
+
+            form.open = false;
+            this.notFound = false;
+            this.barcode = '';
+
+            if (product) {
+                this.addProduct(product);
+                this.barcodeFlash = `أُضيفت المادة وأُضيفت للفاتورة: ${product.name}`;
+            }
+
+            this.focusBarcode();
+        },
+
+        openQuickParty() {
+            this.quickParty = { open: true, name: '', phone: '', errors: {}, saving: false };
+        },
+
+        async saveQuickParty() {
+            const form = this.quickParty;
+            form.saving = true;
+            form.errors = {};
+
+            const { ok, status, data } = await postJson(partiesUrl, { name: form.name, phone: form.phone || null, type: partyType });
+
+            form.saving = false;
+
+            if (status === 422) {
+                form.errors = Object.fromEntries(Object.entries(data.errors ?? {}).map(([key, messages]) => [key, messages[0]]));
+
+                return;
+            }
+
+            if (!ok) {
+                form.errors = { name: failureMessage(status) };
+
+                return;
+            }
+
+            this.parties.push({ id: data.id, name: data.name });
+            await this.$nextTick();
+            this.partyId = String(data.id);
+            this.errors.party_id = '';
+            form.open = false;
         },
 
         removeLine(line) {
