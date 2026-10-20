@@ -26,6 +26,7 @@
         <div class="mx-auto flex max-w-[794px] justify-end gap-2 px-4 py-4 print:hidden">
             <x-ui.button type="button" onclick="window.print()">طباعة</x-ui.button>
             <x-ui.button variant="secondary" :href="route('movements.show', $movement)">رجوع</x-ui.button>
+            <x-ui.button variant="secondary" :href="$movement->type->createUrl()">+ حركة جديدة</x-ui.button>
         </div>
 
         <main class="relative mx-auto flex min-h-[1123px] w-full max-w-[794px] flex-col gap-7 overflow-hidden bg-white px-6 py-10 text-[13px] shadow-lg print:min-h-0 print:max-w-none print:px-[60px] print:py-14 print:shadow-none sm:px-[60px] sm:py-14">

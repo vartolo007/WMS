@@ -14,6 +14,7 @@
                         <x-ui.button variant="secondary" :href="route('movements.return', $movement)">إنشاء مرتجع</x-ui.button>
                     @endif
                     <x-ui.button variant="secondary" :href="route('movements.print', $movement)" target="_blank" rel="noopener">طباعة</x-ui.button>
+                    <x-ui.button variant="ghost" :href="$movement->type->createUrl()">+ حركة جديدة من نفس النوع</x-ui.button>
                     @if ($canCancel)
                         <x-ui.confirm :title="'إلغاء الحركة '.$movement->displayNumber().'؟'" :action="route('movements.cancel', $movement)" confirm-label="نعم، ألغِ الحركة" cancel-label="تراجع">
                             <x-slot:trigger>

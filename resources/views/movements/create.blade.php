@@ -44,6 +44,7 @@
                 'date' => today()->toDateString(),
                 'checksStock' => $type->reducesSourceStock(),
                 'warehouseNames' => $targetWarehouses->pluck('name', 'id'),
+                'rememberWarehouse' => $isOwner,
             ]) }})"
             class="flex flex-col gap-5 pb-28 lg:pb-0"
         >
@@ -239,8 +240,12 @@
                         <span class="text-[34px] font-bold leading-tight text-primary"><span x-text="netText"></span>@if (filled($symbol)) <span class="text-[15px] font-medium text-muted">{{ $symbol }}</span>@endif</span>
                     </div>
                     @endif
+                    <label class="flex items-center gap-2 text-sm text-ink">
+                        <input type="checkbox" x-model="printAfter" class="h-[18px] w-[18px] rounded border-line-strong text-primary focus:ring-primary-ring">
+                        اطبع بعد الحفظ
+                    </label>
                     <div class="mt-1 hidden gap-2 lg:flex">
-                        <x-ui.button type="button" size="lg" class="flex-1" ::disabled="saving" @click="save()"><span x-text="saving ? 'جاري الحفظ…' : 'حفظ الحركة'"></span></x-ui.button>
+                        <x-ui.button type="button" size="lg" class="flex-1" ::disabled="saving" @click="save()"><span x-text="saving ? 'جاري الحفظ…' : (printAfter ? 'حفظ وطباعة' : 'حفظ الحركة')"></span></x-ui.button>
                         <x-ui.button type="button" size="lg" variant="secondary" @click="lines = []; focusBarcode()">إفراغ</x-ui.button>
                     </div>
                 </div>
@@ -302,7 +307,7 @@
                         <span class="text-xl font-bold text-primary"><span x-text="netText"></span>@if (filled($symbol)) <span class="text-xs font-medium text-muted">{{ $symbol }}</span>@endif</span>
                     @endif
                 </div>
-                <x-ui.button type="button" size="lg" ::disabled="saving" @click="save()"><span x-text="saving ? 'جاري الحفظ…' : 'حفظ'"></span></x-ui.button>
+                <x-ui.button type="button" size="lg" ::disabled="saving" @click="save()"><span x-text="saving ? 'جاري الحفظ…' : (printAfter ? 'حفظ وطباعة' : 'حفظ')"></span></x-ui.button>
             </div>
         </div>
     @endif

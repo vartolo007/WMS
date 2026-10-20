@@ -88,7 +88,8 @@ class MovementController extends Controller
         session()->flash('status', 'تم حفظ الحركة '.$movement->displayNumber().'.');
 
         // The invoice screen posts JSON so a rejected save keeps every line on screen.
-        return $request->wantsJson() ? response()->json(['redirect' => $target]) : redirect($target);
+        // `print` lets the screen's "print after saving" option go straight to the A4 copy.
+        return $request->wantsJson() ? response()->json(['redirect' => $target, 'print' => route('movements.print', $movement)]) : redirect($target);
     }
 
     public function show(Movement $movement, ReturnService $returns): View

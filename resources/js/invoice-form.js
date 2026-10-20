@@ -8,6 +8,23 @@ import postJson, { failureMessage } from './post-json';
  * The server stays the judge: it re-checks stock, prices, party and discount. The checks here only
  * give early feedback (a red line, a disabled save) and use whole-unit arithmetic, never floats.
  */
+/** localStorage that never throws: private windows and blocked site data just remember nothing. */
+function remembered(key) {
+    try {
+        return window.localStorage.getItem(key);
+    } catch {
+        return null;
+    }
+}
+
+function remember(key, value) {
+    try {
+        window.localStorage.setItem(key, value);
+    } catch {
+        // nothing to do: the screen works without it
+    }
+}
+
 export default function invoiceForm({
     type,
     lookupUrl,
@@ -21,6 +38,7 @@ export default function invoiceForm({
     date,
     checksStock,
     warehouseNames = {},
+    rememberWarehouse = false,
     units = {},
     lines = [],
 }) {
@@ -45,11 +63,26 @@ export default function invoiceForm({
         unknownTerm: '',
         quickProduct: { open: false, name: '', barcode: '', unit: Object.keys(units)[0] ?? '', location: '', errors: {}, saving: false },
         quickParty: { open: false, name: '', phone: '', errors: {}, saving: false },
+        printAfter: false,
         saving: false,
         formError: '',
         errors: {},
 
         init() {
+            // What the user did last time: print after saving, and (owner) the warehouse. A blocked storage changes nothing.
+            this.printAfter = remembered('wms.printAfterSave') === '1';
+            this.$watch('printAfter', (on) => remember('wms.printAfterSave', on ? '1' : '0'));
+
+            if (rememberWarehouse) {
+                const last = remembered('wms.lastWarehouse');
+
+                if (!this.warehouseId && last && warehouseNames[last]) {
+                    this.warehouseId = String(last);
+                }
+
+                this.$watch('warehouseId', (id) => id && remember('wms.lastWarehouse', String(id)));
+            }
+
             this.focusBarcode();
 
             window.addEventListener('keydown', (event) => {
@@ -446,7 +479,7 @@ export default function invoiceForm({
             this.saving = false;
 
             if (ok) {
-                window.location.href = data.redirect;
+                window.location.href = this.printAfter && data.print ? data.print : data.redirect;
             } else if (status === 422) {
                 this.showServerErrors(data.errors ?? {});
             } else {

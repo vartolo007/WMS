@@ -303,3 +303,31 @@ test('the dashboards and the sidebar lead to the invoice screens', function () {
             ->assertSee(route('movements.index'), false);
     }
 });
+
+test('a saved invoice answers with its print page, and the pages lead to a new movement of the same type', function () {
+    ($this->stock)($this->warehouse, $this->oil, '10');
+    $this->actingAs($this->owner);
+
+    foreach (['purchase', 'sale'] as $type) {
+        $payload = ($this->payload)([
+            'type' => $type,
+            'party_id' => $type === 'purchase' ? $this->supplier->id : null,
+            'items' => [['product_id' => $this->oil->id, 'quantity' => '1', 'unit_price' => '10']],
+        ]);
+
+        $response = $this->postJson('/movements', $payload)->assertOk();
+        $movement = Movement::findOrFail(basename($response->json('redirect')));
+
+        $response->assertJson(['print' => route('movements.print', $movement)]);
+
+        $this->get(route('movements.print', $movement))->assertSee(route('movements.create', ['type' => $type]), false);
+        $this->get(route('movements.show', $movement))->assertSee(route('movements.create', ['type' => $type]), false);
+    }
+
+    expect(MovementType::SaleReturn->createUrl())->toBe(route('returns.create', ['type' => 'sale_return']))
+        ->and(MovementType::Transfer->createUrl())->toBe(route('movements.create', ['type' => 'transfer']));
+});
+
+test('the invoice screen has the print-after-saving option', function () {
+    $this->actingAs($this->owner)->get('/movements/create?type=sale')->assertOk()->assertSee('اطبع بعد الحفظ');
+});

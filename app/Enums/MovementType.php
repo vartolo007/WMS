@@ -117,6 +117,16 @@ enum MovementType: string
     }
 
     /**
+     * The screen that creates a movement of this type (returns start from their original invoice).
+     */
+    public function createUrl(): string
+    {
+        return $this->isReturn()
+            ? route('returns.create', ['type' => $this->value])
+            : route('movements.create', ['type' => $this->value]);
+    }
+
+    /**
      * Short label for the tabs of the new-movement screen.
      */
     public function tabLabel(): string
