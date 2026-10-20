@@ -155,6 +155,21 @@ enum MovementType: string
     }
 
     /**
+     * What cancelling does to the stock, in words, for the confirmation dialog (design screens 8-9). The text
+     * follows the real effect of each type, so the user knows before confirming.
+     */
+    public function cancelEffect(string $items, string $warehouse, ?string $target = null): string
+    {
+        $effect = match ($this) {
+            self::Purchase, self::SaleReturn => "{$items} رح ينخصموا من مستودع «{$warehouse}».",
+            self::Sale, self::PurchaseReturn => "{$items} رح يرجعوا لمستودع «{$warehouse}».",
+            self::Transfer => "{$items} رح يرجعوا لمستودع «{$warehouse}» وينخصموا من مستودع «{$target}».",
+        };
+
+        return "الإلغاء نهائي. {$effect} والحركة بتضل بالسجل كـ «ملغاة»، وما فيك ترجّعها.";
+    }
+
+    /**
      * Who is on the other side, for lists and printouts: the party, "cash sale" for an anonymous sale,
      * or the receiving warehouse of a transfer.
      */

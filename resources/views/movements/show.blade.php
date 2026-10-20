@@ -1,4 +1,4 @@
-{{-- Screen 9 (design batch 4): movement details with the returns of an invoice. Cancel comes with Phase 6. --}}
+{{-- Screen 9 (design batch 4): movement details with the returns of an invoice, and the cancel action (FR-17). --}}
 <x-app-layout :title="$movement->displayNumber()">
     <div class="flex flex-col gap-5">
         <div class="flex flex-col gap-2">
@@ -9,14 +9,35 @@
                     <x-ui.badge :tone="$movement->type->tone()" shape="tag">{{ $movement->type->label() }}</x-ui.badge>
                     <x-ui.badge :tone="$movement->status->tone()">{{ $movement->status->label() }}</x-ui.badge>
                 </div>
-                <div class="flex gap-2">
+                <div class="flex flex-wrap items-center gap-2">
                     @if ($canReturn)
                         <x-ui.button variant="secondary" :href="route('movements.return', $movement)">إنشاء مرتجع</x-ui.button>
                     @endif
                     <x-ui.button variant="secondary" :href="route('movements.print', $movement)" target="_blank" rel="noopener">طباعة</x-ui.button>
+                    @if ($canCancel)
+                        <x-ui.confirm :title="'إلغاء الحركة '.$movement->displayNumber().'؟'" :action="route('movements.cancel', $movement)" confirm-label="نعم، ألغِ الحركة" cancel-label="تراجع">
+                            <x-slot:trigger>
+                                <x-ui.button type="button" variant="secondary" class="!border-danger-border !text-danger">إلغاء الحركة</x-ui.button>
+                            </x-slot:trigger>
+                            {{ $movement->type->cancelEffect($movement->itemsSummary(), $movement->warehouse->name, $movement->targetWarehouse?->name) }}
+                        </x-ui.confirm>
+                    @elseif ($cancelBlockedByReturn)
+                        <span class="text-[13px] text-muted">ألغِ المرتجع أولاً لتقدر تلغي الفاتورة.</span>
+                    @endif
                 </div>
             </div>
         </div>
+
+        @if ($errors->has('cancel'))
+            <x-ui.alert>{{ $errors->first('cancel') }}</x-ui.alert>
+        @endif
+
+        @if ($movement->isCancelled())
+            <div class="rounded-[10px] border border-line bg-canvas px-4 py-3 text-sm leading-7 text-muted">
+                أُلغيت هالحركة بتاريخ <b class="tabular-nums text-ink">{{ \App\Support\Format::date($movement->cancelled_at) }} · {{ $movement->cancelled_at->format('H:i') }}</b>
+                بواسطة <b class="text-ink">{{ $movement->canceller?->name }}</b>. محفوظة للتدقيق، ومستثناة من الأرصدة والتقارير.
+            </div>
+        @endif
 
         <dl class="grid grid-cols-2 gap-4 rounded-xl border border-line bg-white p-5 text-[15px] sm:grid-cols-3 lg:grid-cols-5">
             <div class="flex flex-col gap-1"><dt class="text-[13px] text-muted">التاريخ</dt><dd class="font-semibold tabular-nums">{{ \App\Support\Format::date($movement->date) }}</dd></div>

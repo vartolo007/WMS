@@ -1,4 +1,4 @@
-{{-- Screen 8 (design batch 4): movements list. The cancel action comes with Phase 6 (Q5). --}}
+{{-- Screen 8 (design batch 4): movements list with the cancel action (FR-17). --}}
 @php
     $isOwner = auth()->user()->isOwner();
     $typeOptions = collect(\App\Enums\MovementType::cases())->mapWithKeys(fn ($t) => [$t->value => $t->label()])->all();
@@ -10,6 +10,10 @@
         <x-ui.page-header title="الحركات">
             <x-ui.button :href="route('movements.create')">+ حركة جديدة</x-ui.button>
         </x-ui.page-header>
+
+        @if ($errors->has('cancel'))
+            <x-ui.alert>{{ $errors->first('cancel') }}</x-ui.alert>
+        @endif
 
         <form method="GET" action="{{ route('movements.index') }}" class="flex flex-wrap items-end gap-3 rounded-xl border border-line bg-white p-4 lg:px-5">
             <div class="w-full sm:w-[160px]"><x-ui.select name="type" label="النوع" :options="$typeOptions" :value="$filters['type'] ?? null" placeholder="كل الأنواع" /></div>
@@ -68,7 +72,19 @@
                                 <x-ui.money :amount="$movement->total" :class="$movement->isCancelled() ? 'line-through' : ''" />
                             </x-ui.td>
                             <x-ui.td><x-ui.badge :tone="$movement->status->tone()">{{ $movement->status->label() }}</x-ui.badge></x-ui.td>
-                            <x-ui.td class="text-left"><x-ui.button size="sm" variant="ghost" :href="route('movements.show', $movement)">عرض</x-ui.button></x-ui.td>
+                            <x-ui.td class="whitespace-nowrap text-left">
+                                <div class="inline-flex items-center gap-1">
+                                    <x-ui.button size="sm" variant="ghost" :href="route('movements.show', $movement)">عرض</x-ui.button>
+                                    @if (Gate::allows('cancel', $movement) && ! $movement->has_active_return)
+                        <x-ui.confirm :title="'إلغاء الحركة '.$movement->displayNumber().'؟'" :action="route('movements.cancel', $movement)" confirm-label="نعم، ألغِ الحركة" cancel-label="تراجع">
+                            <x-slot:trigger>
+                                <x-ui.button size="sm" variant="ghost" type="button" class="!text-danger">إلغاء</x-ui.button>
+                            </x-slot:trigger>
+                            {{ $movement->type->cancelEffect($movement->itemsSummary(), $movement->warehouse->name, $movement->targetWarehouse?->name) }}
+                        </x-ui.confirm>
+                                    @endif
+                                </div>
+                            </x-ui.td>
                         </tr>
                     @endforeach
                 </tbody>

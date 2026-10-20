@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\CompanySettingsController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MovementCancelController;
 use App\Http\Controllers\MovementController;
 use App\Http\Controllers\MovementReturnController;
 use App\Http\Controllers\PartyController;
@@ -42,6 +43,8 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::post('/movements', [MovementController::class, 'store'])->name('movements.store');
         Route::get('/movements/{movement}', [MovementController::class, 'show'])->name('movements.show');
         Route::get('/movements/{movement}/print', [MovementController::class, 'print'])->name('movements.print');
+        // FR-17: a movement is never edited or deleted, it is cancelled.
+        Route::post('/movements/{movement}/cancel', MovementCancelController::class)->name('movements.cancel');
 
         // FR-15: a return starts from its original invoice (search it, then the return form).
         Route::get('/returns/create', [MovementReturnController::class, 'search'])->name('returns.create');

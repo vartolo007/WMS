@@ -6,6 +6,7 @@ use App\Enums\MovementStatus;
 use App\Enums\MovementType;
 use App\Models\Concerns\BelongsToCompany;
 use App\Models\Scopes\WarehouseScope;
+use App\Support\Format;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -150,6 +151,22 @@ class Movement extends Model
                 $q->orWhere('number', (int) $term);
             }
         });
+    }
+
+    /**
+     * "6 لتر زيت و5 كيلو أرز": the first lines of the movement in words, for the cancel dialog.
+     */
+    public function itemsSummary(int $limit = 3): string
+    {
+        $items = $this->items->loadMissing('product');
+
+        $text = $items->take($limit)
+            ->map(fn (MovementItem $item) => Format::plain((string) $item->quantity).' '.$item->product->unitLabel().' '.$item->product->name)
+            ->implode(' و');
+
+        $more = $items->count() - $limit;
+
+        return $more > 0 ? "{$text} و{$more} مواد أخرى" : $text;
     }
 
     public function isCancelled(): bool

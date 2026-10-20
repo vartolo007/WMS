@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MovementStatus;
 use App\Enums\MovementType;
 use App\Http\Requests\MovementFilterRequest;
 use App\Http\Requests\StoreMovementRequest;
@@ -36,8 +37,9 @@ class MovementController extends Controller
             : null;
 
         $movements = Movement::query()
-            ->with(['party', 'warehouse', 'targetWarehouse'])
+            ->with(['party', 'warehouse', 'targetWarehouse', 'items.product'])
             ->withCount('items')
+            ->withExists(['returns as has_active_return' => fn ($query) => $query->where('status', MovementStatus::Confirmed)])
             ->filter($filters, $warehouseId)
             ->orderByDesc('date')
             ->orderByDesc('id')
@@ -93,12 +95,17 @@ class MovementController extends Controller
         $movement = $this->loaded($movement);
         $isInvoice = $movement->type->returnType() !== null;
         $returnLines = $isInvoice ? $returns->lines($movement) : collect();
+        $returnList = $isInvoice ? $movement->returns()->orderBy('date')->orderBy('id')->get() : collect();
+        $hasActiveReturn = $returnList->contains(fn (Movement $return) => ! $return->isCancelled());
 
         return view('movements.show', [
             'movement' => $movement,
             // An invoice shows what was returned of each product, and the returns themselves.
             'returnLines' => $returnLines,
-            'returns' => $isInvoice ? $movement->returns()->orderBy('date')->orderBy('id')->get() : collect(),
+            'returns' => $returnList,
+            // An invoice with an active return waits for that return to be cancelled first (SRS 3.4.8).
+            'canCancel' => Gate::allows('cancel', $movement) && ! $hasActiveReturn,
+            'cancelBlockedByReturn' => Gate::allows('cancel', $movement) && $hasActiveReturn,
             'canReturn' => $isInvoice
                 && Gate::allows('createReturn', $movement)
                 && $returns->anyReturnable($returnLines),
@@ -114,6 +121,6 @@ class MovementController extends Controller
 
     private function loaded(Movement $movement): Movement
     {
-        return $movement->load(['items.product', 'party', 'warehouse', 'targetWarehouse', 'creator', 'company', 'relatedMovement']);
+        return $movement->load(['items.product', 'party', 'warehouse', 'targetWarehouse', 'creator', 'company', 'relatedMovement', 'canceller']);
     }
 }
