@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\PartyType;
+use App\Support\Rules\PartyRules;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 /**
  * Data shape of a customer / supplier (FR-08, SRS 7). Create and update differ only in permission.
+ * The rules themselves live in `PartyRules`, shared with the CSV import.
  */
 abstract class PartyRequest extends FormRequest
 {
@@ -16,12 +16,7 @@ abstract class PartyRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', Rule::enum(PartyType::class)],
-            // Digits (any script), spaces, + - ( ) only.
-            'phone' => ['nullable', 'string', 'max:30', 'regex:/^[\d\s+\-()]+$/u'],
-        ];
+        return PartyRules::rules();
     }
 
     /**
@@ -29,11 +24,7 @@ abstract class PartyRequest extends FormRequest
      */
     public function attributes(): array
     {
-        return [
-            'name' => 'الاسم',
-            'type' => 'النوع',
-            'phone' => 'الهاتف',
-        ];
+        return PartyRules::attributes();
     }
 
     /**
@@ -41,9 +32,6 @@ abstract class PartyRequest extends FormRequest
      */
     public function messages(): array
     {
-        return [
-            'name.required' => 'الاسم إلزامي.',
-            'phone.regex' => 'اكتب رقم هاتف صحيح، أرقام فقط.',
-        ];
+        return PartyRules::messages();
     }
 }

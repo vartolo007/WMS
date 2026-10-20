@@ -20,6 +20,7 @@
         class="flex flex-col gap-6"
     >
         <x-ui.page-header title="العملاء والموردون" subtitle="مشتركين بين كل مستودعات الشركة.">
+            <x-ui.button variant="secondary" :href="route('imports.show', 'parties')">استيراد من CSV</x-ui.button>
             <x-ui.button type="button" @click="create()">+ إضافة</x-ui.button>
         </x-ui.page-header>
 

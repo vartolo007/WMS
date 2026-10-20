@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\CompanySettingsController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ImportController;
 use App\Http\Controllers\MovementCancelController;
 use App\Http\Controllers\MovementController;
 use App\Http\Controllers\MovementReturnController;
@@ -55,6 +56,12 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
         Route::get('/reports/{report}/print', [ReportController::class, 'print'])->name('reports.print');
+
+        // Import products or parties from a CSV file: upload → preview → confirm (all or nothing).
+        Route::get('/imports/{kind}', [ImportController::class, 'show'])->name('imports.show');
+        Route::post('/imports/{kind}/preview', [ImportController::class, 'preview'])->name('imports.preview');
+        Route::post('/imports/{kind}/confirm', [ImportController::class, 'confirm'])->name('imports.confirm');
+        Route::get('/imports/{kind}/sample', [ImportController::class, 'sample'])->name('imports.sample');
 
         Route::get('/parties', [PartyController::class, 'index'])->name('parties.index');
         Route::post('/parties', [PartyController::class, 'store'])->name('parties.store');

@@ -12,6 +12,7 @@
         class="flex flex-col gap-6"
     >
         <x-ui.page-header title="دليل المواد" :subtitle="'الدليل مشترك لكل مستودعات الشركة · الرصيد: '.$balanceScope">
+            <x-ui.button variant="secondary" :href="route('imports.show', 'products')">استيراد من CSV</x-ui.button>
             <x-ui.button type="button" @click="create()">+ مادة</x-ui.button>
         </x-ui.page-header>
 
