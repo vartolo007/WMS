@@ -1,4 +1,4 @@
-{{-- Screen 11 (design batch 5): product catalogue. The "low only" filter comes with Phase 5. --}}
+{{-- Screen 11 (design batch 5): product catalogue with balance, suggested price and the "low only" filter. --}}
 <x-app-layout title="دليل المواد">
     <div
         x-data="recordForm({
@@ -21,6 +21,7 @@
             </div>
             <x-ui.button variant="secondary">بحث</x-ui.button>
             <x-ui.checkbox name="inactive" label="إظهار الموقوفة" :checked="$showInactive" onchange="this.form.submit()" />
+            <x-ui.checkbox name="low" label="المنخفضة فقط" :checked="$lowOnly" onchange="this.form.submit()" />
         </form>
 
         @if ($products->isEmpty())

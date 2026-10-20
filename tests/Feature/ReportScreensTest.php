@@ -112,3 +112,35 @@ test('the sidebar of both roles links to the reports', function () {
         $this->actingAs($user)->get('/dashboard')->assertOk()->assertSee(route('reports.index'), false);
     }
 });
+
+test('the products list can show only the low ones, in the warehouse being viewed', function () {
+    $service = app(MovementService::class);
+    $fine = Product::factory()->for($this->company)->create(['name' => 'مادة وافرة', 'unit' => 'piece', 'min_stock' => '5']);
+    $service->purchase($this->owner, ['warehouse_id' => $this->city->id, 'party_id' => $this->supplier->id, 'items' => [['product_id' => $fine->id, 'quantity' => '50', 'unit_price' => '10']]]);
+
+    $names = fn ($response) => $response->assertOk()->viewData('products')->pluck('name')->sort()->values()->all();
+
+    // company wide: oil 96 + 10 = 106 (min 20) is fine, the plentiful one too → nothing is low
+    expect($names($this->get('/products?low=1')))->toBe([]);
+
+    // in the rural warehouse oil is 10 ≤ 20 and the plentiful one is 0 ≤ 5; in the city both are fine
+    expect($names($this->withSession(['warehouse_id' => $this->rural->id])->get('/products?low=1')))->toBe(['زيت زيتون', 'مادة وافرة'])
+        ->and($names($this->withSession(['warehouse_id' => $this->city->id])->get('/products?low=1')))->toBe([]);
+
+    // without the filter everything is listed
+    expect($names($this->get('/products')))->toBe(['زيت زيتون', 'مادة وافرة']);
+});
+
+test('a warehouse user filters by their own warehouse', function () {
+    $names = fn ($response) => $response->assertOk()->viewData('products')->pluck('name')->all();
+
+    expect($names($this->actingAs($this->rural)->get('/products?low=1')))->toBe(['زيت زيتون'])
+        ->and($names($this->actingAs($this->city)->get('/products?low=1')))->toBe([]);
+});
+
+test('every party row links to its movement report', function () {
+    $link = route('reports.show', ['report' => ReportKind::PartyMovement, 'party_id' => $this->customer->id]);
+
+    $this->get('/parties')->assertOk()->assertSee(e($link), false)->assertSee('حركته');
+    $this->get($link)->assertOk()->assertSee('سامر الحلبي');
+});

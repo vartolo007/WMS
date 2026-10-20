@@ -1,5 +1,6 @@
-{{-- Row actions of a party: edit (opens the modal via recordForm), stop / reactivate. Used by the table and the mobile cards. --}}
+{{-- Row actions of a party: his movement report (FR-22), edit (opens the modal via recordForm), stop / reactivate. Used by the table and the mobile cards. --}}
 <div class="inline-flex items-center gap-1">
+    <x-ui.button size="sm" variant="ghost" :href="route('reports.show', ['report' => \App\Enums\ReportKind::PartyMovement, 'party_id' => $party->id])">حركته</x-ui.button>
     <x-ui.button size="sm" variant="ghost" type="button"
                  @click="edit({{ Js::from($party->only(['id', 'name', 'phone']) + ['type' => $party->type->value]) }})">تعديل</x-ui.button>
     @if ($party->is_active)

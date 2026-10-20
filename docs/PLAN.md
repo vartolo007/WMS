@@ -1,6 +1,6 @@
 # Implementation Plan
 
-**Current phase: 5** — Phase 4 is complete (see the phase log); Phase 6 stays ⚠ BLOCKED (Q3, Q5)
+**Current phase: 7** — Phases 3–5 are complete (see the phase log); Phase 6 stays ⚠ BLOCKED (Q3, Q5) until Mr. Kamal answers
 
 Each phase: plan mode → user approval → code + tests → `php artisan test` and `pint` green → tick tasks → log line.
 
@@ -97,8 +97,8 @@ Screens: 5, 6, 16–18; "low only" filter of screen 11; "حركته" link of scr
 - [x] Product ledger with opening balance (SRS 3.6.4 example as a test)
 - [x] Party movement, stock report, below_min (balance ≤ min), moved, stagnant (period from the filter)
 - [x] Reports screen with all SRS 3.6.2 reports, filters; print-friendly view — screens 16–18
-- [ ] Dashboards filled per role; stagnant count uses `config('wms.stagnant_days', 60)` — screens 5–6
-- [ ] Products "low only" filter (screen 11) and party "حركته" link to the party report (screen 12)
+- [x] Dashboards filled per role; stagnant count uses `config('wms.stagnant_days', 60)` — screens 5–6
+- [x] Products "low only" filter (screen 11) and party "حركته" link to the party report (screen 12)
 
 **Done when:** every report in SRS 3.6.2 is reachable from the engine and matches hand-calculated data.
 
@@ -152,3 +152,5 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-20 — 4 — Return screens (search the original, return form with live totals), shared type tabs, returns panel / returned column / original link on details, print shows the original; 331 tests pass, Pint clean; checked end to end at 1440px and 375px
 2026-10-20 — 5 — Batch A: `ReportFilters`, `ReportKind` (the 14 reports), `StockFilter`, `ReportService` (summary, details, ledger, stock, daily sales, party summary), `wms.stagnant_days`; SRS 3.6.4 ledger example passes
 2026-10-20 — 5 — Batch B: reports centre (14 reports, filters, mobile select), print copy, `ReportPolicy`, `ReportFilterRequest`, sidebar link; 355 tests pass; checked at 1440px and 375px
+2026-10-20 — 5 — Batch C: warehouse and owner dashboards (`DashboardService` on the report engine): net sales per warehouse, today's movements, low stock, stagnant count, subscription card
+2026-10-20 — 5 — Batch D: products "low only" filter and party "حركته" link; Phase 5 complete: 364 tests pass, Pint clean, checked at 1440px and 375px

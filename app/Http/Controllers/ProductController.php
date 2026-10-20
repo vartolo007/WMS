@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\StockFilter;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use App\Services\PricingService;
 use App\Services\ProductService;
+use App\Services\ReportService;
 use App\Services\StockService;
 use App\Support\CurrentWarehouse;
+use App\Support\ReportFilters;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -19,22 +22,28 @@ use Illuminate\View\View;
  */
 class ProductController extends Controller
 {
-    public function index(Request $request, CurrentWarehouse $current, StockService $stock, PricingService $pricing): View
+    public function index(Request $request, CurrentWarehouse $current, StockService $stock, PricingService $pricing, ReportService $reports): View
     {
         Gate::authorize('viewAny', Product::class);
 
         $showInactive = $request->boolean('inactive');
+        $lowOnly = $request->boolean('low');
+        $warehouse = $current->get();
 
         $products = Product::query()
             ->search($request->query('q'))
             ->unless($showInactive, fn ($query) => $query->active())
+            // "Low only" uses the stock report's own rule (balance ≤ minimum) for the warehouse in view.
+            ->when($lowOnly, fn ($query) => $query->whereIn('id', $reports->stock(new ReportFilters(
+                warehouseId: $warehouse?->id,
+                stockFilter: StockFilter::BelowMin,
+            ))->pluck('product.id')->all()))
             ->orderBy('name')
             ->paginate(25)
             ->withQueryString();
 
         // Balance of the warehouse in view (own warehouse, or the owner's top-bar choice); the whole
         // company when the owner looks at all warehouses. Always computed from operations (rule 8).
-        $warehouse = $current->get();
         $ids = $products->getCollection()->pluck('id')->all();
 
         return view('products.index', [
@@ -44,6 +53,7 @@ class ProductController extends Controller
             'balanceScope' => $warehouse?->name ?? 'كل المستودعات',
             'search' => (string) $request->query('q'),
             'showInactive' => $showInactive,
+            'lowOnly' => $lowOnly,
         ]);
     }
 
