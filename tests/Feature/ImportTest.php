@@ -227,6 +227,35 @@ test('parties import the same way', function () {
         ->and($parties->pluck('company_id')->unique()->all())->toBe([$this->company->id]);
 });
 
+test('the preview speaks Arabic: column headers and unit / type labels, not field keys', function () {
+    $this->post('/imports/products/preview', ['file' => ($this->upload)('الاسم,الوحدة,الحد الأدنى
+طحين,كيلو,30
+')])
+        ->assertOk()
+        ->assertSeeInOrder(['الاسم', 'الوحدة', 'الحد الأدنى', 'طحين', 'كيلو', '30'])
+        ->assertDontSee('min_stock')
+        ->assertDontSee('>kilo<', false);
+
+    $this->post('/imports/parties/preview', ['file' => ($this->upload)('الاسم,النوع
+الشام,supplier
+', 'parties.csv')])
+        ->assertOk()
+        ->assertSeeInOrder(['الاسم', 'النوع', 'الشام', 'مورد'])
+        ->assertDontSee('>supplier<', false);
+});
+
+test('a row with several problems reports all of them on its line', function () {
+    $this->post('/imports/parties/preview', ['file' => ($this->upload)('الاسم,النوع,الهاتف
+,جار,abc
+أبو خالد,عميل,0944
+', 'parties.csv')])
+        ->assertOk()
+        ->assertSee('1 من 2 سطر')
+        ->assertSeeInOrder(['2', 'اكتب رقم هاتف صحيح'])
+        ->assertSee('اسم')
+        ->assertSee('النوع');
+});
+
 test('an unusable upload is refused with a message', function () {
     $this->post('/imports/products/preview', ['file' => UploadedFile::fake()->create('items.pdf', 10, 'application/pdf')])->assertSessionHasErrors('file');
     $this->post('/imports/products/preview', [])->assertSessionHasErrors('file');

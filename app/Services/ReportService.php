@@ -135,10 +135,12 @@ class ReportService
             ->withQueryString()
             ->through(fn ($row) => $this->detailRow($row) + ['running' => Money::sumQuantity([$opening, (string) $row->running])]);
 
+        // A transfer is valued only for the record (SRS 3.4.7) and has no money in it: its legs count in the
+        // quantities, which must reconcile with the balance, but not in the value totals.
         $totals = $this->base($filters)
             ->selectRaw('COALESCE(SUM(operations.qty_in), 0) AS in_qty, COALESCE(SUM(operations.qty_out), 0) AS out_qty,
-                COALESCE(SUM(CASE WHEN operations.qty_in > 0 THEN operations.net_value ELSE 0 END), 0) AS in_value,
-                COALESCE(SUM(CASE WHEN operations.qty_out > 0 THEN operations.net_value ELSE 0 END), 0) AS out_value')
+                COALESCE(SUM(CASE WHEN operations.qty_in > 0 AND operations.type <> ? THEN operations.net_value ELSE 0 END), 0) AS in_value,
+                COALESCE(SUM(CASE WHEN operations.qty_out > 0 AND operations.type <> ? THEN operations.net_value ELSE 0 END), 0) AS out_value', [MovementType::Transfer->value, MovementType::Transfer->value])
             ->first();
 
         $inQty = Money::quantity((string) $totals->in_qty);
@@ -222,6 +224,7 @@ class ReportService
                     'last_sale' => $lastSale,
                     'days_since_sale' => $lastSale === null ? null : (int) Carbon::parse($lastSale)->startOfDay()->diffInDays(Carbon::parse($to)->startOfDay(), true),
                     'low' => $min !== null && Money::compare($remaining, $min) <= 0,
+                    'has_history' => $row !== null,
                     'stagnant' => Money::isPositive($remaining) && Money::compare($sold, $zero) === 0,
                 ];
 
@@ -240,7 +243,8 @@ class ReportService
     private function passesStockFilter(array $entry, ?StockFilter $filter): bool
     {
         return match ($filter) {
-            StockFilter::BelowMin => $entry['low'],
+            // A product the scope never received is not "running low": it was never stocked there.
+            StockFilter::BelowMin => $entry['low'] && $entry['has_history'],
             StockFilter::Moved => Money::isPositive($entry['sold']),
             StockFilter::Stagnant => $entry['stagnant'],
             null => true,

@@ -85,6 +85,27 @@ test('a ledger of one warehouse ignores the others', function () {
     expect($city['closing'])->toBe('80.000')->and($company['closing'])->toBe('87.000');
 });
 
+test('transfer legs count in the ledger quantities but not in its value totals', function () {
+    ($this->buy)($this->city, $this->oil, '100', '10', ($this->day)(3));
+    app(MovementService::class)->transfer($this->owner, [
+        'warehouse_id' => $this->city->id, 'target_warehouse_id' => $this->rural->id, 'date' => ($this->day)(2),
+        'items' => [['product_id' => $this->oil->id, 'quantity' => '40']],
+    ]);
+
+    $company = $this->reports->ledger(new ReportFilters(productId: $this->oil->id));
+    $city = $this->reports->ledger(new ReportFilters(productId: $this->oil->id, warehouseId: $this->city->id));
+
+    // company wide the transfer is internal: quantities show both legs, the balance is unchanged, no money moved
+    expect($company['in_qty'])->toBe('140.000')
+        ->and($company['out_qty'])->toBe('40.000')
+        ->and($company['closing'])->toBe('100.000')
+        ->and($company['in_value'])->toBe('1000.00')
+        ->and($company['out_value'])->toBe('0.00')
+        // the city warehouse really lost 40 litres, still without any money
+        ->and($city['closing'])->toBe('60.000')
+        ->and($city['out_value'])->toBe('0.00');
+});
+
 // --- Daily net sales (SRS 3.6.3, 6.2) -----------------------------------------------------------------
 
 test('net sales of the day are sales minus returns, after the discounts, per warehouse', function () {
@@ -237,9 +258,9 @@ test('below_min counts a balance equal to the minimum and skips products without
 
     $low = $this->reports->stock(new ReportFilters(stockFilter: StockFilter::BelowMin));
 
-    // oil 20 ≤ 20, rice 50 ≤ 50, the unbought one 0 ≤ 5; sugar has no minimum
-    expect($low->pluck('product.name')->sort()->values()->all())->toBe(['بدون حركة', 'رز', 'زيت'])
-        ->and($low->firstWhere('product.id', $unbought->id)['remaining'])->toBe('0.000');
+    // oil 20 ≤ 20, rice 50 ≤ 50; sugar has no minimum; the unbought one (minimum 5) was never stocked, so it is not "running low"
+    expect($low->pluck('product.name')->sort()->values()->all())->toBe(['رز', 'زيت'])
+        ->and($low->pluck('product.id')->all())->not->toContain($unbought->id);
 
     $all = $this->reports->stock(new ReportFilters);
     expect($all->pluck('product.name')->all())->not->toContain('موقوفة');
@@ -267,7 +288,7 @@ test('moved lists what was sold in the period, stagnant what has stock and sold 
     expect($wide->pluck('product.name')->sort()->values()->all())->toBe(['رز', 'زيت']);
 });
 
-test('stock can be split by warehouse and counts a warehouse with nothing as zero', function () {
+test('stock can be split by warehouse and lists a warehouse with nothing as zero', function () {
     ($this->buy)($this->city, $this->oil, '10', '10', ($this->day)(5));
     ($this->buy)($this->rural, $this->oil, '30', '10', ($this->day)(5));
 
@@ -277,9 +298,24 @@ test('stock can be split by warehouse and counts a warehouse with nothing as zer
 
     expect($company->first()['remaining'])->toBe('40.000')
         ->and($split->mapWithKeys(fn ($r) => [$r['warehouse']->name => $r['remaining']])->all())->toBe(['مستودع الريف' => '30.000', 'مستودع المدينة' => '10.000'])
-        // oil is below its minimum (20) only in the city warehouse; rice and sugar never came in
-        ->and($low->map(fn ($r) => $r['product']->name.'@'.$r['warehouse']->name)->sort()->values()->all())
-        ->toBe(['رز@مستودع الريف', 'رز@مستودع المدينة', 'زيت@مستودع المدينة']);
+        // oil is below its minimum (20) only in the city warehouse; rice (minimum 50) never came in anywhere
+        ->and($low->map(fn ($r) => $r['product']->name.'@'.$r['warehouse']->name)->all())->toBe(['زيت@مستودع المدينة']);
+});
+
+test('a product never received by a warehouse is not low there, but one that ran out is', function () {
+    ($this->buy)($this->city, $this->oil, '30', '10', ($this->day)(5));
+    ($this->buy)($this->rural, $this->rice, '60', '10', ($this->day)(5));
+    ($this->sell)($this->rural, [['product_id' => $this->rice->id, 'quantity' => '60', 'unit_price' => '20']], ($this->day)(1));
+
+    $split = $this->reports->stock(new ReportFilters(splitByWarehouse: true, stockFilter: StockFilter::BelowMin));
+    $rural = $this->reports->stock(new ReportFilters(warehouseId: $this->rural->id, stockFilter: StockFilter::BelowMin));
+    $inventory = $this->reports->stock(new ReportFilters(productId: $this->oil->id, splitByWarehouse: true));
+
+    // rice ran out in the rural warehouse (history, balance 0 ≤ 50); oil is fine in the city and was never in the rural one
+    expect($split->map(fn ($r) => $r['product']->name.'@'.$r['warehouse']->name)->all())->toBe(['رز@مستودع الريف'])
+        ->and($rural->pluck('product.name')->all())->toBe(['رز'])
+        // the full inventory sheet still lists every cell, zeros included
+        ->and($inventory)->toHaveCount(2);
 });
 
 // --- Isolation --------------------------------------------------------------------------------------------

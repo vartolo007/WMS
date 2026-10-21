@@ -49,6 +49,11 @@ class ProductImportService extends CatalogImportService
         return ProductRules::rules((int) Auth::user()->company_id, null, $row['unit'] ?? null, checkBarcodeUnique: false);
     }
 
+    protected function displayValue(string $field, ?string $value): string
+    {
+        return $field === 'unit' && $value !== null ? Units::label($value) : parent::displayValue($field, $value);
+    }
+
     protected function attributes(): array
     {
         return ProductRules::attributes();

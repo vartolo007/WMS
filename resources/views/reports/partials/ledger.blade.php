@@ -61,7 +61,7 @@
             <x-ui.td numeric class="border-t-2 !border-line-strong text-[17px] text-primary">{{ \App\Support\Format::quantity($result['closing']) }}</x-ui.td>
         </tr>
         <tr class="bg-canvas text-sm">
-            <x-ui.td colspan="4" class="text-muted">مجموع القيم الصافية</x-ui.td>
+            <x-ui.td colspan="4" class="text-muted">مجموع القيم الصافية <span class="text-[13px]">(بدون النقل بين المستودعات)</span></x-ui.td>
             <x-ui.td numeric class="font-semibold">{{ \App\Support\Format::money($result['in_value']) }}</x-ui.td>
             <x-ui.td numeric class="font-semibold">{{ \App\Support\Format::money($result['out_value']) }}</x-ui.td>
             <x-ui.td></x-ui.td>

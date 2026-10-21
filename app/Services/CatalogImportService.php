@@ -93,7 +93,7 @@ abstract class CatalogImportService
     /**
      * Reads and validates a whole file. Throws RuntimeException (Arabic message) when the file itself is unusable.
      *
-     * @return array{rows: list<array<string, ?string>>, errors: list<array{line: int, message: string}>, count: int, preview: list<array<string, ?string>>}
+     * @return array{rows: list<array<string, ?string>>, errors: list<array{line: int, message: string}>, count: int, preview: list<array<string, string>>}
      */
     public function check(string $contents): array
     {
@@ -129,7 +129,32 @@ abstract class CatalogImportService
             }
         }
 
-        return ['rows' => $rows, 'errors' => $errors, 'count' => count($file['rows']), 'preview' => array_slice($rows, 0, self::PREVIEW_ROWS)];
+        return ['rows' => $rows, 'errors' => $errors, 'count' => count($file['rows']), 'preview' => array_map($this->display(...), array_slice($rows, 0, self::PREVIEW_ROWS))];
+    }
+
+    /**
+     * A row as the user reads it in the preview: Arabic column headers and readable values.
+     *
+     * @param  array<string, ?string>  $row
+     * @return array<string, string>
+     */
+    private function display(array $row): array
+    {
+        $shown = [];
+
+        foreach ($row as $field => $value) {
+            $shown[$this->columns()[$field][1]] = $this->displayValue($field, $value);
+        }
+
+        return $shown;
+    }
+
+    /**
+     * How one cell reads in the preview (a stored key becomes its Arabic label).
+     */
+    protected function displayValue(string $field, ?string $value): string
+    {
+        return $value ?? '—';
     }
 
     /**

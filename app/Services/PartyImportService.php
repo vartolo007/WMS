@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\PartyType;
 use App\Models\Party;
 use App\Support\Rules\PartyRules;
 
@@ -39,6 +40,11 @@ class PartyImportService extends CatalogImportService
     protected function rules(array $row): array
     {
         return PartyRules::rules();
+    }
+
+    protected function displayValue(string $field, ?string $value): string
+    {
+        return $field === 'type' && $value !== null ? (PartyType::tryFrom($value)?->label() ?? $value) : parent::displayValue($field, $value);
     }
 
     protected function attributes(): array

@@ -123,8 +123,8 @@ test('the products list can show only the low ones, in the warehouse being viewe
     // company wide: oil 96 + 10 = 106 (min 20) is fine, the plentiful one too → nothing is low
     expect($names($this->get('/products?low=1')))->toBe([]);
 
-    // in the rural warehouse oil is 10 ≤ 20 and the plentiful one is 0 ≤ 5; in the city both are fine
-    expect($names($this->withSession(['warehouse_id' => $this->rural->id])->get('/products?low=1')))->toBe(['زيت زيتون', 'مادة وافرة'])
+    // in the rural warehouse oil is 10 ≤ 20; the plentiful one was never stocked there, so it is not "low"; in the city both are fine
+    expect($names($this->withSession(['warehouse_id' => $this->rural->id])->get('/products?low=1')))->toBe(['زيت زيتون'])
         ->and($names($this->withSession(['warehouse_id' => $this->city->id])->get('/products?low=1')))->toBe([]);
 
     // without the filter everything is listed

@@ -173,3 +173,4 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 
 2026-10-20 — Comfort pack — A–D: quick-add of a product / party on the invoice screen, save-and-print + remembered settings, camera scan, CSV import of products and parties
 2026-10-20 — Comfort pack — E: `wms:alerts:low-stock` (08:00), `LowStockDigest`, `AdminAlert` on failed backup / restore check / alerts, `companies.low_stock_alerts` + settings checkbox; schema.json and SRS 5.2 updated
+2026-10-21 — Comfort pack — walked the whole scenario in the browser, fixed three findings: low stock only where a product was ever stocked, Arabic CSV preview, ledger value totals without transfers; 460 tests pass, Pint clean
