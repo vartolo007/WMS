@@ -58,3 +58,26 @@ test('password can be reset with valid token', function () {
         return true;
     });
 });
+
+test('the reset e-mail is Arabic, right to left, in the company colour, with a working link', function () {
+    Notification::fake();
+
+    $company = \App\Models\Company::factory()->create(['primary_color' => '#0F766E']);
+    $user = User::factory()->for($company)->create(['name' => 'سامر']);
+
+    $this->post('/forgot-password', ['email' => $user->email]);
+
+    Notification::assertSentTo($user, ResetPassword::class, function (ResetPassword $notification) use ($user) {
+        $mail = $notification->toMail($user);
+        $html = (string) $mail->render();
+
+        expect($mail->subject)->toContain('استعادة كلمة المرور')
+            ->and($html)->toContain('dir="rtl"')
+            ->and($html)->toContain('أهلاً سامر')
+            ->and($html)->toContain('#0F766E')
+            ->and($html)->toContain(route('password.reset', ['token' => $notification->token, 'email' => $user->email]))
+            ->and($html)->not->toContain('You are receiving this email');
+
+        return true;
+    });
+});

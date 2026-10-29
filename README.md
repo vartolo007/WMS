@@ -43,6 +43,25 @@ composer run dev
 
 `migrate:fresh --seed` ينشئ مدير المنصة من `ADMIN_EMAIL` و`ADMIN_PASSWORD` في `.env`، وعند `APP_ENV=local` فقط شركة تجريبية بحسابات
 `owner@demo.test` (صاحب الشركة) و`city@demo.test` و`rural@demo.test` (مستودعان)، وكلمة المرور `password`. لا تعمل هذه الحسابات في الإنتاج.
+الشركة التجريبية فيها أسبوع حركات جاهز (شراء، بيع، مرتجع، نقل)، فاللوحات والتقارير بتعرض أرقامًا من أول دخول، و«السكر» بمستودع الريف تحت حده الأدنى.
+
+## النشر على السيرفر (الإنتاج)
+
+```bash
+composer install --no-dev --optimize-autoloader
+npm ci && npm run build
+cp .env.example .env    # ثم عدّل القيم أدناه
+php artisan key:generate
+php artisan migrate --force
+php artisan db:seed --class=SuperAdminSeeder --force   # مدير المنصة فقط، بدون بيانات تجريبية
+php artisan storage:link
+php artisan config:cache && php artisan route:cache && php artisan view:cache
+```
+
+- في `.env`: `APP_ENV=production` و`APP_DEBUG=false` و`APP_URL` بعنوان الموقع (HTTPS، وهو شرط لكاميرا الباركود)، وبيانات `DB_*` و`MAIL_*`، و`ADMIN_EMAIL` و`ADMIN_PASSWORD` لمدير المنصة.
+- شغّل المجدول كل دقيقة (قسم «المهام المجدولة» أدناه)، وإلا ما بتنعمل النسخ الاحتياطية ولا تنبيهات البريد.
+- مجلدا `storage` و`bootstrap/cache` لازم يكونوا قابلين للكتابة من خادم الويب.
+- بعد أي تعديل على `.env` أعد `php artisan config:cache`.
 
 ### مفاتيح `.env` الخاصة بالمنصة
 
@@ -51,7 +70,7 @@ composer run dev
 | `WMS_TRIAL_DAYS` | 14 | مدة الفترة التجريبية للشركة الجديدة |
 | `WMS_STAGNANT_DAYS` | 60 | بعدها تُعدّ المادة راكدة في لوحة التحكم |
 | `WMS_SUPPORT_PHONE` / `_EMAIL` / `_HOURS` | قيم تجريبية | وسيلة التواصل التي تظهر لصاحب الشركة الموقوفة |
-| `WMS_MYSQLDUMP_PATH` | `mysqldump` | مسار `mysqldump` (على XAMPP: `C:\xampp\mysql\bin\mysqldump.exe`) |
+| `WMS_MYSQLDUMP_PATH` | `mysqldump` | مسار `mysqldump`؛ على XAMPP لازم يتحدد: `C:/xampp/mysql/bin/mysqldump.exe` (لأنه مش بالـ PATH) |
 | `WMS_BACKUP_KEEP_DAYS` | 14 | عمر النسخ الاحتياطية قبل حذفها (الأحدث تبقى دائمًا) |
 | `WMS_BACKUP_PATH` | `storage/app/backups` | مكان النسخ (خارج `public`) |
 

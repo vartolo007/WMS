@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="نسيت كلمة المرور">
     <form method="POST" action="{{ route('password.email') }}" class="flex flex-col gap-5">
         @csrf
 

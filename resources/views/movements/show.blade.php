@@ -103,7 +103,7 @@
                     </div>
                 @else
                     <div class="flex justify-between text-[15px]"><span class="text-muted">المجموع</span><b><x-ui.money :amount="$movement->subtotal" /></b></div>
-                    <div class="flex justify-between text-[15px]"><span class="text-muted">الحسم</span><b dir="ltr">−<x-ui.money :amount="$movement->discount" /></b></div>
+                    <div class="flex justify-between text-[15px]"><span class="text-muted">الحسم</span><b dir="ltr">@if (\App\Support\Money::isPositive($movement->discount))−@endif<x-ui.money :amount="$movement->discount" /></b></div>
                     <div class="h-px bg-line"></div>
                     <div class="flex items-end justify-between">
                         <span class="flex flex-col"><b>الصافي</b><span class="text-[13px] text-muted">{{ $movement->type->netLabel() }}</span></span>

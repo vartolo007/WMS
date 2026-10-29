@@ -14,7 +14,7 @@
 
             <form method="GET" action="{{ route('returns.create') }}" class="flex gap-3">
                 <input type="hidden" name="type" value="{{ $type->value }}">
-                <div class="flex-1">
+                <div class="min-w-0 flex-1">
                     <x-ui.input name="q" type="search" :value="$term" size="lg" autofocus autocomplete="off"
                                 :placeholder="$type === \App\Enums\MovementType::SaleReturn ? 'رقم فاتورة البيع، مثال: S-0142' : 'رقم فاتورة الشراء، مثال: P-0087'" />
                 </div>

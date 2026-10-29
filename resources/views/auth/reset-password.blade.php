@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="كلمة مرور جديدة">
     <form method="POST" action="{{ route('password.store') }}" class="flex flex-col gap-5">
         @csrf
         <input type="hidden" name="token" value="{{ $request->route('token') }}">

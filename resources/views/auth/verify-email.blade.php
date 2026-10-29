@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="تأكيد البريد">
     <div class="flex flex-col gap-5">
         <div class="flex flex-col gap-1.5">
             <h1 class="text-2xl font-bold sm:text-[28px]">تأكيد البريد</h1>

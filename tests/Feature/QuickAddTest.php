@@ -65,10 +65,10 @@ test('the forms still redirect for the catalogue pages', function () {
 
 test('the invoice screen offers the quick forms where they make sense', function () {
     $purchase = $this->get('/movements/create?type=purchase')->assertOk();
-    $purchase->assertSee('أضف هالمادة')->assertSee('quickParty.open', false)->assertSee('إضافة المورد جديد');
+    $purchase->assertSee('أضف هالمادة')->assertSee('quickParty.open', false)->assertSee('إضافة مورد جديد')->assertDontSee('المورد جديد');
 
     // a sale takes a customer on the spot, but a brand new product has no stock to sell
-    $this->get('/movements/create?type=sale')->assertOk()->assertSee('إضافة العميل جديد')->assertDontSee('أضف هالمادة');
+    $this->get('/movements/create?type=sale')->assertOk()->assertSee('إضافة عميل جديد')->assertDontSee('أضف هالمادة');
 
     // a transfer has neither a party nor a product to create
     $this->get('/movements/create?type=transfer')->assertOk()->assertDontSee('quickParty.open', false)->assertDontSee('أضف هالمادة');

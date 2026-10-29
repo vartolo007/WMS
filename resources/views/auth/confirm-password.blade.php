@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="تأكيد كلمة المرور">
     <form method="POST" action="{{ route('password.confirm') }}" class="flex flex-col gap-5">
         @csrf
 

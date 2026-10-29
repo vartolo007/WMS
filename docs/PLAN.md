@@ -1,6 +1,6 @@
 # Implementation Plan
 
-**Current phase: none** — every phase of the plan is complete (see the phase log); the "comfort pack" is done too (see below)
+**Current phase: none** — every phase and the "comfort pack" are complete; the delivery pass is logged below (2026-10-29)
 
 Each phase: plan mode → user approval → code + tests → `php artisan test` and `pint` green → tick tasks → log line.
 
@@ -174,3 +174,4 @@ Screens: 7 (transfer tab), "+ نقل" on screen 5, cancel actions and dialog on 
 2026-10-20 — Comfort pack — A–D: quick-add of a product / party on the invoice screen, save-and-print + remembered settings, camera scan, CSV import of products and parties
 2026-10-20 — Comfort pack — E: `wms:alerts:low-stock` (08:00), `LowStockDigest`, `AdminAlert` on failed backup / restore check / alerts, `companies.low_stock_alerts` + settings checkbox; schema.json and SRS 5.2 updated
 2026-10-21 — Comfort pack — walked the whole scenario in the browser, fixed three findings: low stock only where a product was ever stocked, Arabic CSV preview, ledger value totals without transfers; 460 tests pass, Pint clean
+2026-10-29 — Delivery — audit against the SRS and a browser pass of every screen (desktop and 375px, all three roles): Arabic password-reset e-mail, guest page titles, quick-add and invoice-line polish, return search on phones; demo data with a week of movements; README deployment section

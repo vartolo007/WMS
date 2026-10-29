@@ -81,7 +81,7 @@
                             <option value="">{{ $isSale ? 'بدون عميل (بيع نقدي)' : 'اختر المورد…' }}</option>
                             <template x-for="party in parties" :key="party.id"><option :value="party.id" x-text="party.name"></option></template>
                         </select>
-                        <button type="button" @click.prevent="openQuickParty()" title="إضافة {{ $type->partyLabel() }} جديد" aria-label="إضافة {{ $type->partyLabel() }} جديد"
+                        <button type="button" @click.prevent="openQuickParty()" title="إضافة {{ $type->partyType()?->label() }} جديد" aria-label="إضافة {{ $type->partyType()?->label() }} جديد"
                                 class="h-10 w-10 flex-none rounded-lg border border-line-strong bg-white text-xl font-semibold text-primary hover:bg-canvas">+</button>
                     </div>
                     <span x-show="errors.party_id" x-text="errors.party_id" class="text-[13px] font-medium text-danger"></span>
@@ -164,7 +164,7 @@
 
                         <div class="col-span-2 flex flex-col pe-8 lg:col-span-1 lg:pe-0 lg:pt-1">
                             <b class="text-[15px] font-semibold" x-text="line.name"></b>
-                            <span class="text-xs text-muted"><span x-text="line.unit"></span><template x-if="line.location"><span> · رف <span x-text="line.location"></span></span></template></span>
+                            <span class="text-xs text-muted"><span x-text="line.unit"></span><template x-if="line.location"><span> · <span x-text="line.location"></span></span></template></span>
                         </div>
 
                         @if ($showBalance)
@@ -298,7 +298,7 @@
 
             @unless ($isTransfer)
                 {{-- A supplier / customer missing from the catalogue, added without leaving the invoice --}}
-                <x-ui.modal show="quickParty.open" title="'{{ $type->partyLabel() }} جديد'">
+                <x-ui.modal show="quickParty.open" title="'{{ $type->partyType()?->label() }} جديد'">
                     <form @submit.prevent="saveQuickParty()" class="flex flex-col gap-4">
                         <label class="flex flex-col gap-1.5"><span class="text-[13px] font-medium">الاسم</span>
                             <input x-model="quickParty.name" required maxlength="255" class="{{ $field }}">

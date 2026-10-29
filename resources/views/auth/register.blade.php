@@ -1,4 +1,4 @@
-<x-guest-layout width="max-w-[460px]">
+<x-guest-layout title="تسجيل شركة" width="max-w-[460px]">
     <x-slot:headerAction>
         عندك حساب؟ <a href="{{ route('login') }}" class="font-medium text-primary hover:underline">سجّل دخول</a>
     </x-slot:headerAction>

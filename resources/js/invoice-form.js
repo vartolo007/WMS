@@ -264,11 +264,12 @@ export default function invoiceForm({
 
             form.open = false;
             this.notFound = false;
+            this.barcodeError = '';
             this.barcode = '';
 
             if (product) {
                 this.addProduct(product);
-                this.barcodeFlash = `أُضيفت المادة وأُضيفت للفاتورة: ${product.name}`;
+                this.barcodeFlash = `انضافت للدليل وللفاتورة: ${product.name}`;
             }
 
             this.focusBarcode();

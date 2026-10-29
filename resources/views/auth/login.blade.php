@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="تسجيل الدخول">
     <form method="POST" action="{{ route('login') }}" class="flex flex-col gap-5">
         @csrf
 
