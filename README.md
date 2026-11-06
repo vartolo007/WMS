@@ -30,6 +30,8 @@ Laravel 12 · PHP 8.2 · MySQL (XAMPP) · Blade + Tailwind + Alpine.js · Larave
 
 ## التشغيل محليًا
 
+لتجربة سريعة بخطوات ونتائج متوقعة بالأرقام: [`TRY-IT.md`](TRY-IT.md).
+
 ```bash
 composer install
 npm install
